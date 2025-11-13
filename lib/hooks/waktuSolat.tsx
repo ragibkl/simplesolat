@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { waktuSolatStore, WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { getWaktuSolatByZone } from "@/lib/remote/waktusolat";
+import { WaktuSolat, waktuSolatStore } from "@/lib/data/waktuSolatStore";
+import { getWaktuSolatByZone } from "@/lib/remote/simplesolat";
 import {
   getWaktuSolatFromStore,
   mergeWaktuSolatResponseIntoStore,

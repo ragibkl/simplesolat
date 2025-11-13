@@ -8,7 +8,7 @@ import {
 import {
   getWaktuSolatByZone,
   WaktuSolatResponse,
-} from "@/lib/remote/waktusolat";
+} from "@/lib/remote/simplesolat";
 import { compareAsc, startOfYesterday } from "date-fns";
 
 function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
@@ -43,12 +43,13 @@ export function mergeWaktuSolatResponseIntoStore(
 ): WaktuSolatStore {
   const newStore: WaktuSolatStore = {};
 
-  res.prayers.forEach((p) => {
+  res.data.forEach((p) => {
+    const [year, month, day] = p.date.split('-') as [string, string, string];
     const waktuSolat: WaktuSolat = {
-      year: res.year,
-      month: res.month_number,
-      date: p.day,
-      zone: res.zone,
+      year: parseInt(year),
+      month: parseInt(month),
+      date: parseInt(day),
+      zone: p.zone,
       prayerTime: {
         fajr: p.fajr,
         syuruk: p.syuruk,
