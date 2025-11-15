@@ -34,7 +34,7 @@ export async function getWaktuSolatByZone(
     from: toDateString(date),
     to: toDateString(to),
   });
-  const url = `https://api.simplesolat.apps.bancuh.net/prayer-times/by-zone/${zone}?${params.toString()}`;
+  const url = `https://api.simplesolat.com/prayer-times/by-zone/${zone}?${params.toString()}`;
   console.log(`getWaktuSolatByZone - GET ${url}`);
   const response = await axios.get(url);
   return response.data as WaktuSolatResponse;
