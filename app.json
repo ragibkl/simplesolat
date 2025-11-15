@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "monoso",
-    "slug": "monoso",
+    "name": "simplesolat",
+    "slug": "simplesolat",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "monoso",
+    "scheme": "simplesolat",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ragibkl.monoso"
+      "bundleIdentifier": "com.simplesolat.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +26,7 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
-      "package": "com.ragibkl.monoso"
+      "package": "com.simplesolat.app"
     },
     "web": {
       "bundler": "metro",
@@ -37,7 +37,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow MonoSo to use your location.",
+          "locationAlwaysAndWhenInUsePermission": "Allow simplesolat to use your location.",
           "isAndroidBackgroundLocationEnabled": true
         }
       ],
@@ -57,13 +57,13 @@
           "fonts": ["./assets/fonts/LiberationMono.ttf"],
           "widgets": [
             {
-              "name": "WaktuSolat",
-              "label": "WaktuSolat Widget",
-              "minWidth": "320dp",
+              "name": "simplesolat",
+              "label": "simplesolat waktu solat",
+              "minWidth": "280dp",
               "minHeight": "60dp",
-              "targetCellWidth": 5,
+              "targetCellWidth": 4,
               "targetCellHeight": 1,
-              "description": "MonoSo WaktuSolat Widget",
+              "description": "simplesolat prayer times widget",
               "previewImage": "./assets/widget-preview/waktu-solat.png",
               "updatePeriodMillis": 1800000
             }
