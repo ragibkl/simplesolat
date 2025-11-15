@@ -8,7 +8,13 @@ export default function RootLayout() {
     <waktuSolatStore.Provider>
       <zoneStore.Provider>
         <Stack>
-          <Stack.Screen name="index" options={{ title: "Waktu Solat" }} />
+          <Stack.Screen
+            name="index"
+            options={{
+              title: "simplesolat",
+              headerTitleStyle: { fontFamily: "JetBrainsMono_400Regular" },
+            }}
+          />
         </Stack>
       </zoneStore.Provider>
     </waktuSolatStore.Provider>

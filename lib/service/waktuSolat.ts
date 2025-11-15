@@ -44,7 +44,7 @@ export function mergeWaktuSolatResponseIntoStore(
   const newStore: WaktuSolatStore = {};
 
   res.data.forEach((p) => {
-    const [year, month, day] = p.date.split('-') as [string, string, string];
+    const [year, month, day] = p.date.split("-") as [string, string, string];
     const waktuSolat: WaktuSolat = {
       year: parseInt(year),
       month: parseInt(month),
