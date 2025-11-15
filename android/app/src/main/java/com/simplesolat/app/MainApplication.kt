@@ -1,4 +1,4 @@
-package com.ragibkl.monoso
+package com.simplesolat.app
 
 import android.app.Application
 import android.content.res.Configuration

@@ -38,7 +38,7 @@
     <receiver android:name=".widget.WaktuSolat" android:exported="false" android:label="WaktuSolat Widget">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-        <action android:name="com.ragibkl.monoso.WIDGET_CLICK"/>
+        <action android:name="com.simplesolat.app.WIDGET_CLICK"/>
       </intent-filter>
       <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_waktusolat"/>
     </receiver>

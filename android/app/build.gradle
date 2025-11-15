@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.ragibkl.monoso'
+    namespace 'com.simplesolat.app'
     defaultConfig {
-        applicationId 'com.ragibkl.monoso'
+        applicationId 'com.simplesolat.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

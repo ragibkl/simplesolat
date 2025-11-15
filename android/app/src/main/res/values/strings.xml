@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">monoso</string>
+  <string name="app_name">simplesolat</string>
   <string name="expo_system_ui_user_interface_style" translatable="false">automatic</string>
   <string name="widget_waktusolat_description" translatable="false">MonoSo WaktuSolat Widget</string>
   <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>

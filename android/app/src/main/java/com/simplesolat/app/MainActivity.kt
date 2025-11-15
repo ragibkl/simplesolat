@@ -1,4 +1,4 @@
-package com.ragibkl.monoso
+package com.simplesolat.app
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
