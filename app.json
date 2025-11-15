@@ -35,6 +35,12 @@
     },
     "plugins": [
       [
+        "expo-font",
+        {
+          "fonts": ["node_modules/@expo-google-fonts/jetbrains-mono/400Regular/JetBrainsMono_400Regular.ttf"]
+        }
+      ],
+      [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow simplesolat to use your location.",
@@ -55,6 +61,7 @@
         "react-native-android-widget",
         {
           "fonts": [
+            "./assets/fonts/JetBrainsMono.ttf",
             "./assets/fonts/LiberationMono.ttf"
           ],
           "widgets": [
@@ -72,7 +79,8 @@
           ]
         }
       ],
-      "expo-background-task"
+      "expo-background-task",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
