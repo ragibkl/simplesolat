@@ -33,6 +33,8 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="monoso"/>
         <data android:scheme="exp+monoso"/>
+        <data android:scheme="simplesolat"/>
+        <data android:scheme="exp+simplesolat"/>
       </intent-filter>
     </activity>
     <receiver android:name=".widget.WaktuSolat" android:exported="false" android:label="WaktuSolat Widget">
@@ -41,6 +43,13 @@
         <action android:name="com.simplesolat.app.WIDGET_CLICK"/>
       </intent-filter>
       <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_waktusolat"/>
+    </receiver>
+    <receiver android:name=".widget.simplesolat" android:exported="false" android:label="simplesolat waktu solat">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+        <action android:name="com.simplesolat.app.WIDGET_CLICK"/>
+      </intent-filter>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_simplesolat"/>
     </receiver>
   </application>
 </manifest>

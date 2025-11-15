@@ -31,14 +31,14 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>monoso</string>
-          <string>com.ragibkl.monoso</string>
+          <string>simplesolat</string>
+          <string>com.simplesolat.app</string>
         </array>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>exp+monoso</string>
+          <string>exp+simplesolat</string>
         </array>
       </dict>
     </array>
@@ -56,7 +56,7 @@
       <true/>
     </dict>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Allow MonoSo to use your location.</string>
+    <string>Allow simplesolat to use your location.</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your location</string>
     <key>NSLocationWhenInUseUsageDescription</key>
@@ -64,6 +64,10 @@
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
+    </array>
+    <key>UIAppFonts</key>
+    <array>
+      <string>JetBrainsMono_400Regular.ttf</string>
     </array>
     <key>UIBackgroundModes</key>
     <array>
