@@ -54,7 +54,9 @@
       [
         "react-native-android-widget",
         {
-          "fonts": ["./assets/fonts/LiberationMono.ttf"],
+          "fonts": [
+            "./assets/fonts/LiberationMono.ttf"
+          ],
           "widgets": [
             {
               "name": "simplesolat",
@@ -78,8 +80,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "1fc43d06-f3dd-4360-bc0d-58d38b35ba5a"
+        "projectId": "3bcad127-53f2-48b9-91e2-8eb34746eb93"
       }
-    }
+    },
+    "owner": "ragibkl"
   }
 }
