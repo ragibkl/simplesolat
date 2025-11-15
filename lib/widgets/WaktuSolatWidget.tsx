@@ -31,7 +31,7 @@ function ColumnText(props: { children: string; bold: boolean }) {
         text={props.children}
         style={{
           fontSize: 11,
-          fontFamily: "LiberationMono",
+          fontFamily: "JetBrainsMono_400Regular",
           fontWeight: props.bold ? "bold" : "normal",
         }}
       />
@@ -114,7 +114,7 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
           style={{
             fontSize: 11,
             color: "#000000",
-            fontFamily: "LiberationMono",
+            fontFamily: "JetBrainsMono_400Regular",
           }}
         />
         <TextWidget
@@ -122,7 +122,7 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
           style={{
             fontSize: 11,
             color: "#000000",
-            fontFamily: "LiberationMono",
+            fontFamily: "JetBrainsMono_400Regular",
           }}
         />
       </FlexWidget>
