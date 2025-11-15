@@ -68,8 +68,8 @@
           ],
           "widgets": [
             {
-              "name": "simplesolat",
-              "label": "simplesolat waktu solat",
+              "name": "WaktuSolat",
+              "label": "WaktuSolat",
               "minWidth": "280dp",
               "minHeight": "60dp",
               "targetCellWidth": 4,
@@ -81,8 +81,7 @@
           ]
         }
       ],
-      "expo-background-task",
-      "expo-font"
+      "expo-background-task"
     ],
     "experiments": {
       "typedRoutes": true

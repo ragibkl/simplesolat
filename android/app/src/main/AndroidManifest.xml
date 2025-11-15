@@ -35,13 +35,12 @@
         <data android:scheme="exp+simplesolat"/>
       </intent-filter>
     </activity>
-
-    <receiver android:name=".widget.simplesolat" android:exported="false" android:label="simplesolat waktu solat">
+    <receiver android:name=".widget.WaktuSolat" android:exported="false" android:label="WaktuSolat">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
         <action android:name="com.simplesolat.app.WIDGET_CLICK"/>
       </intent-filter>
-      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_simplesolat"/>
+      <meta-data android:name="android.appwidget.provider" android:resource="@xml/widgetprovider_waktusolat"/>
     </receiver>
   </application>
 </manifest>
