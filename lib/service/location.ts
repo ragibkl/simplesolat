@@ -5,7 +5,8 @@ async function getLocationPermissions(): Promise<boolean> {
   try {
     const fgPermissionCurrent = await Location.getForegroundPermissionsAsync();
     if (fgPermissionCurrent.status !== "granted") {
-      const fgPermission: Location.LocationPermissionResponse = await new Promise((resolve, _reject) => {
+      const fgPermission: Location.LocationPermissionResponse =
+        await new Promise((resolve, _reject) => {
           Alert.alert(
             "Location Permission",
             "This app needs your location to determine which of the JAKIM prayer zones you're in, so it can display accurate prayer times for your area.",
