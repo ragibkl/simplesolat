@@ -72,7 +72,7 @@
               "label": "WaktuSolat",
               "minWidth": "280dp",
               "minHeight": "60dp",
-              "targetCellWidth": 4,
+              "targetCellWidth": 5,
               "targetCellHeight": 1,
               "description": "simplesolat prayer times widget",
               "previewImage": "./assets/widget-preview/waktu-solat.png",
