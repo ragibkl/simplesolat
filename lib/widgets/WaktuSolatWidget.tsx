@@ -2,10 +2,10 @@ import React from "react";
 import {
   FlexWidget,
   requestWidgetUpdate,
-  TextWidget,
   WidgetTaskHandlerProps,
 } from "react-native-android-widget";
 
+import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { PrayerTime } from "@/lib/data/waktuSolatStore";
 import { Zone } from "@/lib/data/zoneStore";
 
@@ -19,6 +19,7 @@ function getTimeText(epochSeconds: number) {
 }
 
 function ColumnText(props: { children: string; bold: boolean }) {
+  const fontWeight = props.bold ? "bold" : "regular";
   return (
     <FlexWidget
       style={{
@@ -27,13 +28,7 @@ function ColumnText(props: { children: string; bold: boolean }) {
         alignItems: "center",
       }}
     >
-      <TextWidget
-        text={props.children}
-        style={{
-          fontSize: 11,
-          fontFamily: props.bold ? "JetBrainsMono_800ExtraBold" :"JetBrainsMono_400Regular",
-        }}
-      />
+      <MonoTextWidget fontWeight={fontWeight}>{props.children}</MonoTextWidget>
     </FlexWidget>
   );
 }
@@ -108,22 +103,8 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
           justifyContent: "space-between",
         }}
       >
-        <TextWidget
-          text={date.toDateString()}
-          style={{
-            fontSize: 11,
-            color: "#000000",
-            fontFamily: "JetBrainsMono_400Regular",
-          }}
-        />
-        <TextWidget
-          text={zoneText}
-          style={{
-            fontSize: 11,
-            color: "#000000",
-            fontFamily: "JetBrainsMono_400Regular",
-          }}
-        />
+        <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
+        <MonoTextWidget>{zoneText}</MonoTextWidget>
       </FlexWidget>
 
       <FlexWidget

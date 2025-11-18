@@ -1,5 +1,6 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
+import { MonoText } from "@/lib/components/MonoText";
 import { useCurrentDate } from "@/lib/hooks/date";
 import { useWaktuSolatCurrent } from "@/lib/hooks/waktuSolat";
 import { useWaktuSolatWidgetUpdate } from "@/lib/hooks/waktuSolatWidget";
@@ -16,29 +17,23 @@ function getTimeText(epochSeconds: number) {
 
 function LabelText(props: { children: string; bold: boolean }) {
   return (
-    <Text
-      style={{
-        width: 150,
-        fontSize: 20,
-        fontFamily: props.bold ? "JetBrainsMono_800ExtraBold" :"JetBrainsMono_400Regular",
-      }}
+    <MonoText
+      style={{ width: 150, fontSize: 20}}
+      fontWeight={props.bold ? "extrabold" : "regular"}
     >
       {props.children}
-    </Text>
+    </MonoText>
   );
 }
 
 function ValueText(props: { children: string; bold: boolean }) {
   return (
-    <Text
-      style={{
-        width: 100,
-        fontSize: 20,
-        fontFamily: props.bold ? "JetBrainsMono_800ExtraBold" :"JetBrainsMono_400Regular",
-      }}
+    <MonoText
+      style={{ width: 100, fontSize: 20}}
+      fontWeight={props.bold ? "extrabold" : "regular"}
     >
       {props.children}
-    </Text>
+    </MonoText>
   );
 }
 
@@ -91,24 +86,12 @@ export default function Index() {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ padding: 20 }}>
-        <Text
-          style={{
-            padding: 5,
-            fontSize: 20,
-            fontFamily: "JetBrainsMono_400Regular",
-          }}
-        >
+        <MonoText style={{ padding: 5, fontSize: 20}}>
           {dateText}
-        </Text>
-        <Text
-          style={{
-            padding: 5,
-            fontSize: 20,
-            fontFamily: "JetBrainsMono_400Regular",
-          }}
-        >
+        </MonoText>
+        <MonoText style={{ padding: 5, fontSize: 20}}>
           {zoneText}
-        </Text>
+        </MonoText>
       </View>
 
       <View>
