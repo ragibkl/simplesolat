@@ -20,8 +20,7 @@ function LabelText(props: { children: string; bold: boolean }) {
       style={{
         width: 150,
         fontSize: 20,
-        fontFamily: "JetBrainsMono_400Regular",
-        fontWeight: props.bold ? "bold" : "normal",
+        fontFamily: props.bold ? "JetBrainsMono_800ExtraBold" :"JetBrainsMono_400Regular",
       }}
     >
       {props.children}
@@ -35,8 +34,7 @@ function ValueText(props: { children: string; bold: boolean }) {
       style={{
         width: 100,
         fontSize: 20,
-        fontFamily: "JetBrainsMono_400Regular",
-        fontWeight: props.bold ? "bold" : "normal",
+        fontFamily: props.bold ? "JetBrainsMono_800ExtraBold" :"JetBrainsMono_400Regular",
       }}
     >
       {props.children}
@@ -57,7 +55,6 @@ function PrayerTimeRow(props: {
   return (
     <View
       style={{
-        // flex: 1,
         paddingVertical: 10,
         flexDirection: "row",
         justifyContent: "center",

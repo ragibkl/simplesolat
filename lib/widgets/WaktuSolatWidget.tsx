@@ -31,8 +31,7 @@ function ColumnText(props: { children: string; bold: boolean }) {
         text={props.children}
         style={{
           fontSize: 11,
-          fontFamily: "JetBrainsMono_400Regular",
-          fontWeight: props.bold ? "bold" : "normal",
+          fontFamily: props.bold ? "JetBrainsMono_800ExtraBold" :"JetBrainsMono_400Regular",
         }}
       />
     </FlexWidget>
