@@ -1,6 +1,7 @@
 import { View } from "react-native";
 
 import { MonoText } from "@/lib/components/MonoText";
+import { MonoView } from "@/lib/components/MonoView";
 import { useCurrentDate } from "@/lib/hooks/date";
 import { useWaktuSolatCurrent } from "@/lib/hooks/waktuSolat";
 import { useWaktuSolatWidgetUpdate } from "@/lib/hooks/waktuSolatWidget";
@@ -84,7 +85,7 @@ export default function Index() {
     : "Location not set";
 
   return (
-    <View style={{ flex: 1 }}>
+    <MonoView style={{ flex: 1 }}>
       <View style={{ padding: 20 }}>
         <MonoText style={{ padding: 5, fontSize: 20}}>
           {dateText}
@@ -102,6 +103,6 @@ export default function Index() {
         <PrayerTimeRow date={date} label="Maghrib" start={maghrib} end={isha} />
         <PrayerTimeRow date={date} label="Isha" start={isha} />
       </View>
-    </View>
+    </MonoView>
   );
 }
