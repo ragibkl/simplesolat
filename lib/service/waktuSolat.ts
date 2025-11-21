@@ -1,3 +1,4 @@
+import { compareAsc, startOfYesterday } from "date-fns";
 import merge from "deepmerge";
 
 import {
@@ -9,7 +10,6 @@ import {
   getWaktuSolatByZone,
   WaktuSolatResponse,
 } from "@/lib/remote/simplesolat";
-import { compareAsc, startOfYesterday } from "date-fns";
 
 function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
   return [

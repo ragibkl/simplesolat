@@ -1,4 +1,3 @@
-import { startOfMinute } from "date-fns";
 import React from "react";
 import {
   FlexWidget,
@@ -6,13 +5,12 @@ import {
   WidgetTaskHandlerProps,
 } from "react-native-android-widget";
 
-import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
-import { getMonoStyle } from "@/lib/components/monoui";
 import { PrayerTime } from "@/lib/data/waktuSolatStore";
 import { Zone } from "@/lib/data/zoneStore";
-import { getPrayerData } from "@/lib/service/waktuSolatWidget";
-
-import { Empty } from "./Empty";
+import { startOfMinute } from "date-fns";
+import { ShadowTextWidget } from "../components/ShadowTextWidget";
+import { getPrayerData } from "../service/waktuSolatWidget";
+import { EmptyTransparent } from "./EmptyTransparent";
 
 function getTimeText(epochSeconds: number) {
   const date = new Date(0);
@@ -33,10 +31,11 @@ function ColumnText(props: { children: string; bold: boolean }) {
         alignItems: "center",
       }}
     >
-      <MonoTextWidget fontWeight={fontWeight}>{props.children}</MonoTextWidget>
+      <ShadowTextWidget fontWeight={fontWeight}>{props.children}</ShadowTextWidget>
     </FlexWidget>
   );
 }
+
 
 function Column(props: {
   date: Date;
@@ -70,7 +69,7 @@ type WaktuSolatWidgetProps = {
   prayerTime?: PrayerTime;
 };
 
-export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
+export function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
   const {
     date,
     prayerTime: {
@@ -86,8 +85,6 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
 
   const zoneText = zone ? zone.district : "Location not set";
 
-  const { backgroundColor, borderColor } = getMonoStyle();
-
   return (
     <FlexWidget
       clickAction="OPEN_APP"
@@ -98,7 +95,6 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
         width: "match_parent",
         justifyContent: "space-between",
         alignItems: "flex-start",
-        backgroundColor,
         borderRadius: 5,
         padding: 10,
       }}
@@ -111,8 +107,8 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
           alignItems: "center",
         }}
       >
-        <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
-        <MonoTextWidget>{zoneText}</MonoTextWidget>
+        <ShadowTextWidget>{date.toDateString()}</ShadowTextWidget>
+        <ShadowTextWidget>{zoneText}</ShadowTextWidget>
       </FlexWidget>
 
       <FlexWidget
@@ -121,9 +117,6 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
           flex: 2,
           flexDirection: "row",
           width: "match_parent",
-          borderRadius: 4,
-          borderColor,
-          borderWidth: 1,
         }}
       >
         <Column date={date} label="Fajr" start={fajr} end={syuruk} />
@@ -147,16 +140,16 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
 
   console.log("Found PrayerData, rendering widget");
   props.renderWidget(
-    <WaktuSolatWidget date={date} zone={data.zone} prayerTime={data.waktuSolat.prayerTime} />,
+    <WaktuSolatTransparent date={date} zone={data.zone} prayerTime={data.waktuSolat.prayerTime} />,
   );
 }
 
-export async function waktuSolatWidgetTaskHandler(props: WidgetTaskHandlerProps) {
+export async function waktuSolatTransparentTaskHandler(props: WidgetTaskHandlerProps) {
   console.log(props.widgetAction, props.widgetInfo);
 
   switch (props.widgetAction) {
     case "WIDGET_ADDED":
-      props.renderWidget(<Empty />);
+      props.renderWidget(<EmptyTransparent />);
       await updateWaktuSolatAndRender(props);
       break;
 
@@ -184,15 +177,15 @@ export async function waktuSolatWidgetTaskHandler(props: WidgetTaskHandlerProps)
   }
 }
 
-export async function requestWaktuSolatWidgetUpdate(
+export async function requestWaktuSolatTransparentUpdate(
   date: Date,
   zone: Zone,
   prayerTime: PrayerTime,
 ) {
   await requestWidgetUpdate({
-    widgetName: "WaktuSolat",
+    widgetName: "WaktuSolatTransparent",
     renderWidget: () => (
-      <WaktuSolatWidget date={date} zone={zone} prayerTime={prayerTime} />
+      <WaktuSolatTransparent date={date} zone={zone} prayerTime={prayerTime} />
     ),
     widgetNotFound: () => {},
   });
