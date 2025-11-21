@@ -35,7 +35,7 @@ export function useMonoStyle() {
   const backgroundColor = colorScheme === "dark" ? "#000000" : "#FFFFFF";
   const borderColor = colorScheme === "dark" ? "#ffffff" : "#000000";
 
-  return { color, colorScheme, backgroundColor, borderColor };
+  return { color, colorScheme, backgroundColor, borderColor, getFontFamily: getMonoFontFamily };
 }
 
 export function getMonoStyle() {
@@ -46,5 +46,5 @@ export function getMonoStyle() {
     colorScheme === "dark" ? "#000000" : "#FFFFFF";
   const borderColor: ColorProp = colorScheme === "dark" ? "#ffffff" : "#000000";
 
-  return { color, colorScheme, backgroundColor, borderColor };
+  return { color, colorScheme, backgroundColor, borderColor, getFontFamily: getMonoFontFamily };
 }

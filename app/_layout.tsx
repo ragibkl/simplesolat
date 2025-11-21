@@ -5,7 +5,7 @@ import { waktuSolatStore } from "@/lib/data/waktuSolatStore";
 import { zoneStore } from "@/lib/data/zoneStore";
 
 export default function RootLayout() {
-  const { backgroundColor, color } = useMonoStyle();
+  const { backgroundColor, color, getFontFamily } = useMonoStyle();
   return (
     <waktuSolatStore.Provider>
       <zoneStore.Provider>
@@ -16,7 +16,7 @@ export default function RootLayout() {
               title: "simplesolat",
               headerStyle: { backgroundColor },
               headerTitleStyle: {
-                fontFamily: "JetBrainsMono_400Regular",
+                fontFamily: getFontFamily(),
                 color,
               },
             }}
