@@ -34,7 +34,7 @@
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "deepmerge": "^4.3.1",
-    "expo": "~53.0.23",
+    "expo": "~53.0.24",
     "expo-background-task": "~0.2.8",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
