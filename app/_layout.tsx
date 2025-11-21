@@ -1,11 +1,11 @@
 import { Stack } from "expo-router";
 
-import { useMonoStyle } from "@/lib/components/monofont";
+import { useMonoStyle } from "@/lib/components/monoui";
 import { waktuSolatStore } from "@/lib/data/waktuSolatStore";
 import { zoneStore } from "@/lib/data/zoneStore";
 
 export default function RootLayout() {
-  const { backgroundColor, color } = useMonoStyle()
+  const { backgroundColor, color } = useMonoStyle();
   return (
     <waktuSolatStore.Provider>
       <zoneStore.Provider>
@@ -15,7 +15,10 @@ export default function RootLayout() {
             options={{
               title: "simplesolat",
               headerStyle: { backgroundColor },
-              headerTitleStyle: { fontFamily: "JetBrainsMono_400Regular", color },
+              headerTitleStyle: {
+                fontFamily: "JetBrainsMono_400Regular",
+                color,
+              },
             }}
           />
         </Stack>

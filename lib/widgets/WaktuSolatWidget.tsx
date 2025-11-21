@@ -8,7 +8,7 @@ import {
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { PrayerTime } from "@/lib/data/waktuSolatStore";
 import { Zone } from "@/lib/data/zoneStore";
-import { Appearance } from "react-native";
+import { getMonoStyle } from "../components/monoui";
 
 function getTimeText(epochSeconds: number) {
   const date = new Date(0);
@@ -82,7 +82,7 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
 
   const zoneText = zone ? zone.district : "Location not set";
 
-  const colorScheme = Appearance.getColorScheme();
+  const { backgroundColor, borderColor } = getMonoStyle();
 
   return (
     <FlexWidget
@@ -94,9 +94,9 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
         width: "match_parent",
         justifyContent: "space-between",
         alignItems: "flex-start",
-        backgroundColor: colorScheme === "dark" ? "#000000" : "#ffffff",
-        borderRadius: 2,
-        padding: 5,
+        backgroundColor,
+        borderRadius: 5,
+        padding: 10,
       }}
     >
       <FlexWidget
@@ -104,6 +104,7 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
           flexDirection: "row",
           width: "match_parent",
           justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
@@ -117,7 +118,7 @@ export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
           flexDirection: "row",
           width: "match_parent",
           borderRadius: 4,
-          borderColor: colorScheme === "dark" ? "#ffffff" : "#000000",
+          borderColor,
           borderWidth: 1,
         }}
       >

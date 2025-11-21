@@ -19,7 +19,7 @@ function getTimeText(epochSeconds: number) {
 function LabelText(props: { children: string; bold: boolean }) {
   return (
     <MonoText
-      style={{ width: 150, fontSize: 20}}
+      style={{ width: 150, fontSize: 20 }}
       fontWeight={props.bold ? "extrabold" : "regular"}
     >
       {props.children}
@@ -30,7 +30,7 @@ function LabelText(props: { children: string; bold: boolean }) {
 function ValueText(props: { children: string; bold: boolean }) {
   return (
     <MonoText
-      style={{ width: 100, fontSize: 20}}
+      style={{ width: 100, fontSize: 20 }}
       fontWeight={props.bold ? "extrabold" : "regular"}
     >
       {props.children}
@@ -87,12 +87,8 @@ export default function Index() {
   return (
     <MonoView style={{ flex: 1 }}>
       <View style={{ padding: 20 }}>
-        <MonoText style={{ padding: 5, fontSize: 20}}>
-          {dateText}
-        </MonoText>
-        <MonoText style={{ padding: 5, fontSize: 20}}>
-          {zoneText}
-        </MonoText>
+        <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
+        <MonoText style={{ padding: 5, fontSize: 20 }}>{zoneText}</MonoText>
       </View>
 
       <View>

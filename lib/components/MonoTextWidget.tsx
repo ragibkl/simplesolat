@@ -1,6 +1,6 @@
 import { TextWidget, TextWidgetStyle } from "react-native-android-widget";
 
-import { FontWeight, getMonoFontFamily, getMonoStyle } from "./monofont";
+import { FontWeight, getMonoFontFamily, getMonoStyle } from "./monoui";
 
 type MonoTextProps = {
   children: string;

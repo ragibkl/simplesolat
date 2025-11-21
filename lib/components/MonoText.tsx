@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { StyleProp, Text, TextStyle } from "react-native";
 
-import { FontWeight, getMonoFontFamily, useMonoStyle } from "./monofont";
+import { FontWeight, getMonoFontFamily, useMonoStyle } from "./monoui";
 
 type MonoTextProps = {
   children: ReactNode | ReactNode[];
