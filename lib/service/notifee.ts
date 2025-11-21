@@ -3,7 +3,10 @@ import notifee, { EventType, TriggerType } from "@notifee/react-native";
 import { PrayerTime, WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { Zone } from "@/lib/data/zoneStore";
 
-import { requestUpdateWaktuSolatWidgets, updateWaktuSolatAndWidgets } from "./waktuSolatWidget";
+import {
+  requestUpdateWaktuSolatWidgets,
+  updateWaktuSolatAndWidgets,
+} from "./waktuSolatWidget";
 
 export const WAKTU_SOLAT_PREFIX = "waktu_solat";
 
@@ -121,7 +124,7 @@ notifee.onBackgroundEvent(async ({ type, detail }) => {
     if (data && "waktuSolat" in data && "zone" in data) {
       const waktuSolat = data.waktuSolat as WaktuSolat;
       const zone = data.zone as Zone;
-      await requestUpdateWaktuSolatWidgets(new Date(), zone, waktuSolat)
+      await requestUpdateWaktuSolatWidgets(new Date(), zone, waktuSolat);
     } else {
       await updateWaktuSolatAndWidgets(false, false);
     }

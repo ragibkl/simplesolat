@@ -29,7 +29,7 @@ export async function getPrayerData(
 export async function requestUpdateWaktuSolatWidgets(
   date: Date,
   zone: Zone,
-  waktuSolat: WaktuSolat
+  waktuSolat: WaktuSolat,
 ) {
   await requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime);

@@ -8,7 +8,7 @@ export type FontWeight =
   | "bold"
   | "extrabold";
 
-export function getMonoFontFamily(fontWeight?: FontWeight): string {
+export function getFontFamily(fontWeight?: FontWeight): string {
   if (fontWeight === "regular") {
     return "JetBrainsMono_400Regular";
   }
@@ -35,7 +35,13 @@ export function useMonoStyle() {
   const backgroundColor = colorScheme === "dark" ? "#000000" : "#FFFFFF";
   const borderColor = colorScheme === "dark" ? "#ffffff" : "#000000";
 
-  return { color, colorScheme, backgroundColor, borderColor, getFontFamily: getMonoFontFamily };
+  return {
+    color,
+    colorScheme,
+    backgroundColor,
+    borderColor,
+    getFontFamily,
+  };
 }
 
 export function getMonoStyle() {
@@ -46,5 +52,11 @@ export function getMonoStyle() {
     colorScheme === "dark" ? "#000000" : "#FFFFFF";
   const borderColor: ColorProp = colorScheme === "dark" ? "#ffffff" : "#000000";
 
-  return { color, colorScheme, backgroundColor, borderColor, getFontFamily: getMonoFontFamily };
+  return {
+    color,
+    colorScheme,
+    backgroundColor,
+    borderColor,
+    getFontFamily,
+  };
 }

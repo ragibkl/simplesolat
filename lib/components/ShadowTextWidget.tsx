@@ -1,6 +1,6 @@
 import { TextWidget, TextWidgetStyle } from "react-native-android-widget";
 
-import { FontWeight, getMonoFontFamily } from "./monoui";
+import { FontWeight, getFontFamily } from "./monoui";
 
 type ShadowTextProps = {
   children: string;
@@ -10,7 +10,7 @@ type ShadowTextProps = {
 
 export function ShadowTextWidget(props: ShadowTextProps) {
   const style = props.style || {};
-  const fontFamily = getMonoFontFamily(props.fontWeight);
+  const fontFamily = getFontFamily(props.fontWeight);
 
   return (
     <TextWidget
@@ -20,7 +20,7 @@ export function ShadowTextWidget(props: ShadowTextProps) {
         fontFamily,
         textShadowColor: "#000000",
         textShadowRadius: 1,
-        textShadowOffset: { height: 1, width: 1},
+        textShadowOffset: { height: 1, width: 1 },
         ...style,
       }}
       text={props.children}

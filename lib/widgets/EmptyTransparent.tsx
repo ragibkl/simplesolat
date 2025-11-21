@@ -1,22 +1,20 @@
-import { FlexWidget } from "react-native-android-widget";
-import { ShadowTextWidget } from "../components/ShadowTextWidget";
+import { MonoTextWidget } from "../components/MonoTextWidget";
+import { WidgetContainer } from "./WidgetContainer";
 
 export function EmptyTransparent() {
   return (
-    <FlexWidget
-      clickAction="OPEN_APP"
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        height: "match_parent",
-        width: "match_parent",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 5,
-        padding: 10,
-      }}
-    >
-      <ShadowTextWidget style={{ fontSize: 20 }}>No data available</ShadowTextWidget>
-    </FlexWidget>
+    <WidgetContainer style={{ alignItems: "center" }}>
+      <MonoTextWidget
+        style={{
+          fontSize: 20,
+          color: "#FFFFFF",
+          textShadowColor: "#000000",
+          textShadowRadius: 1,
+          textShadowOffset: { height: 1, width: 1 },
+        }}
+      >
+        No data available
+      </MonoTextWidget>
+    </WidgetContainer>
   );
 }
