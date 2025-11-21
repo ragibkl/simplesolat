@@ -87,7 +87,7 @@
               "targetCellWidth": 5,
               "targetCellHeight": 1,
               "description": "simplesolat prayer times widget",
-              "previewImage": "./assets/widget-preview/waktu-solat.png",
+              "previewImage": "./assets/widget-preview/waktu-solat-transparent.png",
               "updatePeriodMillis": 1800000
             }
           ]
