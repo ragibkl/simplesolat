@@ -13,37 +13,39 @@ import { Zone } from "@/lib/data/zoneStore";
 import { getPrayerData } from "@/lib/service/waktuSolatWidget";
 
 import { Empty } from "./Empty";
-import { WaktuColumn } from "./WaktuColumn";
+import { WaktuColumn, WaktuColumnProps } from "./WaktuColumn";
+import { WaktuSolatWidgetProps } from "./WaktuSolat";
 import { WidgetContainer } from "./WidgetContainer";
 
-export type WaktuSolatWidgetProps = {
-  date: Date;
-  zone: Zone;
-  prayerTime: PrayerTime;
-};
+function Column(props: WaktuColumnProps) {
+  return <WaktuColumn textStyle={{ fontSize: 10 }} {...props} />;
+}
 
-function WaktuSolat(props: WaktuSolatWidgetProps) {
+function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
   const {
     date,
     prayerTime: { fajr, syuruk, dhuhr, asr, maghrib, isha },
     zone,
   } = props;
 
-  const { borderColor } = getMonoStyle();
+  const { backgroundColor } = getMonoStyle();
 
   return (
-    <WidgetContainer>
+    <WidgetContainer style={{ backgroundColor, borderRadius: 0, padding: 5 }}>
       <FlexWidget
         style={{
-          flex: 1,
           flexDirection: "row",
           width: "match_parent",
           justifyContent: "space-between",
           alignItems: "center",
         }}
       >
-        <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
-        <MonoTextWidget>{zone.district}</MonoTextWidget>
+        <MonoTextWidget style={{ fontSize: 10 }}>
+          {date.toDateString()}
+        </MonoTextWidget>
+        <MonoTextWidget style={{ fontSize: 10 }}>
+          {zone.district}
+        </MonoTextWidget>
       </FlexWidget>
 
       <FlexWidget
@@ -52,17 +54,13 @@ function WaktuSolat(props: WaktuSolatWidgetProps) {
           flex: 2,
           flexDirection: "row",
           width: "match_parent",
-          borderRadius: 4,
-          borderColor,
-          borderWidth: 1,
         }}
       >
-        <WaktuColumn date={date} label="Fajr" start={fajr} end={syuruk} />
-        <WaktuColumn date={date} label="Syuruk" start={syuruk} end={dhuhr} />
-        <WaktuColumn date={date} label="Dhuhr" start={dhuhr} end={asr} />
-        <WaktuColumn date={date} label="Asr" start={asr} end={maghrib} />
-        <WaktuColumn date={date} label="Maghrib" start={maghrib} end={isha} />
-        <WaktuColumn date={date} label="Isha" start={isha} />
+        <Column date={date} label="Fajr" start={fajr} end={syuruk} />
+        <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
+        <Column date={date} label="Asr" start={asr} end={maghrib} />
+        <Column date={date} label="Maghrib" start={maghrib} end={isha} />
+        <Column date={date} label="Isha" start={isha} />
       </FlexWidget>
     </WidgetContainer>
   );
@@ -78,7 +76,7 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
 
   console.log("Found PrayerData, rendering widget");
   props.renderWidget(
-    <WaktuSolat
+    <WaktuSolatCompact
       date={date}
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
@@ -86,7 +84,7 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
   );
 }
 
-export async function waktuSolatWidgetTaskHandler(
+export async function waktuSolatCompactTaskHandler(
   props: WidgetTaskHandlerProps,
 ) {
   console.log(props.widgetAction, props.widgetInfo);
@@ -121,15 +119,15 @@ export async function waktuSolatWidgetTaskHandler(
   }
 }
 
-export async function requestWaktuSolatWidgetUpdate(
+export async function requestWaktuSolatCompactUpdate(
   date: Date,
   zone: Zone,
   prayerTime: PrayerTime,
 ) {
   await requestWidgetUpdate({
-    widgetName: "WaktuSolat",
+    widgetName: "WaktuSolatCompact",
     renderWidget: () => (
-      <WaktuSolat date={date} zone={zone} prayerTime={prayerTime} />
+      <WaktuSolatCompact date={date} zone={zone} prayerTime={prayerTime} />
     ),
     widgetNotFound: () => {},
   });

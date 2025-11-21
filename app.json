@@ -75,7 +75,7 @@
               "minHeight": "60dp",
               "targetCellWidth": 5,
               "targetCellHeight": 1,
-              "description": "simplesolat prayer times widget",
+              "description": "prayer times widget",
               "previewImage": "./assets/widget-preview/waktu-solat.png",
               "updatePeriodMillis": 1800000
             },
@@ -86,8 +86,19 @@
               "minHeight": "60dp",
               "targetCellWidth": 5,
               "targetCellHeight": 1,
-              "description": "simplesolat prayer times widget",
+              "description": "prayer times widget (transparent background)",
               "previewImage": "./assets/widget-preview/waktu-solat-transparent.png",
+              "updatePeriodMillis": 1800000
+            },
+            {
+              "name": "WaktuSolatCompact",
+              "label": "Waktu Solat Compact",
+              "minWidth": "280dp",
+              "minHeight": "60dp",
+              "targetCellWidth": 4,
+              "targetCellHeight": 1,
+              "description": "prayer times widget (compact)",
+              "previewImage": "./assets/widget-preview/waktu-solat.png",
               "updatePeriodMillis": 1800000
             }
           ]

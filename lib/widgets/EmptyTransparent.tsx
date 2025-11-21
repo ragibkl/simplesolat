@@ -1,9 +1,11 @@
-import { MonoTextWidget } from "../components/MonoTextWidget";
+import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { WidgetContainer } from "./WidgetContainer";
 
 export function EmptyTransparent() {
   return (
-    <WidgetContainer style={{ alignItems: "center" }}>
+    <WidgetContainer
+      style={{ alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0)" }}
+    >
       <MonoTextWidget
         style={{
           fontSize: 20,

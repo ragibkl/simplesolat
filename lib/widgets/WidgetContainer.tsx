@@ -13,11 +13,10 @@ export function WidgetContainer(props: WidgetContainerProps) {
     <FlexWidget
       clickAction="OPEN_APP"
       style={{
-        flex: 1,
         flexDirection: "column",
         height: "match_parent",
         width: "match_parent",
-        justifyContent: "space-around",
+        justifyContent: "flex-start",
         alignItems: "flex-start",
         borderRadius: 5,
         padding: 10,

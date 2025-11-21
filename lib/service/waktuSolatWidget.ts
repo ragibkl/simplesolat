@@ -3,6 +3,7 @@ import { startOfMinute } from "date-fns";
 import { WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { Zone, zoneStore } from "@/lib/data/zoneStore";
 import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
+import { requestWaktuSolatCompactUpdate } from "@/lib/widgets/WaktuSolatCompact";
 import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTransparent";
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
@@ -32,6 +33,7 @@ export async function requestUpdateWaktuSolatWidgets(
   waktuSolat: WaktuSolat,
 ) {
   await requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime);
+  await requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime);
 }
 
