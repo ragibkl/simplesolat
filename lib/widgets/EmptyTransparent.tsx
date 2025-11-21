@@ -11,7 +11,7 @@ export function EmptyTransparent() {
         height: "match_parent",
         width: "match_parent",
         justifyContent: "center",
-        alignItems: "flex-start",
+        alignItems: "center",
         borderRadius: 5,
         padding: 10,
       }}

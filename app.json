@@ -70,7 +70,7 @@
           "widgets": [
             {
               "name": "WaktuSolat",
-              "label": "WaktuSolat",
+              "label": "Waktu Solat",
               "minWidth": "350dp",
               "minHeight": "60dp",
               "targetCellWidth": 5,
@@ -81,7 +81,7 @@
             },
             {
               "name": "WaktuSolatTransparent",
-              "label": "WaktuSolat",
+              "label": "Waktu Solat Transparent",
               "minWidth": "350dp",
               "minHeight": "60dp",
               "targetCellWidth": 5,
