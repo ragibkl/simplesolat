@@ -70,7 +70,7 @@ type WaktuSolatWidgetProps = {
   prayerTime?: PrayerTime;
 };
 
-export function WaktuSolatWidget(props: WaktuSolatWidgetProps) {
+export function WaktuSolat(props: WaktuSolatWidgetProps) {
   const {
     date,
     prayerTime: {
@@ -147,7 +147,7 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
 
   console.log("Found PrayerData, rendering widget");
   props.renderWidget(
-    <WaktuSolatWidget date={date} zone={data.zone} prayerTime={data.waktuSolat.prayerTime} />,
+    <WaktuSolat date={date} zone={data.zone} prayerTime={data.waktuSolat.prayerTime} />,
   );
 }
 
@@ -192,7 +192,7 @@ export async function requestWaktuSolatWidgetUpdate(
   await requestWidgetUpdate({
     widgetName: "WaktuSolat",
     renderWidget: () => (
-      <WaktuSolatWidget date={date} zone={zone} prayerTime={prayerTime} />
+      <WaktuSolat date={date} zone={zone} prayerTime={prayerTime} />
     ),
     widgetNotFound: () => {},
   });

@@ -2,8 +2,8 @@ import { startOfMinute } from "date-fns";
 
 import { WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { Zone, zoneStore } from "@/lib/data/zoneStore";
+import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
 import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTransparent";
-import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolatWidget";
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
 import { getOrRetrieveWaktuSolat } from "./waktuSolat";
