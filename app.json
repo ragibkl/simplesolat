@@ -2,7 +2,7 @@
   "expo": {
     "name": "simplesolat",
     "slug": "simplesolat",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "simplesolat",
@@ -98,7 +98,7 @@
               "targetCellWidth": 4,
               "targetCellHeight": 1,
               "description": "prayer times widget (compact)",
-              "previewImage": "./assets/widget-preview/waktu-solat.png",
+              "previewImage": "./assets/widget-preview/waktu-solat-compact.png",
               "updatePeriodMillis": 1800000
             }
           ]
