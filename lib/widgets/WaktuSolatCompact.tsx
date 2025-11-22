@@ -51,7 +51,7 @@ function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
       <FlexWidget
         clickAction="WAKTU_SOLAT_CLICK_ACTION"
         style={{
-          flex: 2,
+          flex: 1,
           flexDirection: "row",
           width: "match_parent",
         }}

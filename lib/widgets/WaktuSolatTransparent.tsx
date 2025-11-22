@@ -39,7 +39,6 @@ function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
     <WidgetContainer style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}>
       <FlexWidget
         style={{
-          flex: 1,
           flexDirection: "row",
           width: "match_parent",
           justifyContent: "space-between",
@@ -53,7 +52,7 @@ function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
       <FlexWidget
         clickAction="WAKTU_SOLAT_CLICK_ACTION"
         style={{
-          flex: 2,
+          flex: 1,
           flexDirection: "row",
           width: "match_parent",
           borderRadius: 4,
