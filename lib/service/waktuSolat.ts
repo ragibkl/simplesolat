@@ -51,6 +51,7 @@ export function mergeWaktuSolatResponseIntoStore(
       date: parseInt(day),
       zone: p.zone,
       prayerTime: {
+        imsak: p.imsak,
         fajr: p.fajr,
         syuruk: p.syuruk,
         dhuhr: p.dhuhr,

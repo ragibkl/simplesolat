@@ -1,6 +1,7 @@
 import { createDataStore } from "./dataStore";
 
 export type PrayerTime = {
+  imsak: number;
   fajr: number;
   syuruk: number;
   dhuhr: number;
@@ -22,6 +23,6 @@ export type WaktuSolatStore = {
 };
 
 export const waktuSolatStore = createDataStore<WaktuSolatStore>(
-  "WAKTU_SOLAT_STORE_V2_KEY",
+  "WAKTU_SOLAT_STORE_V3_KEY",
   {},
 );
