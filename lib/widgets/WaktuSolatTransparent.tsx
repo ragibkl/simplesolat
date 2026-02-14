@@ -50,7 +50,6 @@ function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
       </FlexWidget>
 
       <FlexWidget
-        clickAction="WAKTU_SOLAT_CLICK_ACTION"
         style={{
           flex: 1,
           flexDirection: "row",
@@ -108,13 +107,6 @@ export async function waktuSolatTransparentTaskHandler(
 
     case "WIDGET_DELETED":
       // Not needed for now
-      break;
-
-    case "WIDGET_CLICK":
-      // Not needed for now
-      if (props.clickAction === "WAKTU_SOLAT_CLICK_ACTION") {
-        await updateWaktuSolatAndRender(props);
-      }
       break;
 
     default:
