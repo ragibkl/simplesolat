@@ -42,7 +42,7 @@ export async function updateZoneViaGps(
 }
 
 export async function getUpdatedZone(): Promise<Zone | null> {
-  const location = await getLocation(true);
+  const location = await getLocation();
   if (location) {
     const zone = await updateZoneViaGps(
       location.coords.latitude,

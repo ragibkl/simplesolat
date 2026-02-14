@@ -60,9 +60,7 @@ async function getLocationPermissions(): Promise<boolean> {
   }
 }
 
-export async function getLocation(
-  fast: boolean = false,
-): Promise<Location.LocationObject | null> {
+export async function getLocation(): Promise<Location.LocationObject | null> {
   try {
     const permission = await getLocationPermissions();
     if (!permission) {
@@ -81,13 +79,17 @@ export async function getLocation(
       }
     }
 
-    if (fast) {
-      return await Location.getLastKnownPositionAsync();
-    } else {
-      return await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Lowest,
-      });
+    const lastKnown = await Location.getLastKnownPositionAsync({
+      maxAge: 15 * 60 * 1000,
+      requiredAccuracy: 3000,
+    });
+    if (lastKnown) {
+      return lastKnown;
     }
+
+    return await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Lowest,
+    });
   } catch (e) {
     console.log("Cannot get location", e);
     return null;
