@@ -72,6 +72,7 @@ export default function Index() {
   const dateText = date.toDateString();
 
   const {
+    imsak = 0,
     fajr = 0,
     syuruk = 0,
     dhuhr = 0,
@@ -92,6 +93,7 @@ export default function Index() {
       </View>
 
       <View>
+        <PrayerTimeRow date={date} label="Imsak" start={imsak} end={fajr} />
         <PrayerTimeRow date={date} label="Fajr" start={fajr} end={syuruk} />
         <PrayerTimeRow date={date} label="Syuruk" start={syuruk} end={dhuhr} />
         <PrayerTimeRow date={date} label="Dhuhr" start={dhuhr} end={asr} />

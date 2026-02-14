@@ -80,6 +80,7 @@ export async function scheduleAllWaktuSolatNotifications(
   const existingNotifs: {
     [k in keyof PrayerTime]: boolean;
   } = {
+    imsak: false,
     fajr: false,
     syuruk: false,
     dhuhr: false,
