@@ -1,4 +1,4 @@
-import notifee, { EventType, TriggerType } from "@notifee/react-native";
+import notifee, { AuthorizationStatus, EventType, TriggerType } from "@notifee/react-native";
 
 import { PrayerTime, WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { Zone } from "@/lib/data/zoneStore";
@@ -42,9 +42,6 @@ async function scheduleWaktuSolatNotification(
     return;
   }
 
-  // Request permissions (required for iOS)
-  await notifee.requestPermission();
-
   // Create a channel (required for Android)
   const channelId = await notifee.createChannel({
     id: `${WAKTU_SOLAT_PREFIX}_${waktu}`,
@@ -77,6 +74,11 @@ export async function scheduleAllWaktuSolatNotifications(
   waktuSolat: WaktuSolat,
   zone: Zone,
 ) {
+  const settings = await notifee.getNotificationSettings();
+  if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
+    return;
+  }
+
   const existingNotifs: {
     [k in keyof PrayerTime]: boolean;
   } = {
