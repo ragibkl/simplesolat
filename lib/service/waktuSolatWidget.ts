@@ -1,4 +1,4 @@
-import { startOfMinute } from "date-fns";
+import { addDays, startOfMinute } from "date-fns";
 
 import { WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { Zone, zoneStore } from "@/lib/data/zoneStore";
@@ -34,10 +34,14 @@ export async function requestUpdateWaktuSolatWidgets(
   zone: Zone,
   waktuSolat: WaktuSolat,
 ) {
+  const tomorrow = addDays(date, 1);
+  const tomorrowData = await getOrRetrieveWaktuSolat(zone.zone, tomorrow);
+  const nextDayImsak = tomorrowData?.prayerTime.imsak;
+
   await requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime);
-  await requestWaktuSolatLargeUpdate(date, zone, waktuSolat.prayerTime);
-  await requestWaktuSolatLargeTransparentUpdate(date, zone, waktuSolat.prayerTime);
+  await requestWaktuSolatLargeUpdate(date, zone, waktuSolat.prayerTime, nextDayImsak);
+  await requestWaktuSolatLargeTransparentUpdate(date, zone, waktuSolat.prayerTime, nextDayImsak);
   await requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime);
 }
 

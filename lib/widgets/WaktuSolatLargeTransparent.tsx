@@ -1,4 +1,4 @@
-import { startOfMinute } from "date-fns";
+import { addDays, startOfMinute } from "date-fns";
 import React from "react";
 import {
   FlexWidget,
@@ -13,9 +13,9 @@ import { Zone } from "@/lib/data/zoneStore";
 import { getPrayerData } from "@/lib/service/waktuSolatWidget";
 
 import { EmptyTransparent } from "./EmptyTransparent";
-import { WaktuColumn, WaktuColumnProps } from "./WaktuColumn";
-import { WaktuSolatWidgetProps } from "./WaktuSolat";
+import { WaktuRow, WaktuRowProps } from "./WaktuRow";
 import { WidgetContainer } from "./WidgetContainer";
+import { getNextPrayer, getTimeText } from "./utils";
 
 const textStyle: TextWidgetStyle = {
   color: "#FFFFFF",
@@ -24,16 +24,27 @@ const textStyle: TextWidgetStyle = {
   textShadowOffset: { height: 1, width: 1 },
 };
 
-function Column(props: WaktuColumnProps) {
-  return <WaktuColumn textStyle={textStyle} {...props} />;
+function Row(props: WaktuRowProps) {
+  return <WaktuRow textStyle={textStyle} {...props} />;
 }
 
-function WaktuSolatLargeTransparent(props: WaktuSolatWidgetProps) {
+export type WaktuSolatLargeTransparentProps = {
+  date: Date;
+  zone: Zone;
+  prayerTime: PrayerTime;
+  nextDayImsak?: number;
+};
+
+function WaktuSolatLargeTransparent(props: WaktuSolatLargeTransparentProps) {
   const {
     date,
     prayerTime: { imsak, fajr, syuruk, dhuhr, asr, maghrib, isha },
     zone,
+    nextDayImsak,
   } = props;
+
+  const currentEpoch = date.getTime() / 1000;
+  const nextPrayer = getNextPrayer(props.prayerTime, currentEpoch, nextDayImsak);
 
   return (
     <WidgetContainer style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}>
@@ -42,17 +53,40 @@ function WaktuSolatLargeTransparent(props: WaktuSolatWidgetProps) {
           flexDirection: "row",
           width: "match_parent",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-start",
         }}
       >
-        <MonoTextWidget style={textStyle}>{date.toDateString()}</MonoTextWidget>
-        <MonoTextWidget style={textStyle}>{zone.district}</MonoTextWidget>
+        <FlexWidget
+          style={{
+            flexDirection: "column",
+            alignItems: "flex-start",
+          }}
+        >
+          <MonoTextWidget style={textStyle}>{zone.district}</MonoTextWidget>
+          <MonoTextWidget style={textStyle}>{date.toDateString()}</MonoTextWidget>
+        </FlexWidget>
+
+        {nextPrayer && (
+          <FlexWidget
+            style={{
+              flexDirection: "column",
+              alignItems: "flex-end",
+            }}
+          >
+            <MonoTextWidget style={textStyle} fontWeight="extrabold">
+              {nextPrayer.label}
+            </MonoTextWidget>
+            <MonoTextWidget style={textStyle} fontWeight="extrabold">
+              {getTimeText(nextPrayer.epochSeconds)}
+            </MonoTextWidget>
+          </FlexWidget>
+        )}
       </FlexWidget>
 
       <FlexWidget
         style={{
           flex: 1,
-          flexDirection: "column",
+          flexDirection: "row",
           width: "match_parent",
           borderRadius: 4,
         }}
@@ -60,26 +94,26 @@ function WaktuSolatLargeTransparent(props: WaktuSolatWidgetProps) {
         <FlexWidget
           style={{
             flex: 1,
-            flexDirection: "row",
-            width: "match_parent",
+            flexDirection: "column",
+            height: "match_parent",
           }}
         >
-          <Column date={date} label="Imsak" start={imsak} end={fajr} />
-          <Column date={date} label="Fajr" start={fajr} end={syuruk} />
-          <Column date={date} label="Syuruk" start={syuruk} end={dhuhr} />
-          <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
+          <Row date={date} label="Imsak" start={imsak} end={fajr} />
+          <Row date={date} label="Fajr" start={fajr} end={syuruk} />
+          <Row date={date} label="Syuruk" start={syuruk} end={dhuhr} />
         </FlexWidget>
 
         <FlexWidget
           style={{
             flex: 1,
-            flexDirection: "row",
-            width: "match_parent",
+            flexDirection: "column",
+            height: "match_parent",
           }}
         >
-          <Column date={date} label="Asr" start={asr} end={maghrib} />
-          <Column date={date} label="Maghrib" start={maghrib} end={isha} />
-          <Column date={date} label="Isha" start={isha} />
+          <Row date={date} label="Dhuhr" start={dhuhr} end={asr} />
+          <Row date={date} label="Asr" start={asr} end={maghrib} />
+          <Row date={date} label="Maghrib" start={maghrib} end={isha} />
+          <Row date={date} label="Isha" start={isha} />
         </FlexWidget>
       </FlexWidget>
     </WidgetContainer>
@@ -94,12 +128,17 @@ async function updateAndRender(props: WidgetTaskHandlerProps) {
     return;
   }
 
+  const tomorrow = addDays(date, 1);
+  const tomorrowData = await getPrayerData(tomorrow, false);
+  const nextDayImsak = tomorrowData?.waktuSolat.prayerTime.imsak;
+
   console.log("Found PrayerData, rendering large transparent widget");
   props.renderWidget(
     <WaktuSolatLargeTransparent
       date={date}
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
+      nextDayImsak={nextDayImsak}
     />,
   );
 }
@@ -136,6 +175,7 @@ export async function requestWaktuSolatLargeTransparentUpdate(
   date: Date,
   zone: Zone,
   prayerTime: PrayerTime,
+  nextDayImsak?: number,
 ) {
   await requestWidgetUpdate({
     widgetName: "WaktuSolatLargeTransparent",
@@ -144,6 +184,7 @@ export async function requestWaktuSolatLargeTransparentUpdate(
         date={date}
         zone={zone}
         prayerTime={prayerTime}
+        nextDayImsak={nextDayImsak}
       />
     ),
     widgetNotFound: () => {},
