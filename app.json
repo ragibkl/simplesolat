@@ -91,6 +91,17 @@
               "updatePeriodMillis": 1800000
             },
             {
+              "name": "WaktuSolatLarge",
+              "label": "Waktu Solat Large",
+              "minWidth": "350dp",
+              "minHeight": "120dp",
+              "targetCellWidth": 5,
+              "targetCellHeight": 2,
+              "description": "prayer times widget (2-row with imsak)",
+              "previewImage": "./assets/widget-preview/waktu-solat.png",
+              "updatePeriodMillis": 1800000
+            },
+            {
               "name": "WaktuSolatCompact",
               "label": "Waktu Solat Compact",
               "minWidth": "280dp",
