@@ -44,7 +44,11 @@ function WaktuSolatLargeTransparent(props: WaktuSolatLargeTransparentProps) {
   } = props;
 
   const currentEpoch = date.getTime() / 1000;
-  const nextPrayer = getNextPrayer(props.prayerTime, currentEpoch, nextDayImsak);
+  const nextPrayer = getNextPrayer(
+    props.prayerTime,
+    currentEpoch,
+    nextDayImsak,
+  );
 
   return (
     <WidgetContainer style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}>
@@ -63,7 +67,9 @@ function WaktuSolatLargeTransparent(props: WaktuSolatLargeTransparentProps) {
           }}
         >
           <MonoTextWidget style={textStyle}>{zone.district}</MonoTextWidget>
-          <MonoTextWidget style={textStyle}>{date.toDateString()}</MonoTextWidget>
+          <MonoTextWidget style={textStyle}>
+            {date.toDateString()}
+          </MonoTextWidget>
         </FlexWidget>
 
         {nextPrayer && (

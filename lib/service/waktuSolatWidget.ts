@@ -40,8 +40,18 @@ export async function requestUpdateWaktuSolatWidgets(
 
   await requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime);
-  await requestWaktuSolatLargeUpdate(date, zone, waktuSolat.prayerTime, nextDayImsak);
-  await requestWaktuSolatLargeTransparentUpdate(date, zone, waktuSolat.prayerTime, nextDayImsak);
+  await requestWaktuSolatLargeUpdate(
+    date,
+    zone,
+    waktuSolat.prayerTime,
+    nextDayImsak,
+  );
+  await requestWaktuSolatLargeTransparentUpdate(
+    date,
+    zone,
+    waktuSolat.prayerTime,
+    nextDayImsak,
+  );
   await requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime);
 }
 

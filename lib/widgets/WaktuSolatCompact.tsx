@@ -21,7 +21,7 @@ function Column(props: WaktuColumnProps) {
   return <WaktuColumn textStyle={{ fontSize: 10 }} {...props} />;
 }
 
-function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
+export function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
   const {
     date,
     prayerTime: { fajr, syuruk, dhuhr, asr, maghrib, isha },

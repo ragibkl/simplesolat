@@ -1,4 +1,8 @@
-import notifee, { AuthorizationStatus, EventType, TriggerType } from "@notifee/react-native";
+import notifee, {
+  AuthorizationStatus,
+  EventType,
+  TriggerType,
+} from "@notifee/react-native";
 
 import { PrayerTime, WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { Zone } from "@/lib/data/zoneStore";

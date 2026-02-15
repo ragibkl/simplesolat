@@ -22,7 +22,7 @@ export type WaktuSolatWidgetProps = {
   prayerTime: PrayerTime;
 };
 
-function WaktuSolat(props: WaktuSolatWidgetProps) {
+export function WaktuSolat(props: WaktuSolatWidgetProps) {
   const {
     date,
     prayerTime: { fajr, syuruk, dhuhr, asr, maghrib, isha },

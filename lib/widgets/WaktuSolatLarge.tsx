@@ -34,7 +34,11 @@ function WaktuSolatLarge(props: WaktuSolatLargeWidgetProps) {
 
   const { borderColor } = getMonoStyle();
   const currentEpoch = date.getTime() / 1000;
-  const nextPrayer = getNextPrayer(props.prayerTime, currentEpoch, nextDayImsak);
+  const nextPrayer = getNextPrayer(
+    props.prayerTime,
+    currentEpoch,
+    nextDayImsak,
+  );
 
   return (
     <WidgetContainer>
