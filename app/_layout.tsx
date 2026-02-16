@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 
 import { useMonoStyle } from "@/lib/components/monoui";
 import { waktuSolatStore } from "@/lib/data/waktuSolatStore";
@@ -16,17 +16,17 @@ export default function RootLayout() {
   return (
     <waktuSolatStore.Provider>
       <zoneStore.Provider>
-        <Stack>
+        <Stack
+          screenOptions={{
+            headerTintColor: color,
+            headerStyle: { backgroundColor },
+            headerTitleStyle: { fontFamily: getFontFamily() },
+          }}
+        >
+          <Stack.Screen name="index" options={{ title: "simplesolat" }} />
           <Stack.Screen
-            name="index"
-            options={{
-              title: "simplesolat",
-              headerStyle: { backgroundColor },
-              headerTitleStyle: {
-                fontFamily: getFontFamily(),
-                color,
-              },
-            }}
+            name="previews"
+            options={{ title: "Widget Previews" }}
           />
         </Stack>
       </zoneStore.Provider>

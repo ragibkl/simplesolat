@@ -1,13 +1,13 @@
-import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Link } from "expo-router";
+import { View } from "react-native";
 
+import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
 import { MonoView } from "@/lib/components/MonoView";
 import { useCurrentDate } from "@/lib/hooks/date";
 import { useWaktuSolatCurrent } from "@/lib/hooks/waktuSolat";
 import { useWaktuSolatWidgetUpdate } from "@/lib/hooks/waktuSolatWidget";
 import { useUpdatedZone } from "@/lib/hooks/zone";
-import { WidgetPreviews } from "@/lib/widgets/WidgetPreviews";
 
 function getTimeText(epochSeconds: number) {
   const date = new Date(0);
@@ -88,37 +88,38 @@ export default function Index() {
     : "Location not set";
 
   return (
-    <SafeAreaView edges={["bottom"]}>
-      <ScrollView>
-        <MonoView style={{ flex: 1 }}>
-          <View style={{ padding: 20 }}>
-            <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
-            <MonoText style={{ padding: 5, fontSize: 20 }}>{zoneText}</MonoText>
-          </View>
+    <MonoScrollPage>
+      <View style={{ padding: 20 }}>
+        <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
+        <MonoText style={{ padding: 5, fontSize: 20 }}>{zoneText}</MonoText>
+      </View>
 
-          <View>
-            <PrayerTimeRow date={date} label="Imsak" start={imsak} end={fajr} />
-            <PrayerTimeRow date={date} label="Fajr" start={fajr} end={syuruk} />
-            <PrayerTimeRow
-              date={date}
-              label="Syuruk"
-              start={syuruk}
-              end={dhuhr}
-            />
-            <PrayerTimeRow date={date} label="Dhuhr" start={dhuhr} end={asr} />
-            <PrayerTimeRow date={date} label="Asr" start={asr} end={maghrib} />
-            <PrayerTimeRow
-              date={date}
-              label="Maghrib"
-              start={maghrib}
-              end={isha}
-            />
-            <PrayerTimeRow date={date} label="Isha" start={isha} />
-          </View>
+      <View>
+        <PrayerTimeRow date={date} label="Imsak" start={imsak} end={fajr} />
+        <PrayerTimeRow date={date} label="Fajr" start={fajr} end={syuruk} />
+        <PrayerTimeRow date={date} label="Syuruk" start={syuruk} end={dhuhr} />
+        <PrayerTimeRow date={date} label="Dhuhr" start={dhuhr} end={asr} />
+        <PrayerTimeRow date={date} label="Asr" start={asr} end={maghrib} />
+        <PrayerTimeRow date={date} label="Maghrib" start={maghrib} end={isha} />
+        <PrayerTimeRow date={date} label="Isha" start={isha} />
+      </View>
 
-          {__DEV__ && <WidgetPreviews />}
-        </MonoView>
-      </ScrollView>
-    </SafeAreaView>
+      {__DEV__ && (
+        <View style={{ padding: 20, alignItems: "center" }}>
+          <Link href="/previews">
+            <MonoView
+              style={{
+                borderWidth: 1,
+                borderRadius: 8,
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+              }}
+            >
+              <MonoText style={{ fontSize: 16 }}>Widget Previews</MonoText>
+            </MonoView>
+          </Link>
+        </View>
+      )}
+    </MonoScrollPage>
   );
 }

@@ -10,8 +10,10 @@ type MonoTextProps = {
 };
 
 export function MonoView(props: MonoTextProps) {
-  const { backgroundColor } = useMonoStyle();
+  const { backgroundColor, borderColor } = useMonoStyle();
   return (
-    <View style={[{ backgroundColor }, props.style]}>{props.children}</View>
+    <View style={[{ backgroundColor, borderColor }, props.style]}>
+      {props.children}
+    </View>
   );
 }
