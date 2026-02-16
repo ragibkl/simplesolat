@@ -7,7 +7,7 @@ const KAABA_LAT = (21.4225 * Math.PI) / 180;
 const KAABA_LNG = (39.8262 * Math.PI) / 180;
 
 // Lower = smoother but slower to respond, higher = more responsive but jittery
-const SMOOTHING = 0.5;
+const SMOOTHING = 0.9;
 
 function getQiblaBearing(lat: number, lng: number): number {
   const latRad = (lat * Math.PI) / 180;
@@ -31,16 +31,36 @@ function smoothAngle(current: number, target: number): number {
   return (current + diff * SMOOTHING + 360) % 360;
 }
 
-function useHeading(): number | null {
-  const [heading, setHeading] = useState<number | null>(null);
+export type Accuracy = "high" | "medium" | "low" | "none";
+
+function getAccuracyLabel(level: number): Accuracy {
+  if (level >= 3) {
+    return "high";
+  } else if (level === 2) {
+    return "medium";
+  } else if (level === 1) {
+    return "low";
+  } else {
+    return "none";
+  }
+}
+
+type HeadingData = {
+  heading: number;
+  accuracy: Accuracy;
+};
+
+function useHeading(): HeadingData | null {
+  const [data, setData] = useState<HeadingData | null>(null);
   const smoothed = useRef<number | null>(null);
 
   useEffect(() => {
     let subscription: Location.LocationSubscription | null = null;
 
     async function start() {
-      subscription = await Location.watchHeadingAsync((data) => {
-        const raw = data.trueHeading >= 0 ? data.trueHeading : data.magHeading;
+      subscription = await Location.watchHeadingAsync((update) => {
+        const raw =
+          update.trueHeading >= 0 ? update.trueHeading : update.magHeading;
 
         if (smoothed.current == null) {
           smoothed.current = raw;
@@ -48,7 +68,10 @@ function useHeading(): number | null {
           smoothed.current = smoothAngle(smoothed.current, raw);
         }
 
-        setHeading(smoothed.current);
+        setData({
+          heading: smoothed.current,
+          accuracy: getAccuracyLabel(update.accuracy),
+        });
       });
     }
 
@@ -59,29 +82,37 @@ function useHeading(): number | null {
     };
   }, []);
 
-  return heading;
+  return data;
 }
 
 export type CompassData =
   | {
       ready: true;
       heading: number;
+      accuracy: Accuracy;
       location: Location.LocationObject;
       qiblaBearing: number;
     }
   | {
       ready: false;
       heading: null;
+      accuracy: null;
       location: null;
       qiblaBearing: null;
     };
 
 export function useCompass(): CompassData {
   const { location } = useLocation();
-  const heading = useHeading();
+  const headingData = useHeading();
 
-  if (heading == null || location == null) {
-    return { ready: false, heading: null, location: null, qiblaBearing: null };
+  if (headingData == null || location == null) {
+    return {
+      ready: false,
+      heading: null,
+      accuracy: null,
+      location: null,
+      qiblaBearing: null,
+    };
   }
 
   const qiblaBearing = getQiblaBearing(
@@ -89,5 +120,11 @@ export function useCompass(): CompassData {
     location.coords.longitude,
   );
 
-  return { ready: true, heading, location, qiblaBearing };
+  return {
+    ready: true,
+    heading: headingData.heading,
+    accuracy: headingData.accuracy,
+    location,
+    qiblaBearing,
+  };
 }

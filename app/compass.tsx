@@ -94,7 +94,7 @@ function CardinalLabel(props: {
 }
 
 export default function Compass() {
-  const { ready, heading, qiblaBearing } = useCompass();
+  const { ready, heading, qiblaBearing, accuracy } = useCompass();
 
   if (!ready) {
     return (
@@ -107,17 +107,22 @@ export default function Compass() {
   }
 
   const diff = Math.abs(((heading - qiblaBearing + 540) % 360) - 180);
-  const aligned = diff <= 1.0;
+  const aligned = diff <= 2.0;
 
   return (
     <MonoScrollPage>
       <View style={{ flex: 1, alignItems: "center", paddingBottom: 40 }}>
         <View style={{ padding: 20 }}>
           <MonoText style={{ fontSize: 14 }}>
-            {`Kaaba direction: ${qiblaBearing.toFixed(1)}°`}
+            {`Kaaba direction: ${qiblaBearing.toFixed(0)}°`}
           </MonoText>
           <MonoText style={{ fontSize: 14, marginTop: 5 }}>
-            {`You're facing: ${heading.toFixed(1)}°${aligned ? " \u2713" : ""}`}
+            {`You're facing: ${heading.toFixed(0)}°${aligned ? " \u2713" : ""}`}
+          </MonoText>
+          <MonoText style={{ fontSize: 14, marginTop: 5 }}>
+            Accuracy: {accuracy}{" "}
+            {(accuracy === "low" || accuracy === "none") &&
+              "Low accuracy - wave phone in figure-8"}
           </MonoText>
         </View>
 
