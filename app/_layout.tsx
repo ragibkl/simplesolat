@@ -1,4 +1,5 @@
-import { Stack } from "expo-router";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { Link, Stack } from "expo-router";
 import { useEffect } from "react";
 
 import { useMonoStyle } from "@/lib/components/monoui";
@@ -23,7 +24,18 @@ export default function RootLayout() {
             headerTitleStyle: { fontFamily: getFontFamily() },
           }}
         >
-          <Stack.Screen name="index" options={{ title: "simplesolat" }} />
+          <Stack.Screen
+            name="index"
+            options={{
+              title: "simplesolat",
+              headerRight: () => (
+                <Link href="/compass">
+                  <FontAwesome6 name="kaaba" size={20} color={color} />
+                </Link>
+              ),
+            }}
+          />
+          <Stack.Screen name="compass" options={{ title: "Qibla" }} />
           <Stack.Screen
             name="previews"
             options={{ title: "Widget Previews" }}
