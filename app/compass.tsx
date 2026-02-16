@@ -94,46 +94,48 @@ function CardinalLabel(props: {
 }
 
 export default function Compass() {
-  const { heading, qiblaBearing, ready } = useCompass();
+  const { ready, heading, qiblaBearing } = useCompass();
 
-  const diff = ready
-    ? Math.abs(((heading! - qiblaBearing! + 540) % 360) - 180)
-    : null;
-  const aligned = diff != null && diff <= 1.0;
-
-  return (
-    <MonoScrollPage>
-      {ready ? (
-        <View style={{ flex: 1, alignItems: "center", paddingBottom: 40 }}>
-          <View style={{ padding: 20 }}>
-            <MonoText style={{ fontSize: 14 }}>
-              {`Kaaba direction: ${qiblaBearing!.toFixed(1)}°`}
-            </MonoText>
-            <MonoText style={{ fontSize: 14, marginTop: 5 }}>
-              {`You're facing: ${heading!.toFixed(1)}°${aligned ? " \u2713" : ""}`}
-            </MonoText>
-          </View>
-
-          <View
-            style={{
-              position: "relative",
-              transform: [{ rotate: `${-heading!}deg` }],
-            }}
-          >
-            <CompassRing>
-              <CompassArrow rotation={qiblaBearing!} />
-            </CompassRing>
-            <CardinalLabel label="N" rotation={0} heading={heading!} />
-            <CardinalLabel label="E" rotation={90} heading={heading!} />
-            <CardinalLabel label="S" rotation={180} heading={heading!} />
-            <CardinalLabel label="W" rotation={270} heading={heading!} />
-          </View>
-        </View>
-      ) : (
+  if (!ready) {
+    return (
+      <MonoScrollPage>
         <View style={{ flex: 1, alignItems: "center", paddingTop: 40 }}>
           <MonoText style={{ fontSize: 16 }}>Waiting for compass...</MonoText>
         </View>
-      )}
+      </MonoScrollPage>
+    );
+  }
+
+  const diff = Math.abs(((heading - qiblaBearing + 540) % 360) - 180);
+  const aligned = diff <= 1.0;
+
+  return (
+    <MonoScrollPage>
+      <View style={{ flex: 1, alignItems: "center", paddingBottom: 40 }}>
+        <View style={{ padding: 20 }}>
+          <MonoText style={{ fontSize: 14 }}>
+            {`Kaaba direction: ${qiblaBearing.toFixed(1)}°`}
+          </MonoText>
+          <MonoText style={{ fontSize: 14, marginTop: 5 }}>
+            {`You're facing: ${heading.toFixed(1)}°${aligned ? " \u2713" : ""}`}
+          </MonoText>
+        </View>
+
+        <View
+          style={{
+            position: "relative",
+            transform: [{ rotate: `${-heading}deg` }],
+          }}
+        >
+          <CompassRing>
+            <CompassArrow rotation={qiblaBearing} />
+          </CompassRing>
+          <CardinalLabel label="N" rotation={0} heading={heading} />
+          <CardinalLabel label="E" rotation={90} heading={heading} />
+          <CardinalLabel label="S" rotation={180} heading={heading} />
+          <CardinalLabel label="W" rotation={270} heading={heading} />
+        </View>
+      </View>
     </MonoScrollPage>
   );
 }
