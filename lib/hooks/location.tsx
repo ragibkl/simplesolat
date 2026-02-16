@@ -1,5 +1,6 @@
 import * as Location from "expo-location";
 import { useState, useEffect, useCallback } from "react";
+import { AppState } from "react-native";
 
 import { useCurrentDate } from "@/lib/hooks/date";
 import { getLocation } from "@/lib/service/location";
@@ -20,6 +21,16 @@ export function useLocation() {
   useEffect(() => {
     updateLocation();
   }, [updateLocation, date]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        updateLocation();
+      }
+    });
+
+    return () => sub.remove();
+  }, [updateLocation]);
 
   return { location, updateLocation };
 }
