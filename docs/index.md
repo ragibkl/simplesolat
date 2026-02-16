@@ -2,8 +2,11 @@
 
 A minimal, distraction-free prayer times app for Malaysia.
 
-✅ Shows all 6 prayer times including Syuruk
-✅ Home screen widget - see times without opening app
+✅ Shows all 7 prayer times including Imsak and Syuruk
+✅ Swipe to see tomorrow's prayer times
+✅ Qibla compass - find the direction of the Kaaba
+✅ Home screen widgets - multiple styles to choose from
+✅ Dark mode support
 ✅ All 60 Malaysian zones with complete coverage
 ✅ Automatic zone detection based on GPS
 ✅ Official JAKIM e-Solat data
@@ -13,7 +16,8 @@ A minimal, distraction-free prayer times app for Malaysia.
 ## FEATURES:
 
 🕌 Complete Prayer Times
-Shows all 6 daily prayer times:
+Shows all 7 daily prayer times:
+- Imsak
 - Fajr
 - Syuruk (sunrise) - often hidden in other apps
 - Dhuhr
@@ -21,17 +25,26 @@ Shows all 6 daily prayer times:
 - Maghrib
 - Isha
 
+Swipe to see tomorrow's prayer times — plan your day ahead.
+
 📍 Automatic Zone Detection
 Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah.
 
-📱 Home Screen Widget
-Add the widget to your home screen to see all prayer times at a glance. No need to open the app - prayer times are always visible.
+🧭 Qibla Compass
+Built-in compass to find the direction of the Kaaba from your location. Smooth rotation with accuracy indicator.
+
+📱 Home Screen Widgets
+Multiple widget styles to suit your home screen:
+- Standard - all prayer times at a glance
+- Transparent - blends with your wallpaper
+- Compact - fits smaller spaces
+All widgets support dark mode and update automatically.
 
 📡 Official JAKIM Data
 All prayer times are sourced from JAKIM e-Solat, ensuring accuracy and reliability.
 
 ⚫⚪ Minimal Design
-Clean, distraction-free interface. No ads, no clutter, just prayer times.
+Clean, distraction-free interface with dark mode support. No ads, no clutter, just prayer times.
 
 🌐 Offline Support
 Works without internet connection after initial data sync.
