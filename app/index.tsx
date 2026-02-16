@@ -73,9 +73,10 @@ function PrayerTimeRow(props: {
 function PrayerTimePage(props: {
   currentDate: Date;
   dateText: string;
+  subtitle: string;
   waktuSolat: WaktuSolat | null;
 }) {
-  const { currentDate, dateText, waktuSolat } = props;
+  const { currentDate, dateText, subtitle, waktuSolat } = props;
 
   const {
     imsak = 0,
@@ -91,6 +92,9 @@ function PrayerTimePage(props: {
     <View>
       <View style={{ padding: 20 }}>
         <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
+        <MonoText style={{ paddingHorizontal: 5, fontSize: 14 }}>
+          {subtitle}
+        </MonoText>
       </View>
 
       <View>
@@ -157,11 +161,13 @@ export default function Index() {
         <PrayerTimePage
           currentDate={date}
           dateText={date.toDateString()}
+          subtitle="Today"
           waktuSolat={waktuSolat}
         />
         <PrayerTimePage
           currentDate={date}
           dateText={tomorrow.toDateString()}
+          subtitle="Tomorrow"
           waktuSolat={waktuSolatTomorrow}
         />
       </MonoPager>
