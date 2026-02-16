@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { addDays } from "date-fns";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { WaktuSolat, waktuSolatStore } from "@/lib/data/waktuSolatStore";
 import { getWaktuSolatByZone } from "@/lib/remote/simplesolat";
@@ -58,4 +59,31 @@ export function useWaktuSolatCurrent() {
   }, [zone, getOrRetrieveWaktuSolat, date]);
 
   return { waktuSolat };
+}
+
+export function useWaktuSolatTomorrow() {
+  const { date } = useCurrentDate();
+  const { getOrRetrieveWaktuSolat } = useWaktuSolat();
+  const { zone } = useZone();
+
+  const tomorrow = useMemo(() => addDays(date, 1), [date]);
+  const [waktuSolatTomorrow, setWaktuSolatTomorrow] =
+    useState<WaktuSolat | null>(null);
+
+  useEffect(() => {
+    async function effect() {
+      if (zone) {
+        const w = await getOrRetrieveWaktuSolat(zone.zone, tomorrow);
+        if (w) {
+          setWaktuSolatTomorrow(w);
+        }
+      } else {
+        setWaktuSolatTomorrow(null);
+      }
+    }
+
+    effect();
+  }, [zone, getOrRetrieveWaktuSolat, tomorrow]);
+
+  return { waktuSolatTomorrow, tomorrow };
 }

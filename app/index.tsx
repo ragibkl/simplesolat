@@ -1,11 +1,16 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
+import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
 import { MonoView } from "@/lib/components/MonoView";
+import { WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { useCurrentDate } from "@/lib/hooks/date";
-import { useWaktuSolatCurrent } from "@/lib/hooks/waktuSolat";
+import {
+  useWaktuSolatCurrent,
+  useWaktuSolatTomorrow,
+} from "@/lib/hooks/waktuSolat";
 import { useWaktuSolatWidgetUpdate } from "@/lib/hooks/waktuSolatWidget";
 import { useUpdatedZone } from "@/lib/hooks/zone";
 
@@ -65,13 +70,12 @@ function PrayerTimeRow(props: {
   );
 }
 
-export default function Index() {
-  const { date } = useCurrentDate();
-  const { zone } = useUpdatedZone();
-  const { waktuSolat } = useWaktuSolatCurrent();
-  useWaktuSolatWidgetUpdate();
-
-  const dateText = date.toDateString();
+function PrayerTimePage(props: {
+  currentDate: Date;
+  dateText: string;
+  waktuSolat: WaktuSolat | null;
+}) {
+  const { currentDate, dateText, waktuSolat } = props;
 
   const {
     imsak = 0,
@@ -83,38 +87,89 @@ export default function Index() {
     isha = 0,
   } = waktuSolat?.prayerTime || {};
 
+  return (
+    <View>
+      <View style={{ padding: 20 }}>
+        <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
+      </View>
+
+      <View>
+        <PrayerTimeRow
+          date={currentDate}
+          label="Imsak"
+          start={imsak}
+          end={fajr}
+        />
+        <PrayerTimeRow
+          date={currentDate}
+          label="Fajr"
+          start={fajr}
+          end={syuruk}
+        />
+        <PrayerTimeRow
+          date={currentDate}
+          label="Syuruk"
+          start={syuruk}
+          end={dhuhr}
+        />
+        <PrayerTimeRow
+          date={currentDate}
+          label="Dhuhr"
+          start={dhuhr}
+          end={asr}
+        />
+        <PrayerTimeRow
+          date={currentDate}
+          label="Asr"
+          start={asr}
+          end={maghrib}
+        />
+        <PrayerTimeRow
+          date={currentDate}
+          label="Maghrib"
+          start={maghrib}
+          end={isha}
+        />
+        <PrayerTimeRow date={currentDate} label="Isha" start={isha} />
+      </View>
+    </View>
+  );
+}
+
+export default function Index() {
+  const { date } = useCurrentDate();
+  const { zone } = useUpdatedZone();
+  const { waktuSolat } = useWaktuSolatCurrent();
+  const { waktuSolatTomorrow, tomorrow } = useWaktuSolatTomorrow();
+  useWaktuSolatWidgetUpdate();
+
   const zoneText = zone
     ? `${zone.zone} - ${zone.district}, ${zone.state}`
     : "Location not set";
 
   return (
     <MonoScrollPage>
-      <View style={{ padding: 20 }}>
-        <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
+      <View style={{ padding: 20, paddingBottom: 0 }}>
         <MonoText style={{ padding: 5, fontSize: 20 }}>{zoneText}</MonoText>
       </View>
 
-      <View>
-        <PrayerTimeRow date={date} label="Imsak" start={imsak} end={fajr} />
-        <PrayerTimeRow date={date} label="Fajr" start={fajr} end={syuruk} />
-        <PrayerTimeRow date={date} label="Syuruk" start={syuruk} end={dhuhr} />
-        <PrayerTimeRow date={date} label="Dhuhr" start={dhuhr} end={asr} />
-        <PrayerTimeRow date={date} label="Asr" start={asr} end={maghrib} />
-        <PrayerTimeRow date={date} label="Maghrib" start={maghrib} end={isha} />
-        <PrayerTimeRow date={date} label="Isha" start={isha} />
-      </View>
+      <MonoPager>
+        <PrayerTimePage
+          currentDate={date}
+          dateText={date.toDateString()}
+          waktuSolat={waktuSolat}
+        />
+        <PrayerTimePage
+          currentDate={date}
+          dateText={tomorrow.toDateString()}
+          waktuSolat={waktuSolatTomorrow}
+        />
+      </MonoPager>
 
       {__DEV__ && (
         <View style={{ padding: 20, alignItems: "center" }}>
           <Link href="/previews">
-            <MonoView
-              style={{
-                borderWidth: 1,
-                borderRadius: 8,
-                paddingVertical: 8,
-                paddingHorizontal: 16,
-              }}
-            >
+            <MonoView style={{ borderWidth: 1, borderRadius: 8, padding: 8 }}>
               <MonoText style={{ fontSize: 16 }}>Widget Previews</MonoText>
             </MonoView>
           </Link>
