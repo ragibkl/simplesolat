@@ -27,7 +27,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="index"
             options={{
-              title: "simplesolat",
+              title: "pinkiesolat",
               headerRight: () => (
                 <Link href="/compass">
                   <FontAwesome6 name="kaaba" size={20} color={color} />
