@@ -31,9 +31,9 @@ export function getFontFamily(fontWeight?: FontWeight): string {
 export function useMonoStyle() {
   const colorScheme = useColorScheme();
 
-  const color = colorScheme === "dark" ? "#FFFFFF" : "#000000";
-  const backgroundColor = colorScheme === "dark" ? "#000000" : "#FFFFFF";
-  const borderColor = colorScheme === "dark" ? "#ffffff" : "#000000";
+  const color = colorScheme === "dark" ? "#FFB6C1" : "#D5006D";
+  const backgroundColor = colorScheme === "dark" ? "#1A0A10" : "#FFF0F5";
+  const borderColor = colorScheme === "dark" ? "#FFB6C1" : "#D5006D";
 
   return {
     color,
@@ -47,10 +47,10 @@ export function useMonoStyle() {
 export function getMonoStyle() {
   const colorScheme = Appearance.getColorScheme();
 
-  const color: ColorProp = colorScheme === "dark" ? "#FFFFFF" : "#000000";
+  const color: ColorProp = colorScheme === "dark" ? "#FFB6C1" : "#D5006D";
   const backgroundColor: ColorProp =
-    colorScheme === "dark" ? "#000000" : "#FFFFFF";
-  const borderColor: ColorProp = colorScheme === "dark" ? "#ffffff" : "#000000";
+    colorScheme === "dark" ? "#1A0A10" : "#FFF0F5";
+  const borderColor: ColorProp = colorScheme === "dark" ? "#FFB6C1" : "#D5006D";
 
   return {
     color,
