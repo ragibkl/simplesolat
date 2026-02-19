@@ -12,6 +12,7 @@ import { MonoView } from "@/lib/components/MonoView";
 import { WaktuSolat } from "@/lib/widgets/WaktuSolat";
 import { WaktuSolatCompact } from "@/lib/widgets/WaktuSolatCompact";
 import { WaktuSolatImsak } from "@/lib/widgets/WaktuSolatImsak";
+import { WaktuSolatLarge } from "@/lib/widgets/WaktuSolatLarge";
 import { WaktuSolatTransparent } from "@/lib/widgets/WaktuSolatTransparent";
 
 export default function Index() {
@@ -67,6 +68,20 @@ export default function Index() {
             )}
             width={350}
             height={80}
+          />
+        </MonoView>
+
+        <MonoView style={{ borderWidth: 1, margin: 5 }}>
+          <WidgetPreview
+            renderWidget={() => (
+              <WaktuSolatLarge
+                date={date}
+                zone={zone}
+                prayerTime={waktuSolat?.prayerTime}
+              />
+            )}
+            width={350}
+            height={160}
           />
         </MonoView>
 

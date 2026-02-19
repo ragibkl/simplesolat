@@ -1,4 +1,4 @@
-import { addDays, startOfMinute } from "date-fns";
+import { startOfMinute } from "date-fns";
 import React from "react";
 import {
   FlexWidget,
@@ -15,30 +15,21 @@ import { getPrayerData } from "@/lib/service/waktuSolatWidget";
 import { Empty } from "./Empty";
 import { WaktuRow } from "./WaktuRow";
 import { WidgetContainer } from "./WidgetContainer";
-import { getNextPrayer, getTimeText } from "./utils";
 
 export type WaktuSolatLargeWidgetProps = {
   date: Date;
   zone: Zone;
   prayerTime: PrayerTime;
-  nextDayImsak?: number;
 };
 
-function WaktuSolatLarge(props: WaktuSolatLargeWidgetProps) {
+export function WaktuSolatLarge(props: WaktuSolatLargeWidgetProps) {
   const {
     date,
     prayerTime: { imsak, fajr, syuruk, dhuhr, asr, maghrib, isha },
     zone,
-    nextDayImsak,
   } = props;
 
   const { borderColor } = getMonoStyle();
-  const currentEpoch = date.getTime() / 1000;
-  const nextPrayer = getNextPrayer(
-    props.prayerTime,
-    currentEpoch,
-    nextDayImsak,
-  );
 
   return (
     <WidgetContainer>
@@ -59,22 +50,6 @@ function WaktuSolatLarge(props: WaktuSolatLargeWidgetProps) {
           <MonoTextWidget>{zone.district}</MonoTextWidget>
           <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
         </FlexWidget>
-
-        {nextPrayer && (
-          <FlexWidget
-            style={{
-              flexDirection: "column",
-              alignItems: "flex-end",
-            }}
-          >
-            <MonoTextWidget fontWeight="extrabold">
-              {nextPrayer.label}
-            </MonoTextWidget>
-            <MonoTextWidget fontWeight="extrabold">
-              {getTimeText(nextPrayer.epochSeconds)}
-            </MonoTextWidget>
-          </FlexWidget>
-        )}
       </FlexWidget>
 
       <FlexWidget
@@ -124,17 +99,12 @@ async function updateWaktuSolatLargeAndRender(props: WidgetTaskHandlerProps) {
     return;
   }
 
-  const tomorrow = addDays(date, 1);
-  const tomorrowData = await getPrayerData(tomorrow, false);
-  const nextDayImsak = tomorrowData?.waktuSolat.prayerTime.imsak;
-
   console.log("Found PrayerData, rendering large widget");
   props.renderWidget(
     <WaktuSolatLarge
       date={date}
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
-      nextDayImsak={nextDayImsak}
     />,
   );
 }
@@ -171,17 +141,11 @@ export async function requestWaktuSolatLargeUpdate(
   date: Date,
   zone: Zone,
   prayerTime: PrayerTime,
-  nextDayImsak?: number,
 ) {
   await requestWidgetUpdate({
     widgetName: "WaktuSolatLarge",
     renderWidget: () => (
-      <WaktuSolatLarge
-        date={date}
-        zone={zone}
-        prayerTime={prayerTime}
-        nextDayImsak={nextDayImsak}
-      />
+      <WaktuSolatLarge date={date} zone={zone} prayerTime={prayerTime} />
     ),
     widgetNotFound: () => {},
   });
