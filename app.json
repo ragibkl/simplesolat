@@ -98,7 +98,7 @@
               "targetCellWidth": 5,
               "targetCellHeight": 1,
               "description": "prayer times widget with imsak",
-              "previewImage": "./assets/widget-preview/waktu-solat-imsak.png",
+              "previewImage": "./assets/widget-preview/waktu-solat-with-imsak.png",
               "updatePeriodMillis": 1800000
             },
             {
