@@ -7,13 +7,12 @@ import {
 } from "react-native-android-widget";
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
-import { getMonoStyle } from "@/lib/components/monoui";
 import { PrayerTime } from "@/lib/data/waktuSolatStore";
 import { Zone } from "@/lib/data/zoneStore";
 import { getPrayerData } from "@/lib/service/waktuSolatWidget";
 
 import { Empty } from "./Empty";
-import { WaktuRow } from "./WaktuRow";
+import { WaktuColumn } from "./WaktuColumn";
 import { WidgetContainer } from "./WidgetContainer";
 
 export type WaktuSolatLargeWidgetProps = {
@@ -25,11 +24,11 @@ export type WaktuSolatLargeWidgetProps = {
 export function WaktuSolatLarge(props: WaktuSolatLargeWidgetProps) {
   const {
     date,
-    prayerTime: { imsak, fajr, syuruk, dhuhr, asr, maghrib, isha },
+    prayerTime: { fajr, dhuhr, asr, maghrib, isha },
     zone,
   } = props;
 
-  const { borderColor } = getMonoStyle();
+  const textStyle = { fontSize: 16 };
 
   return (
     <WidgetContainer>
@@ -38,18 +37,11 @@ export function WaktuSolatLarge(props: WaktuSolatLargeWidgetProps) {
           flexDirection: "row",
           width: "match_parent",
           justifyContent: "space-between",
-          alignItems: "flex-start",
+          alignItems: "center",
         }}
       >
-        <FlexWidget
-          style={{
-            flexDirection: "column",
-            alignItems: "flex-start",
-          }}
-        >
-          <MonoTextWidget>{zone.district}</MonoTextWidget>
-          <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
-        </FlexWidget>
+        <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
+        <MonoTextWidget>{zone.district}</MonoTextWidget>
       </FlexWidget>
 
       <FlexWidget
@@ -57,35 +49,42 @@ export function WaktuSolatLarge(props: WaktuSolatLargeWidgetProps) {
           flex: 1,
           flexDirection: "row",
           width: "match_parent",
-          borderRadius: 4,
-          borderColor,
-          borderWidth: 1,
         }}
       >
-        <FlexWidget
-          style={{
-            flex: 1,
-            flexDirection: "column",
-            height: "match_parent",
-          }}
-        >
-          <WaktuRow date={date} label="Imsak" start={imsak} end={fajr} />
-          <WaktuRow date={date} label="Fajr" start={fajr} end={syuruk} />
-          <WaktuRow date={date} label="Syuruk" start={syuruk} end={dhuhr} />
-        </FlexWidget>
-
-        <FlexWidget
-          style={{
-            flex: 1,
-            flexDirection: "column",
-            height: "match_parent",
-          }}
-        >
-          <WaktuRow date={date} label="Dhuhr" start={dhuhr} end={asr} />
-          <WaktuRow date={date} label="Asr" start={asr} end={maghrib} />
-          <WaktuRow date={date} label="Maghrib" start={maghrib} end={isha} />
-          <WaktuRow date={date} label="Isha" start={isha} />
-        </FlexWidget>
+        <WaktuColumn
+          date={date}
+          label="Fajr"
+          start={fajr}
+          end={dhuhr}
+          textStyle={textStyle}
+        />
+        <WaktuColumn
+          date={date}
+          label="Dhuhr"
+          start={dhuhr}
+          end={asr}
+          textStyle={textStyle}
+        />
+        <WaktuColumn
+          date={date}
+          label="Asr"
+          start={asr}
+          end={maghrib}
+          textStyle={textStyle}
+        />
+        <WaktuColumn
+          date={date}
+          label="Maghrib"
+          start={maghrib}
+          end={isha}
+          textStyle={textStyle}
+        />
+        <WaktuColumn
+          date={date}
+          label="Isha"
+          start={isha}
+          textStyle={textStyle}
+        />
       </FlexWidget>
     </WidgetContainer>
   );
