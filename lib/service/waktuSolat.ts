@@ -1,5 +1,4 @@
 import { compareAsc, startOfYesterday } from "date-fns";
-import merge from "deepmerge";
 
 import {
   WaktuSolat,
@@ -81,7 +80,7 @@ export function mergeWaktuSolatResponseIntoStore(
     newStore[key] = waktuSolat;
   });
 
-  return merge(trimmedStore, newStore);
+  return { ...trimmedStore, ...newStore };
 }
 
 export async function getOrRetrieveWaktuSolat(zone: string, date: Date) {
