@@ -37,10 +37,27 @@ export function getWaktuSolatFromStore(
   return store[key] || null;
 }
 
+function trimWaktuSolatStore(store: WaktuSolatStore): WaktuSolatStore {
+  const cutoff = startOfYesterday();
+  const newStore: WaktuSolatStore = {};
+
+  for (const key in store) {
+    const waktuSolat = store[key];
+    const dt = new Date(waktuSolat.year, waktuSolat.month - 1, waktuSolat.date);
+
+    if (compareAsc(dt, cutoff) >= 0) {
+      newStore[key] = waktuSolat;
+    }
+  }
+
+  return newStore;
+}
+
 export function mergeWaktuSolatResponseIntoStore(
   store: WaktuSolatStore,
   res: WaktuSolatResponse,
 ): WaktuSolatStore {
+  const trimmedStore = trimWaktuSolatStore(store);
   const newStore: WaktuSolatStore = {};
 
   res.data.forEach((p) => {
@@ -64,23 +81,7 @@ export function mergeWaktuSolatResponseIntoStore(
     newStore[key] = waktuSolat;
   });
 
-  return merge(store, newStore);
-}
-
-export function trimWaktuSolatStore(store: WaktuSolatStore): WaktuSolatStore {
-  const cutoff = startOfYesterday();
-  const newStore: WaktuSolatStore = {};
-
-  for (const key in store) {
-    const waktuSolat = store[key];
-    const dt = new Date(waktuSolat.year, waktuSolat.month - 1, waktuSolat.date);
-
-    if (compareAsc(dt, cutoff) >= 0) {
-      newStore[key] = waktuSolat;
-    }
-  }
-
-  return newStore;
+  return merge(trimmedStore, newStore);
 }
 
 export async function getOrRetrieveWaktuSolat(zone: string, date: Date) {
@@ -93,8 +94,7 @@ export async function getOrRetrieveWaktuSolat(zone: string, date: Date) {
   }
 
   const res = await getWaktuSolatByZone(date, zone);
-  const trimmedStore = trimWaktuSolatStore(store);
-  const newStore = mergeWaktuSolatResponseIntoStore(trimmedStore, res);
+  const newStore = mergeWaktuSolatResponseIntoStore(store, res);
   console.log(`Update WaktuSolat into store`);
   await waktuSolatStore.save(newStore);
 
