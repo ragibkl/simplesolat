@@ -6,7 +6,6 @@ import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
 import { requestWaktuSolatCompactUpdate } from "@/lib/widgets/WaktuSolatCompact";
 import { requestWaktuSolatImsakWidgetUpdate } from "@/lib/widgets/WaktuSolatImsak";
 import { requestWaktuSolatLargeUpdate } from "@/lib/widgets/WaktuSolatLarge";
-import { requestWaktuSolatLargeTransparentUpdate } from "@/lib/widgets/WaktuSolatLargeTransparent";
 import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTransparent";
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
@@ -43,12 +42,6 @@ export async function requestUpdateWaktuSolatWidgets(
   await requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatImsakWidgetUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatLargeUpdate(
-    date,
-    zone,
-    waktuSolat.prayerTime,
-    nextDayImsak,
-  );
-  await requestWaktuSolatLargeTransparentUpdate(
     date,
     zone,
     waktuSolat.prayerTime,

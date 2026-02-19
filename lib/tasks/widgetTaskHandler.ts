@@ -4,7 +4,6 @@ import { waktuSolatWidgetTaskHandler } from "@/lib/widgets/WaktuSolat";
 import { waktuSolatCompactTaskHandler } from "@/lib/widgets/WaktuSolatCompact";
 import { waktuSolatImsakWidgetTaskHandler } from "@/lib/widgets/WaktuSolatImsak";
 import { waktuSolatLargeTaskHandler } from "@/lib/widgets/WaktuSolatLarge";
-import { waktuSolatLargeTransparentTaskHandler } from "@/lib/widgets/WaktuSolatLargeTransparent";
 import { waktuSolatTransparentTaskHandler } from "@/lib/widgets/WaktuSolatTransparent";
 
 export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
@@ -20,9 +19,6 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
       break;
     case "WaktuSolatLarge":
       await waktuSolatLargeTaskHandler(props);
-      break;
-    case "WaktuSolatLargeTransparent":
-      await waktuSolatLargeTransparentTaskHandler(props);
       break;
     case "WaktuSolatTransparent":
       await waktuSolatTransparentTaskHandler(props);
