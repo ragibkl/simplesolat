@@ -90,7 +90,18 @@
               "previewImage": "./assets/widget-preview/waktu-solat-transparent.png",
               "updatePeriodMillis": 1800000
             },
-{
+            {
+              "name": "WaktuSolatImsak",
+              "label": "Waktu Solat with Imsak",
+              "minWidth": "350dp",
+              "minHeight": "60dp",
+              "targetCellWidth": 5,
+              "targetCellHeight": 1,
+              "description": "prayer times widget with imsak",
+              "previewImage": "./assets/widget-preview/waktu-solat-imsak.png",
+              "updatePeriodMillis": 1800000
+            },
+            {
               "name": "WaktuSolatCompact",
               "label": "Waktu Solat Compact",
               "minWidth": "280dp",

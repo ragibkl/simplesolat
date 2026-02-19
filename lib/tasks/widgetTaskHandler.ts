@@ -2,6 +2,7 @@ import type { WidgetTaskHandlerProps } from "react-native-android-widget";
 
 import { waktuSolatWidgetTaskHandler } from "@/lib/widgets/WaktuSolat";
 import { waktuSolatCompactTaskHandler } from "@/lib/widgets/WaktuSolatCompact";
+import { waktuSolatImsakWidgetTaskHandler } from "@/lib/widgets/WaktuSolatImsak";
 import { waktuSolatLargeTaskHandler } from "@/lib/widgets/WaktuSolatLarge";
 import { waktuSolatLargeTransparentTaskHandler } from "@/lib/widgets/WaktuSolatLargeTransparent";
 import { waktuSolatTransparentTaskHandler } from "@/lib/widgets/WaktuSolatTransparent";
@@ -13,6 +14,9 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps) {
       break;
     case "WaktuSolatCompact":
       await waktuSolatCompactTaskHandler(props);
+      break;
+    case "WaktuSolatImsak":
+      await waktuSolatImsakWidgetTaskHandler(props);
       break;
     case "WaktuSolatLarge":
       await waktuSolatLargeTaskHandler(props);

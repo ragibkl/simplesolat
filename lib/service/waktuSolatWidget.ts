@@ -4,6 +4,7 @@ import { WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { Zone, zoneStore } from "@/lib/data/zoneStore";
 import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
 import { requestWaktuSolatCompactUpdate } from "@/lib/widgets/WaktuSolatCompact";
+import { requestWaktuSolatImsakWidgetUpdate } from "@/lib/widgets/WaktuSolatImsak";
 import { requestWaktuSolatLargeUpdate } from "@/lib/widgets/WaktuSolatLarge";
 import { requestWaktuSolatLargeTransparentUpdate } from "@/lib/widgets/WaktuSolatLargeTransparent";
 import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTransparent";
@@ -40,6 +41,7 @@ export async function requestUpdateWaktuSolatWidgets(
 
   await requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime);
+  await requestWaktuSolatImsakWidgetUpdate(date, zone, waktuSolat.prayerTime);
   await requestWaktuSolatLargeUpdate(
     date,
     zone,
