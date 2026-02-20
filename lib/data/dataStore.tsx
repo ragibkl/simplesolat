@@ -75,8 +75,13 @@ export function createDataStore<T>(dataKey: string, initialValue: T) {
       };
     }, [loadDataToState]);
 
-    const setData = useCallback(async (newData: T) => {
-      await save(newData);
+    // NOTE: Assumes a single Provider instance per store. setData updates
+    // React state directly without emitChange, so other Provider instances
+    // would not be notified. External saves (e.g. from widget/service layer)
+    // still go through save() → emitChange() and are unaffected.
+    const setData = useCallback((newData: T) => {
+      setDataRaw(JSON.stringify(newData));
+      saveInner(newData);
     }, []);
 
     return (
