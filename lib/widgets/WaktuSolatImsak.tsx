@@ -25,7 +25,7 @@ export type WaktuSolatImsakWidgetProps = {
 export function WaktuSolatImsak(props: WaktuSolatImsakWidgetProps) {
   const {
     date,
-    prayerTime: { imsak, fajr, dhuhr, asr, maghrib, isha },
+    prayerTime: { imsak, fajr, syuruk, dhuhr, asr, maghrib, isha },
     zone,
   } = props;
 
@@ -56,7 +56,7 @@ export function WaktuSolatImsak(props: WaktuSolatImsakWidgetProps) {
         }}
       >
         <WaktuColumn date={date} label="Imsak" start={imsak} end={fajr} />
-        <WaktuColumn date={date} label="Fajr" start={fajr} end={dhuhr} />
+        <WaktuColumn date={date} label="Fajr" start={fajr} end={syuruk} />
         <WaktuColumn date={date} label="Dhuhr" start={dhuhr} end={asr} />
         <WaktuColumn date={date} label="Asr" start={asr} end={maghrib} />
         <WaktuColumn date={date} label="Maghrib" start={maghrib} end={isha} />
