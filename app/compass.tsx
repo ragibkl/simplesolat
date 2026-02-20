@@ -81,7 +81,7 @@ function CardinalLabel(props: {
     >
       <MonoText
         style={{
-          fontSize: 18,
+          fontSize: 22,
           color,
           marginTop: 2,
           transform: [{ rotate: `${textRotation}deg` }],
@@ -111,15 +111,15 @@ export default function Compass() {
 
   return (
     <MonoScrollPage>
-      <View style={{ flex: 1, alignItems: "center", paddingBottom: 40 }}>
-        <View style={{ padding: 20 }}>
-          <MonoText style={{ fontSize: 14 }}>
+      <View style={{ flex: 1, paddingBottom: 40, alignItems: "center" }}>
+        <View style={{ padding: 20, alignSelf: "stretch" }}>
+          <MonoText style={{ fontSize: 18 }}>
             {`Kaaba direction: ${qiblaBearing.toFixed(0)}°`}
           </MonoText>
-          <MonoText style={{ fontSize: 14, marginTop: 5 }}>
+          <MonoText style={{ fontSize: 18, marginTop: 5 }}>
             {`You're facing: ${heading.toFixed(0)}°${aligned ? " \u2713" : ""}`}
           </MonoText>
-          <MonoText style={{ fontSize: 14, marginTop: 5 }}>
+          <MonoText style={{ fontSize: 18, marginTop: 5 }}>
             Accuracy: {accuracy}{" "}
             {(accuracy === "low" || accuracy === "none") &&
               "Low accuracy - wave phone in figure-8"}
@@ -129,6 +129,7 @@ export default function Compass() {
         <View
           style={{
             position: "relative",
+            marginTop: 20,
             transform: [{ rotate: `${-heading}deg` }],
           }}
         >
