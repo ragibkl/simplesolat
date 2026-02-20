@@ -50,8 +50,7 @@ export function useWaktuSolat() {
   return { setWaktuSolatData: setData, getOrRetrieveWaktuSolat };
 }
 
-export function useWaktuSolatCurrent() {
-  const { date } = useCurrentDate();
+function useWaktuSolatForDate(date: Date) {
   const { getOrRetrieveWaktuSolat } = useWaktuSolat();
   const { zone } = useZone();
 
@@ -75,29 +74,14 @@ export function useWaktuSolatCurrent() {
   return { waktuSolat };
 }
 
+export function useWaktuSolatCurrent() {
+  const { date } = useCurrentDate();
+  return useWaktuSolatForDate(date);
+}
+
 export function useWaktuSolatTomorrow() {
   const { date } = useCurrentDate();
-  const { getOrRetrieveWaktuSolat } = useWaktuSolat();
-  const { zone } = useZone();
-
   const tomorrow = useMemo(() => addDays(date, 1), [date]);
-  const [waktuSolatTomorrow, setWaktuSolatTomorrow] =
-    useState<WaktuSolat | null>(null);
-
-  useEffect(() => {
-    async function effect() {
-      if (zone) {
-        const w = await getOrRetrieveWaktuSolat(zone.zone, tomorrow);
-        if (w) {
-          setWaktuSolatTomorrow(w);
-        }
-      } else {
-        setWaktuSolatTomorrow(null);
-      }
-    }
-
-    effect();
-  }, [zone, getOrRetrieveWaktuSolat, tomorrow]);
-
-  return { waktuSolatTomorrow, tomorrow };
+  const { waktuSolat } = useWaktuSolatForDate(tomorrow);
+  return { waktuSolatTomorrow: waktuSolat, tomorrow };
 }
