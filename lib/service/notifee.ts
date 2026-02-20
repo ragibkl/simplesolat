@@ -56,6 +56,14 @@ async function scheduleWaktuSolatNotification(
   // Trigger a notification
   await notifee.createTriggerNotification(
     {
+      id: [
+        WAKTU_SOLAT_PREFIX,
+        waktu,
+        waktuSolat.year,
+        waktuSolat.month,
+        waktuSolat.date,
+        waktuSolat.zone,
+      ].join("::"),
       title: `Waktu Solat - ${waktu} at ${dateText}`,
       body: `It is now ${waktu} in ${zone.district}, ${zone.state}`,
       android: {
