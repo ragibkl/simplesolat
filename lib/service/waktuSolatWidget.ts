@@ -34,11 +34,13 @@ export async function requestUpdateWaktuSolatWidgets(
   zone: Zone,
   waktuSolat: WaktuSolat,
 ) {
-  await requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime);
-  await requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime);
-  await requestWaktuSolatImsakWidgetUpdate(date, zone, waktuSolat.prayerTime);
-  await requestWaktuSolatLargeUpdate(date, zone, waktuSolat.prayerTime);
-  await requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime);
+  await Promise.all([
+    requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime),
+    requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime),
+    requestWaktuSolatImsakWidgetUpdate(date, zone, waktuSolat.prayerTime),
+    requestWaktuSolatLargeUpdate(date, zone, waktuSolat.prayerTime),
+    requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime),
+  ]);
 }
 
 export async function updateWaktuSolatAndWidgets(
