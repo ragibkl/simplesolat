@@ -1,4 +1,3 @@
-import axios from "axios";
 import { addYears, endOfYear } from "date-fns";
 
 export type Prayer = {
@@ -36,6 +35,11 @@ export async function getWaktuSolatByZone(
   });
   const url = `https://api.simplesolat.com/prayer-times/by-zone/${zone}?${params.toString()}`;
   console.log(`getWaktuSolatByZone - GET ${url}`);
-  const response = await axios.get(url);
-  return response.data as WaktuSolatResponse;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  const jsonData = await response.json();
+  return jsonData as WaktuSolatResponse;
 }
