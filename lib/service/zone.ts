@@ -3,27 +3,48 @@ import PolygonLookup from "polygon-lookup";
 import { zoneStore, Zone } from "@/lib/data/zoneStore";
 
 import jakimGeoData from "@/assets/geodata/malaysia-district-jakim.json";
+import singaporeGeoData from "@/assets/geodata/singapore-adm0.json";
 import { getLocation } from "./location";
 
-const lookup = new PolygonLookup(jakimGeoData as any);
+const jakimLookup = new PolygonLookup(jakimGeoData as any);
+const singaporeLookup = new PolygonLookup(singaporeGeoData as any);
 
-export function lookupZoneByGps(lat: number, lng: number): Zone | null {
-  const result = lookup.search(lng, lat);
-  console.log("lookupZoneByGps", lat, lng, result);
+function lookupMalaysiaZone(lat: number, lng: number): Zone | null {
+  const result = jakimLookup.search(lng, lat);
   if (!result || !result.properties) {
     return null;
   }
 
-  console.log("lookupZoneByGps - properties", result.properties);
-  const zone = result.properties.jakim_code;
-  const state = result.properties.state;
-  const district = result.properties.name;
+  return {
+    zone: result.properties.jakim_code,
+    country: "MY",
+    state: result.properties.state,
+    district: result.properties.name,
+  };
+}
+
+function lookupSingaporeZone(lat: number, lng: number): Zone | null {
+  const result = singaporeLookup.search(lng, lat);
+  if (!result || !result.properties) {
+    return null;
+  }
 
   return {
-    zone,
-    state,
-    district,
+    zone: "SGP01",
+    country: "SG",
+    state: "Singapore",
+    district: "Singapore",
   };
+}
+
+export function lookupZoneByGps(lat: number, lng: number): Zone | null {
+  const myZone = lookupMalaysiaZone(lat, lng);
+  if (myZone) return myZone;
+
+  const sgZone = lookupSingaporeZone(lat, lng);
+  if (sgZone) return sgZone;
+
+  return null;
 }
 
 export async function updateZoneViaGps(

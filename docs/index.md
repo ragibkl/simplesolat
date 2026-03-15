@@ -1,15 +1,21 @@
 # simplesolat - Prayer times that just work
 
-A minimal, distraction-free prayer times app for Malaysia.
+Prayer times app for Malaysia and Singapore with widget that auto-updates when you travel.
+
+Free, no ads.
+
+Get accurate prayer times including Imsak (for sahur), Syuruk, and all 5 daily prayers. Widget automatically updates when you travel from KL to Penang, balik kampung, or even to Singapore - no manual zone changes needed.
+
+Perfect for Ramadhan - view tomorrow's Imsak time to plan sahur. 🌙
 
 ✅ Shows all 7 prayer times including Imsak and Syuruk
 ✅ Swipe to see tomorrow's prayer times
 ✅ Qibla compass - find the direction of the Kaaba
 ✅ Home screen widgets - multiple styles to choose from
 ✅ Dark mode support
-✅ All 60 Malaysian zones with complete coverage
+✅ All 60 Malaysian zones + Singapore
 ✅ Automatic zone detection based on GPS
-✅ Official JAKIM e-Solat data
+✅ Official JAKIM e-Solat data (Malaysia)
 ✅ Clean, minimal design
 ✅ Works offline after initial setup
 
@@ -17,6 +23,7 @@ A minimal, distraction-free prayer times app for Malaysia.
 
 🕌 Complete Prayer Times
 Shows all 7 daily prayer times:
+
 - Imsak
 - Fajr
 - Syuruk (sunrise) - often hidden in other apps
@@ -28,17 +35,18 @@ Shows all 7 daily prayer times:
 Swipe to see tomorrow's prayer times — plan your day ahead.
 
 📍 Automatic Zone Detection
-Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah.
+Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah, plus Singapore.
 
 🧭 Qibla Compass
 Built-in compass to find the direction of the Kaaba from your location. Smooth rotation with accuracy indicator.
 
 📱 Home Screen Widgets
 Multiple widget styles to suit your home screen:
+
 - Standard - all prayer times at a glance
 - Transparent - blends with your wallpaper
 - Compact - fits smaller spaces
-All widgets support dark mode and update automatically.
+  All widgets support dark mode and update automatically.
 
 📡 Official JAKIM Data
 All prayer times are sourced from JAKIM e-Solat, ensuring accuracy and reliability.
@@ -51,6 +59,7 @@ Works without internet connection after initial data sync.
 
 SUPPORTED ZONES:
 All 60 Malaysian prayer zones including:
+
 - Johor (JHR01-04)
 - Kedah (KDH01-07)
 - Kelantan (KTN01-02)
@@ -67,13 +76,12 @@ All 60 Malaysian prayer zones including:
 - W.P. Kuala Lumpur (WLY01)
 - W.P. Labuan (WLY02)
 
+Singapore (SGP01)
+
 Prayer times that just work. Simple.
 
 ---
 
 Data source: JAKIM e-Solat (https://www.e-solat.gov.my)
-Zone boundaries: MPT Waktu Solat
-
-## Privacy Policy
-
-See [Privacy Policy](./privacy-policy.md)
+Zone boundaries (Malaysia): MPT Waktu Solat
+Zone boundaries (Singapore): geoBoundaries (https://www.geoboundaries.org), CC-BY 4.0
