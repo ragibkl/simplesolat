@@ -1,6 +1,6 @@
 import * as Location from "expo-location";
-import notifee from "@notifee/react-native";
-import { Alert } from "react-native";
+import notifee, { AndroidNotificationSetting } from "@notifee/react-native";
+import { Alert, Platform } from "react-native";
 
 export async function requestAllPermissions(): Promise<void> {
   try {
@@ -48,6 +48,29 @@ export async function requestAllPermissions(): Promise<void> {
 
     // Notifications
     await notifee.requestPermission();
+
+    // Exact alarms (Android 12+)
+    if (Platform.OS === "android") {
+      const settings = await notifee.getNotificationSettings();
+      if (settings.android.alarm !== AndroidNotificationSetting.ENABLED) {
+        await new Promise<void>((resolve) => {
+          Alert.alert(
+            "Exact Alarm Permission",
+            "This app needs exact alarm permission to notify you precisely when each prayer time begins.",
+            [
+              {
+                text: "Ok",
+                style: "default",
+                onPress: async () => {
+                  await notifee.openAlarmPermissionSettings();
+                  resolve();
+                },
+              },
+            ],
+          );
+        });
+      }
+    }
   } catch (e) {
     console.log("Error requesting permissions", e);
   }
