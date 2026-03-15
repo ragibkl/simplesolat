@@ -24,5 +24,6 @@ npx expo start
 ## Data Sources
 
 - Prayer times (Malaysia): [JAKIM e-Solat](https://www.e-solat.gov.my)
+- Prayer times (Singapore): [MUIS](https://www.muis.gov.sg)
 - Zone boundaries (Malaysia): MPT Waktu Solat
 - Zone boundaries (Singapore): [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)

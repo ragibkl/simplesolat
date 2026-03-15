@@ -15,7 +15,7 @@ Perfect for Ramadhan - view tomorrow's Imsak time to plan sahur. 🌙
 ✅ Dark mode support
 ✅ All 60 Malaysian zones + Singapore
 ✅ Automatic zone detection based on GPS
-✅ Official JAKIM e-Solat data (Malaysia)
+✅ Official JAKIM e-Solat data (Malaysia) and MUIS data (Singapore)
 ✅ Clean, minimal design
 ✅ Works offline after initial setup
 
@@ -48,8 +48,8 @@ Multiple widget styles to suit your home screen:
 - Compact - fits smaller spaces
   All widgets support dark mode and update automatically.
 
-📡 Official JAKIM Data
-All prayer times are sourced from JAKIM e-Solat, ensuring accuracy and reliability.
+📡 Official Data Sources
+Prayer times are sourced from JAKIM e-Solat (Malaysia) and MUIS (Singapore), ensuring accuracy and reliability.
 
 ⚫⚪ Minimal Design
 Clean, distraction-free interface with dark mode support. No ads, no clutter, just prayer times.
@@ -80,8 +80,12 @@ Singapore (SGP01)
 
 Prayer times that just work. Simple.
 
+[Get it on Google Play](https://play.google.com/store/apps/details?id=com.simplesolat.app)
+
 ---
 
-Data source: JAKIM e-Solat (https://www.e-solat.gov.my)
-Zone boundaries (Malaysia): MPT Waktu Solat
-Zone boundaries (Singapore): geoBoundaries (https://www.geoboundaries.org), CC-BY 4.0
+Data sources:
+- Prayer times (Malaysia): [JAKIM e-Solat](https://www.e-solat.gov.my)
+- Prayer times (Singapore): [MUIS](https://www.muis.gov.sg)
+- Zone boundaries (Malaysia): MPT Waktu Solat
+- Zone boundaries (Singapore): [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
