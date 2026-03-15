@@ -4,10 +4,13 @@ import { zoneStore, Zone } from "@/lib/data/zoneStore";
 
 import jakimGeoData from "@/assets/geodata/malaysia-district-jakim.json";
 import singaporeGeoData from "@/assets/geodata/singapore-adm0.json";
+import indonesiaGeoData from "@/assets/geodata/indonesia-adm2.json";
+import indonesiaZoneMapping from "@/assets/geodata/adm2_zone_mapping_id.json";
 import { getLocation } from "./location";
 
 const jakimLookup = new PolygonLookup(jakimGeoData as any);
 const singaporeLookup = new PolygonLookup(singaporeGeoData as any);
+const indonesiaLookup = new PolygonLookup(indonesiaGeoData as any);
 
 function lookupMalaysiaZone(lat: number, lng: number): Zone | null {
   const result = jakimLookup.search(lng, lat);
@@ -37,12 +40,37 @@ function lookupSingaporeZone(lat: number, lng: number): Zone | null {
   };
 }
 
+function lookupIndonesiaZone(lat: number, lng: number): Zone | null {
+  const result = indonesiaLookup.search(lng, lat);
+  if (!result || !result.properties) {
+    return null;
+  }
+
+  const shapeName = result.properties.shapeName;
+  const mapping = (
+    indonesiaZoneMapping as Record<string, { zone: string; province: string }>
+  )[shapeName];
+  if (!mapping) {
+    return null;
+  }
+
+  return {
+    zone: mapping.zone,
+    country: "ID",
+    state: mapping.province,
+    district: shapeName,
+  };
+}
+
 export function lookupZoneByGps(lat: number, lng: number): Zone | null {
   const myZone = lookupMalaysiaZone(lat, lng);
   if (myZone) return myZone;
 
   const sgZone = lookupSingaporeZone(lat, lng);
   if (sgZone) return sgZone;
+
+  const idZone = lookupIndonesiaZone(lat, lng);
+  if (idZone) return idZone;
 
   return null;
 }
