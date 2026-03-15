@@ -1,4 +1,5 @@
 import notifee, {
+  AndroidImportance,
   AuthorizationStatus,
   EventType,
   TriggerType,
@@ -12,7 +13,7 @@ import {
   updateWaktuSolatAndWidgets,
 } from "./waktuSolatWidget";
 
-export const WAKTU_SOLAT_PREFIX = "waktu_solat";
+export const WAKTU_SOLAT_CHANNEL = "waktu_solat";
 
 function sameWaktuSolat(left: WaktuSolat, right: WaktuSolat): boolean {
   return (
@@ -48,16 +49,17 @@ async function scheduleWaktuSolatNotification(
 
   // Create a channel (required for Android)
   const channelId = await notifee.createChannel({
-    id: `${WAKTU_SOLAT_PREFIX}_${waktu}`,
-    name: waktu,
+    id: WAKTU_SOLAT_CHANNEL,
+    name: "Prayer Times",
     sound: "default",
+    importance: AndroidImportance.HIGH,
   });
 
   // Trigger a notification
   await notifee.createTriggerNotification(
     {
       id: [
-        WAKTU_SOLAT_PREFIX,
+        WAKTU_SOLAT_CHANNEL,
         waktu,
         waktuSolat.year,
         waktuSolat.month,
@@ -78,6 +80,7 @@ async function scheduleWaktuSolatNotification(
     {
       type: TriggerType.TIMESTAMP,
       timestamp: date.getTime(),
+      alarmManager: true,
     },
   );
 }
@@ -108,7 +111,7 @@ export async function scheduleAllWaktuSolatNotifications(
     // Assert notification trigger channel is waktu_solat_*
     if (
       !n.notification.android?.channelId ||
-      !n.notification.android.channelId.startsWith("waktu_solat")
+      n.notification.android.channelId !== WAKTU_SOLAT_CHANNEL
     ) {
       continue;
     }
