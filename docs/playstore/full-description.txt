@@ -55,24 +55,7 @@ Clean, distraction-free interface with dark mode support. No ads, no clutter, ju
 Offline Support
 Works without internet connection after initial data sync.
 
-SUPPORTED ZONES:
-All 60 Malaysian prayer zones including:
-- Johor
-- Kedah
-- Kelantan
-- Melaka
-- Negeri Sembilan
-- Pahang
-- Perlis
-- Pulau Pinang
-- Perak
-- Sabah
-- Selangor
-- Sarawak
-- Terengganu
-- W.P. Kuala Lumpur
-- W.P. Labuan
-- Singapore
+Covers all of Malaysia (60 JAKIM zones from Perlis to Sabah) and Singapore.
 
 Waktu solat, jadual solat, kiblat compass, prayer time notifications - everything you need, nothing you don't. Simple.
 
