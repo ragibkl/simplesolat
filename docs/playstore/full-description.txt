@@ -1,8 +1,8 @@
-Waktu solat app for Malaysia, Singapore, and Indonesia with widget that auto-updates when you travel.
+Waktu solat app for Malaysia, Singapore, Brunei, and Indonesia with widget that auto-updates when you travel.
 
 Free, no ads.
 
-Get accurate waktu solat including Imsak, Syuruk, and all 7 daily prayer times. Widget automatically updates when you travel from KL to Penang, balik kampung, or even to Singapore or Jakarta - no manual zone changes needed.
+Get accurate waktu solat including Imsak, Syuruk, and all 7 daily prayer times. Widget automatically updates when you travel from KL to Penang, balik kampung, or even to Singapore, Brunei, or Jakarta - no manual zone changes needed.
 
 ✅ Shows all 7 prayer times including Imsak and Syuruk
 ✅ Swipe to see tomorrow's jadual solat
@@ -10,9 +10,9 @@ Get accurate waktu solat including Imsak, Syuruk, and all 7 daily prayer times. 
 ✅ Kiblat/Qibla compass - find the direction of the Kaaba
 ✅ Home screen widgets - multiple styles to choose from
 ✅ Dark mode support
-✅ All 60 Malaysian zones + Singapore + 517 Indonesian zones
+✅ All 60 Malaysian zones + Singapore + 4 Brunei zones + 517 Indonesian zones
 ✅ Automatic zone detection based on GPS
-✅ Official JAKIM e-Solat data (Malaysia), MUIS data (Singapore), and equran.id data (Indonesia)
+✅ Official JAKIM e-Solat data (Malaysia), MUIS data (Singapore), KHEU data (Brunei), and equran.id data (Indonesia)
 ✅ Clean, minimal design
 ✅ Works offline after initial setup
 
@@ -31,7 +31,7 @@ Shows all 7 daily prayer times:
 Swipe to see tomorrow's prayer times - plan your day ahead.
 
 Automatic Zone Detection
-Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah, Singapore, and 517 Indonesian zones from Aceh to Papua.
+Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah, Singapore, 4 Brunei zones, and 517 Indonesian zones from Aceh to Papua.
 
 Kiblat/Qibla Compass
 Built-in compass to find the direction of the Kaaba from your location. Smooth rotation with accuracy indicator.
@@ -47,7 +47,7 @@ Multiple widget styles to suit your home screen:
 All widgets support dark mode and update automatically.
 
 Official Data Sources
-Prayer times are sourced from JAKIM e-Solat (Malaysia), MUIS (Singapore), and equran.id (Indonesia), ensuring accuracy and reliability.
+Prayer times are sourced from JAKIM e-Solat (Malaysia), MUIS (Singapore), KHEU (Brunei), and equran.id (Indonesia), ensuring accuracy and reliability.
 
 Minimal Design
 Clean, distraction-free interface with dark mode support. No ads, no clutter, just prayer times.
@@ -55,13 +55,14 @@ Clean, distraction-free interface with dark mode support. No ads, no clutter, ju
 Offline Support
 Works without internet connection after initial data sync.
 
-Covers all of Malaysia (60 JAKIM zones from Perlis to Sabah) and Singapore.
+Covers all of Malaysia (60 JAKIM zones from Perlis to Sabah), Singapore, Brunei, and Indonesia.
 
 Waktu solat, jadwal sholat, jadual solat, kiblat compass, prayer time notifications - everything you need, nothing you don't. Simple.
 
 Data sources:
 JAKIM e-Solat (https://www.e-solat.gov.my)
 MUIS (https://www.muis.gov.sg)
+KHEU Brunei
 equran.id (https://equran.id)
 Zone boundaries (Malaysia): MPT Waktu Solat
-Zone boundaries (Singapore, Indonesia): geoBoundaries (https://www.geoboundaries.org), CC-BY 4.0
+Zone boundaries (Singapore, Brunei, Indonesia): geoBoundaries (https://www.geoboundaries.org), CC-BY 4.0
