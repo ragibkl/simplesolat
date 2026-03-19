@@ -79,7 +79,7 @@ export async function requestAllPermissions(): Promise<void> {
         await new Promise<void>((resolve) => {
           Alert.alert(
             "Battery Optimization",
-            "To ensure prayer time notifications arrive on time, please disable battery optimization for this app.",
+            'To ensure prayer time notifications arrive on time, please find "simplesolat" in the list, tap on it, and select "Unrestricted".',
             [
               {
                 text: "Ok",
