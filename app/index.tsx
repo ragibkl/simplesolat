@@ -1,6 +1,8 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
+import { getHijriDateText } from "@/lib/service/hijri";
+
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
@@ -72,11 +74,11 @@ function PrayerTimeRow(props: {
 
 function PrayerTimePage(props: {
   currentDate: Date;
-  dateText: string;
+  displayDate: Date;
   subtitle: string;
   waktuSolat: WaktuSolat | null;
 }) {
-  const { currentDate, dateText, subtitle, waktuSolat } = props;
+  const { currentDate, displayDate, subtitle, waktuSolat } = props;
 
   const {
     imsak = 0,
@@ -88,10 +90,14 @@ function PrayerTimePage(props: {
     isha = 0,
   } = waktuSolat?.prayerTime || {};
 
+  const dateText = displayDate.toDateString();
+  const hijriText = getHijriDateText(displayDate);
+
   return (
     <View>
       <View style={{ padding: 20 }}>
         <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
+        <MonoText style={{ padding: 5, fontSize: 16 }}>{hijriText}</MonoText>
         <MonoText style={{ paddingHorizontal: 5, fontSize: 14 }}>
           {subtitle}
         </MonoText>
@@ -147,26 +153,28 @@ export default function Index() {
   const { waktuSolatTomorrow, tomorrow } = useWaktuSolatTomorrow();
   useWaktuSolatWidgetUpdate();
 
-  const zoneText = zone
-    ? `${zone.zone} - ${zone.district}, ${zone.state}`
+  const locationText = zone
+    ? `${zone.district}, ${zone.state}`
     : "Location not set";
+  const zoneText = zone ? `${zone.zone} - ${zone.country}` : "Location not set";
 
   return (
     <MonoScrollPage>
       <View style={{ padding: 20, paddingBottom: 0 }}>
-        <MonoText style={{ padding: 5, fontSize: 20 }}>{zoneText}</MonoText>
+        <MonoText style={{ padding: 5, fontSize: 20 }}>{locationText}</MonoText>
+        <MonoText style={{ padding: 5, fontSize: 14 }}>{zoneText}</MonoText>
       </View>
 
       <MonoPager>
         <PrayerTimePage
           currentDate={date}
-          dateText={date.toDateString()}
+          displayDate={date}
           subtitle="Today"
           waktuSolat={waktuSolat}
         />
         <PrayerTimePage
           currentDate={date}
-          dateText={tomorrow.toDateString()}
+          displayDate={tomorrow}
           subtitle="Tomorrow"
           waktuSolat={waktuSolatTomorrow}
         />
