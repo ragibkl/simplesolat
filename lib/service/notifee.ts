@@ -80,7 +80,7 @@ async function scheduleWaktuSolatNotification(
     {
       type: TriggerType.TIMESTAMP,
       timestamp: date.getTime(),
-      alarmManager: false,
+      alarmManager: true,
     },
   );
 }
