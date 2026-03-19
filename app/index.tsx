@@ -97,7 +97,7 @@ function PrayerTimePage(props: {
     <View>
       <View style={{ padding: 20 }}>
         <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
-        <MonoText style={{ padding: 5, fontSize: 20 }}>{hijriText}</MonoText>
+        <MonoText style={{ padding: 5, fontSize: 16 }}>{hijriText}</MonoText>
         <MonoText style={{ paddingHorizontal: 5, fontSize: 14 }}>
           {subtitle}
         </MonoText>
