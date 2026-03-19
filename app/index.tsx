@@ -1,6 +1,8 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
+import { getHijriDateText } from "@/lib/service/hijri";
+
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
@@ -89,12 +91,7 @@ function PrayerTimePage(props: {
   } = waktuSolat?.prayerTime || {};
 
   const dateText = displayDate.toDateString();
-  const hijriText = new Intl.DateTimeFormat("en", {
-    calendar: "islamic-umalqura",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(displayDate);
+  const hijriText = getHijriDateText(displayDate);
 
   return (
     <View>
