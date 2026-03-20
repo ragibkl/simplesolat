@@ -1,4 +1,5 @@
 import notifee, {
+  AlarmType,
   AndroidImportance,
   AuthorizationStatus,
   EventType,
@@ -70,6 +71,7 @@ async function scheduleWaktuSolatNotification(
       body: `It is now ${waktu} in ${zone.district}, ${zone.state}`,
       android: {
         channelId,
+        importance: AndroidImportance.HIGH,
       },
       data: {
         waktuSolat,
@@ -80,7 +82,11 @@ async function scheduleWaktuSolatNotification(
     {
       type: TriggerType.TIMESTAMP,
       timestamp: date.getTime(),
-      alarmManager: false,
+      alarmManager: {
+        allowWhileIdle: true,
+        // type: AlarmType.SET_EXACT_AND_ALLOW_WHILE_IDLE,
+        type: AlarmType.SET_ALARM_CLOCK,
+      },
     },
   );
 }
