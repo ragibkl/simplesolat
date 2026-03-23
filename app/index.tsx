@@ -1,10 +1,8 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-import {
-  getCalculationMethod,
-  getOfficialSource,
-} from "@/lib/service/calculationMethod";
+import { getZoneInfoText } from "@/lib/service/calculationMethod";
+import { getZoneLocationText } from "@/lib/data/zoneStore";
 import { getHijriDateText } from "@/lib/service/hijri";
 
 import { MonoPager } from "@/lib/components/MonoPager";
@@ -157,17 +155,8 @@ export default function Index() {
   const { waktuSolatTomorrow, tomorrow } = useWaktuSolatTomorrow();
   useWaktuSolatWidgetUpdate();
 
-  const locationText = !zone
-    ? "Location not set"
-    : zone.type === "calculated"
-      ? zone.countryName
-      : `${zone.district}, ${zone.state}`;
-
-  const zoneText = !zone
-    ? "Location not set"
-    : zone.type === "calculated"
-      ? `Calculated (${getCalculationMethod(zone.country).label})`
-      : `${zone.zone} - Source: ${getOfficialSource(zone.country)}`;
+  const locationText = zone ? getZoneLocationText(zone) : "Location not set";
+  const zoneText = zone ? getZoneInfoText(zone) : "Location not set";
 
   return (
     <MonoScrollPage>

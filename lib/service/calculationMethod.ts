@@ -1,3 +1,5 @@
+import { Zone } from "@/lib/data/zoneStore";
+
 const COUNTRY_METHODS: Record<string, { method: string; label: string }> = {
   // Built-in adhan methods
   SA: { method: "UmmAlQura", label: "Umm Al-Qura" },
@@ -46,4 +48,11 @@ export function getCalculationMethod(countryIso: string | null): {
 } {
   if (!countryIso) return DEFAULT_METHOD;
   return COUNTRY_METHODS[countryIso] ?? DEFAULT_METHOD;
+}
+
+export function getZoneInfoText(zone: Zone): string {
+  if (zone.type === "official") {
+    return `${zone.zone} - Source: ${getOfficialSource(zone.country)}`;
+  }
+  return `Calculated (${getCalculationMethod(zone.country).label})`;
 }
