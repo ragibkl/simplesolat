@@ -95,7 +95,7 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
       getZoneCode(zone),
       zone.lat,
       zone.lng,
-      zone.method,
+      zone.country,
     );
   }
 

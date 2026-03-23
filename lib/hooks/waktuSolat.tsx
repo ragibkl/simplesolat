@@ -101,7 +101,7 @@ function useWaktuSolatForDate(date: Date) {
           getZoneCode(zone),
           zone.lat,
           zone.lng,
-          zone.method,
+          zone.country,
         );
         setWaktuSolat(w);
         return;

@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
+import { getCalculationMethod } from "@/lib/service/calculationMethod";
 import { getHijriDateText } from "@/lib/service/hijri";
 
 import { MonoPager } from "@/lib/components/MonoPager";
@@ -162,7 +163,7 @@ export default function Index() {
   const zoneText = !zone
     ? "Location not set"
     : zone.type === "calculated"
-      ? `Calculated (${zone.methodLabel})`
+      ? `Calculated (${getCalculationMethod(zone.country).label})`
       : `${zone.zone} - Source: ${zone.source}`;
 
   return (

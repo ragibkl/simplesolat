@@ -6,7 +6,6 @@ import {
   OfficialZone,
   CalculatedZone,
 } from "@/lib/data/zoneStore";
-import { getCalculationMethod } from "./calculationMethod";
 import { getLocation } from "./location";
 
 import countriesGeoData from "@/assets/geodata/countries-adm0.json";
@@ -106,15 +105,12 @@ function buildCalculatedZone(
   countryIso: string | null,
   countryName: string | null,
 ): CalculatedZone {
-  const { method, label } = getCalculationMethod(countryIso);
   return {
     type: "calculated",
     lat,
     lng,
     country: countryIso ?? "XX",
     countryName: countryName ?? "Unknown",
-    method,
-    methodLabel: label,
   };
 }
 

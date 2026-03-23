@@ -15,8 +15,6 @@ export type CalculatedZone = {
   lng: number;
   country: string;
   countryName: string;
-  method: string;
-  methodLabel: string;
 };
 
 export type Zone = OfficialZone | CalculatedZone;

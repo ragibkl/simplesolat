@@ -7,6 +7,7 @@ import {
 } from "adhan";
 
 import { WaktuSolat } from "@/lib/data/waktuSolatStore";
+import { getCalculationMethod } from "./calculationMethod";
 
 function customMethod(fajrAngle: number, ishaAngle: number) {
   return () => {
@@ -59,9 +60,10 @@ export function calculateWaktuSolat(
   zoneCode: string,
   lat: number,
   lng: number,
-  method: string,
+  country: string,
 ): WaktuSolat {
   const coordinates = new Coordinates(lat, lng);
+  const { method } = getCalculationMethod(country);
   const params = (METHODS[method] ?? METHODS.MuslimWorldLeague)();
   params.madhab = Madhab.Shafi;
 
