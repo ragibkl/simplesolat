@@ -35,7 +35,7 @@ const OFFICIAL_SOURCES: Record<string, string> = {
   MY: "JAKIM",
   SG: "MUIS",
   BN: "KHEU",
-  ID: "equran.id",
+  ID: "Kemenag (equran.id)",
 };
 
 export function getOfficialSource(countryIso: string): string {
