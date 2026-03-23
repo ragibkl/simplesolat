@@ -8,7 +8,26 @@ import {
 
 import { WaktuSolat } from "@/lib/data/waktuSolatStore";
 
+function customMethod(fajrAngle: number, ishaAngle: number) {
+  return () => {
+    const params = CalculationMethod.Other();
+    params.fajrAngle = fajrAngle;
+    params.ishaAngle = ishaAngle;
+    return params;
+  };
+}
+
+function customMethodIshaOffset(fajrAngle: number, ishaOffsetMinutes: number) {
+  return () => {
+    const params = CalculationMethod.Other();
+    params.fajrAngle = fajrAngle;
+    params.ishaInterval = ishaOffsetMinutes;
+    return params;
+  };
+}
+
 const METHODS: Record<string, () => CalculationParameters> = {
+  // Built-in methods
   MuslimWorldLeague: () => CalculationMethod.MuslimWorldLeague(),
   UmmAlQura: () => CalculationMethod.UmmAlQura(),
   Egyptian: () => CalculationMethod.Egyptian(),
@@ -20,6 +39,15 @@ const METHODS: Record<string, () => CalculationParameters> = {
   Turkey: () => CalculationMethod.Turkey(),
   Tehran: () => CalculationMethod.Tehran(),
   Singapore: () => CalculationMethod.Singapore(),
+  // Custom methods
+  Jordan: customMethod(18, 18),
+  Algeria: customMethod(18, 17),
+  Tunisia: customMethod(18, 18),
+  France: customMethod(12, 12),
+  Russia: customMethod(16, 15),
+  Morocco: customMethod(19, 17),
+  Gulf: customMethodIshaOffset(19.5, 90),
+  Portugal: customMethodIshaOffset(18, 77),
 };
 
 function toEpochSeconds(date: Date): number {

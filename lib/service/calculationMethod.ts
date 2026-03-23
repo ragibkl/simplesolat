@@ -1,4 +1,5 @@
 const COUNTRY_METHODS: Record<string, { method: string; label: string }> = {
+  // Built-in adhan methods
   SA: { method: "UmmAlQura", label: "Umm Al-Qura" },
   AE: { method: "Dubai", label: "Dubai" },
   EG: { method: "Egyptian", label: "Egyptian" },
@@ -9,6 +10,18 @@ const COUNTRY_METHODS: Record<string, { method: string; label: string }> = {
   US: { method: "NorthAmerica", label: "ISNA" },
   CA: { method: "NorthAmerica", label: "ISNA" },
   IR: { method: "Tehran", label: "Tehran" },
+  // Custom methods
+  JO: { method: "Jordan", label: "Jordan" },
+  DZ: { method: "Algeria", label: "Algeria" },
+  TN: { method: "Tunisia", label: "Tunisia" },
+  FR: { method: "France", label: "UOIF" },
+  RU: { method: "Russia", label: "Russia" },
+  MA: { method: "Morocco", label: "Morocco" },
+  PT: { method: "Portugal", label: "Lisbon" },
+  // Gulf region (Bahrain, Oman, Yemen)
+  BH: { method: "Gulf", label: "Gulf Region" },
+  OM: { method: "Gulf", label: "Gulf Region" },
+  YE: { method: "Gulf", label: "Gulf Region" },
 };
 
 const DEFAULT_METHOD = {
