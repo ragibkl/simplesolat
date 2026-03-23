@@ -153,10 +153,17 @@ export default function Index() {
   const { waktuSolatTomorrow, tomorrow } = useWaktuSolatTomorrow();
   useWaktuSolatWidgetUpdate();
 
-  const locationText = zone
-    ? `${zone.district}, ${zone.state}`
-    : "Location not set";
-  const zoneText = zone ? `${zone.zone} - ${zone.country}` : "Location not set";
+  const locationText = !zone
+    ? "Location not set"
+    : zone.type === "calculated"
+      ? zone.countryName
+      : `${zone.district}, ${zone.state}`;
+
+  const zoneText = !zone
+    ? "Location not set"
+    : zone.type === "calculated"
+      ? `Calculated (${zone.methodLabel})`
+      : `${zone.zone} - Source: ${zone.source}`;
 
   return (
     <MonoScrollPage>

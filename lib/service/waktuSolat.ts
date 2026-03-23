@@ -5,10 +5,12 @@ import {
   WaktuSolatStore,
   waktuSolatStore,
 } from "@/lib/data/waktuSolatStore";
+import { zoneStore, getZoneCode } from "@/lib/data/zoneStore";
 import {
   getWaktuSolatByZone,
   WaktuSolatResponse,
 } from "@/lib/remote/simplesolat";
+import { calculateWaktuSolat } from "./adhanCalculator";
 
 function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
   return [
@@ -83,19 +85,31 @@ export function mergeWaktuSolatResponseIntoStore(
   return { ...trimmedStore, ...newStore };
 }
 
-export async function getOrRetrieveWaktuSolat(zone: string, date: Date) {
-  const store = await waktuSolatStore.load();
+export async function getOrRetrieveWaktuSolat(date: Date) {
+  const zone = await zoneStore.load();
+  if (!zone) return null;
 
-  const waktuSolat = getWaktuSolatFromStore(store, zone, date);
+  if (zone.type === "calculated") {
+    return calculateWaktuSolat(
+      date,
+      getZoneCode(zone),
+      zone.lat,
+      zone.lng,
+      zone.method,
+    );
+  }
+
+  const store = await waktuSolatStore.load();
+  const waktuSolat = getWaktuSolatFromStore(store, zone.zone, date);
   if (waktuSolat) {
-    console.log(`Found WaktuSolat from store. zone=${zone} date=${date}`);
+    console.log(`Found WaktuSolat from store. zone=${zone.zone} date=${date}`);
     return waktuSolat;
   }
 
-  const res = await getWaktuSolatByZone(date, zone);
+  const res = await getWaktuSolatByZone(date, zone.zone);
   const newStore = mergeWaktuSolatResponseIntoStore(store, res);
   console.log(`Update WaktuSolat into store`);
   await waktuSolatStore.save(newStore);
 
-  return getWaktuSolatFromStore(newStore, zone, date);
+  return getWaktuSolatFromStore(newStore, zone.zone, date);
 }

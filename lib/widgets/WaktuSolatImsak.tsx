@@ -9,7 +9,7 @@ import {
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { getMonoStyle } from "@/lib/components/monoui";
 import { PrayerTime } from "@/lib/data/waktuSolatStore";
-import { Zone } from "@/lib/data/zoneStore";
+import { Zone, getZoneDisplayName } from "@/lib/data/zoneStore";
 import { getPrayerData } from "@/lib/service/waktuSolatWidget";
 
 import { Empty } from "./Empty";
@@ -42,7 +42,7 @@ export function WaktuSolatImsak(props: WaktuSolatImsakWidgetProps) {
         }}
       >
         <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
-        <MonoTextWidget>{zone.district}</MonoTextWidget>
+        <MonoTextWidget>{getZoneDisplayName(zone)}</MonoTextWidget>
       </FlexWidget>
 
       <FlexWidget

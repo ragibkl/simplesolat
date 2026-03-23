@@ -2,7 +2,9 @@ import { addDays } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { WaktuSolat, waktuSolatStore } from "@/lib/data/waktuSolatStore";
+import { getZoneCode } from "@/lib/data/zoneStore";
 import { getWaktuSolatByZone } from "@/lib/remote/simplesolat";
+import { calculateWaktuSolat } from "@/lib/service/adhanCalculator";
 import {
   getWaktuSolatFromStore,
   mergeWaktuSolatResponseIntoStore,
@@ -45,57 +47,74 @@ export function useWaktuSolat() {
   const dataRef = useRef(data);
   dataRef.current = data;
 
-  const getOrRetrieveWaktuSolat = useCallback(
-    async (zone: string, date: Date): Promise<WaktuSolat | null> => {
-      const cached = getWaktuSolatFromStore(dataRef.current, zone, date);
+  const fetchOfficialWaktuSolat = useCallback(
+    async (zoneCode: string, date: Date): Promise<WaktuSolat | null> => {
+      const cached = getWaktuSolatFromStore(dataRef.current, zoneCode, date);
       if (cached) {
-        console.log(`Found WaktuSolat from store. zone=${zone} date=${date}`);
+        console.log(
+          `Found WaktuSolat from store. zone=${zoneCode} date=${date}`,
+        );
         return cached;
       }
 
-      return withLock(zone, async () => {
+      return withLock(zoneCode, async () => {
         // Re-check after acquiring lock — a previous waiter may have already fetched
         const cachedAfterWait = getWaktuSolatFromStore(
           dataRef.current,
-          zone,
+          zoneCode,
           date,
         );
         if (cachedAfterWait) return cachedAfterWait;
 
-        console.log(`Fetch new WaktuSolat from api. zone=${zone} date=${date}`);
-        const res = await getWaktuSolatByZone(date, zone);
+        console.log(
+          `Fetch new WaktuSolat from api. zone=${zoneCode} date=${date}`,
+        );
+        const res = await getWaktuSolatByZone(date, zoneCode);
         const newStore = mergeWaktuSolatResponseIntoStore(dataRef.current, res);
         console.log(`Update WaktuSolat into store`);
         setData(newStore);
-        return getWaktuSolatFromStore(newStore, zone, date);
+        return getWaktuSolatFromStore(newStore, zoneCode, date);
       });
     },
     [setData], // setData is stable (created with useCallback(fn, []) in Provider)
   );
 
-  return { setWaktuSolatData: setData, getOrRetrieveWaktuSolat };
+  return { setWaktuSolatData: setData, fetchOfficialWaktuSolat };
 }
 
 function useWaktuSolatForDate(date: Date) {
-  const { getOrRetrieveWaktuSolat } = useWaktuSolat();
+  const { fetchOfficialWaktuSolat } = useWaktuSolat();
   const { zone } = useZone();
 
   const [waktuSolat, setWaktuSolat] = useState<WaktuSolat | null>(null);
 
   useEffect(() => {
     async function effect() {
-      if (zone) {
-        const w = await getOrRetrieveWaktuSolat(zone.zone, date);
-        if (w) {
-          setWaktuSolat(w);
-        }
-      } else {
+      if (!zone) {
         setWaktuSolat(null);
+        return;
+      }
+
+      if (zone.type === "calculated") {
+        const w = calculateWaktuSolat(
+          date,
+          getZoneCode(zone),
+          zone.lat,
+          zone.lng,
+          zone.method,
+        );
+        setWaktuSolat(w);
+        return;
+      }
+
+      const w = await fetchOfficialWaktuSolat(zone.zone, date);
+      if (w) {
+        setWaktuSolat(w);
       }
     }
 
     effect();
-  }, [zone, getOrRetrieveWaktuSolat, date]);
+  }, [zone, fetchOfficialWaktuSolat, date]);
 
   return { waktuSolat };
 }

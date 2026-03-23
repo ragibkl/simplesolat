@@ -21,7 +21,7 @@ export async function getPrayerData(
     return null;
   }
 
-  const waktuSolat = await getOrRetrieveWaktuSolat(zone.zone, date);
+  const waktuSolat = await getOrRetrieveWaktuSolat(date);
   if (!waktuSolat) {
     return null;
   }
