@@ -29,6 +29,17 @@ const DEFAULT_METHOD = {
   label: "Muslim World League",
 };
 
+const OFFICIAL_SOURCES: Record<string, string> = {
+  MY: "JAKIM",
+  SG: "MUIS",
+  BN: "KHEU",
+  ID: "equran.id",
+};
+
+export function getOfficialSource(countryIso: string): string {
+  return OFFICIAL_SOURCES[countryIso] ?? countryIso;
+}
+
 export function getCalculationMethod(countryIso: string | null): {
   method: string;
   label: string;

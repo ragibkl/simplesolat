@@ -6,7 +6,6 @@ export type OfficialZone = {
   country: string;
   state: string;
   district: string;
-  source: string;
 };
 
 export type CalculatedZone = {

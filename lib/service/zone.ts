@@ -44,7 +44,6 @@ function lookupMalaysiaZone(lat: number, lng: number): OfficialZone | null {
     country: "MY",
     state: result.properties.state,
     district: result.properties.name,
-    source: "JAKIM",
   };
 }
 
@@ -55,7 +54,6 @@ function lookupSingaporeZone(): OfficialZone {
     country: "SG",
     state: "Singapore",
     district: "Singapore",
-    source: "MUIS",
   };
 }
 
@@ -75,7 +73,6 @@ function lookupBruneiZone(lat: number, lng: number): OfficialZone | null {
     country: "BN",
     state: "Brunei",
     district: mapping.district,
-    source: "KHEU",
   };
 }
 
@@ -95,7 +92,6 @@ function lookupIndonesiaZone(lat: number, lng: number): OfficialZone | null {
     country: "ID",
     state: mapping.province,
     district: shapeName,
-    source: "equran.id",
   };
 }
 
