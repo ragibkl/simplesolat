@@ -46,6 +46,9 @@ For countries without official data sources, prayer times are calculated client-
 | France          | Custom UOIF (Fajr 12°, Isha 12°)     |
 | Russia          | Custom (Fajr 16°, Isha 15°)          |
 | UAE             | Dubai                                |
+| Bahrain         | Umm Al-Qura                          |
+| Oman            | Umm Al-Qura                          |
+| Yemen           | Umm Al-Qura                          |
 | Pakistan        | Karachi                              |
 | US / Canada     | ISNA (North America)                 |
 | Default / other | Muslim World League                  |

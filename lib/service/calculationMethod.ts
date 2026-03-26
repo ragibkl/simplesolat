@@ -20,10 +20,10 @@ const COUNTRY_METHODS: Record<string, { method: string; label: string }> = {
   RU: { method: "Russia", label: "Russia" },
   MA: { method: "Morocco", label: "Morocco" },
   PT: { method: "Portugal", label: "Lisbon" },
-  // Gulf region (Bahrain, Oman, Yemen)
-  BH: { method: "Gulf", label: "Gulf Region" },
-  OM: { method: "Gulf", label: "Gulf Region" },
-  YE: { method: "Gulf", label: "Gulf Region" },
+  // Gulf region (Bahrain, Oman, Yemen) — follows Umm Al-Qura
+  BH: { method: "UmmAlQura", label: "Umm Al-Qura" },
+  OM: { method: "UmmAlQura", label: "Umm Al-Qura" },
+  YE: { method: "UmmAlQura", label: "Umm Al-Qura" },
 };
 
 const DEFAULT_METHOD = {

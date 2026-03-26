@@ -47,7 +47,6 @@ const METHODS: Record<string, () => CalculationParameters> = {
   France: customMethod(12, 12),
   Russia: customMethod(16, 15),
   Morocco: customMethod(19, 17),
-  Gulf: customMethodIshaOffset(19.5, 90),
   Portugal: customMethodIshaOffset(18, 77),
 };
 
