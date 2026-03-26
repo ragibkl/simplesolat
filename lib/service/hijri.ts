@@ -1,3 +1,5 @@
+// Currently unused — removed from UI until hijri date accuracy
+// can be verified across MABIMS vs Umm al-Qura calendar differences.
 import { gregorianToHijri } from "islamic-date";
 
 export function getHijriDateText(date: Date): string {

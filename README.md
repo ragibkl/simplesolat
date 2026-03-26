@@ -7,7 +7,6 @@ Free, no ads.
 ## Features
 
 - All 7 prayer times including Imsak and Syuruk
-- Hijri date display (MABIMS calendar)
 - Swipe to see tomorrow's prayer times
 - Qibla compass
 - Home screen widgets (multiple styles, dark mode)

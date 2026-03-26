@@ -3,7 +3,6 @@ import { View } from "react-native";
 
 import { getZoneInfoText } from "@/lib/service/calculationMethod";
 import { getZoneLocationText } from "@/lib/data/zoneStore";
-import { getHijriDateText } from "@/lib/service/hijri";
 
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
@@ -93,13 +92,11 @@ function PrayerTimePage(props: {
   } = waktuSolat?.prayerTime || {};
 
   const dateText = displayDate.toDateString();
-  const hijriText = getHijriDateText(displayDate);
 
   return (
     <View>
       <View style={{ padding: 20 }}>
         <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
-        <MonoText style={{ padding: 5, fontSize: 16 }}>{hijriText}</MonoText>
         <MonoText style={{ paddingHorizontal: 5, fontSize: 14 }}>
           {subtitle}
         </MonoText>
