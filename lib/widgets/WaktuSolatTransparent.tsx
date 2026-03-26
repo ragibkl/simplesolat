@@ -9,7 +9,7 @@ import {
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { PrayerTime } from "@/lib/data/waktuSolatStore";
-import { Zone } from "@/lib/data/zoneStore";
+import { Zone, getZoneDisplayName } from "@/lib/data/zoneStore";
 import { getPrayerData } from "@/lib/service/waktuSolatWidget";
 
 import { EmptyTransparent } from "./EmptyTransparent";
@@ -46,7 +46,9 @@ export function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
         }}
       >
         <MonoTextWidget style={textStyle}>{date.toDateString()}</MonoTextWidget>
-        <MonoTextWidget style={textStyle}>{zone.district}</MonoTextWidget>
+        <MonoTextWidget style={textStyle}>
+          {getZoneDisplayName(zone)}
+        </MonoTextWidget>
       </FlexWidget>
 
       <FlexWidget

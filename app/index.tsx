@@ -1,7 +1,8 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-import { getHijriDateText } from "@/lib/service/hijri";
+import { getZoneInfoText } from "@/lib/service/calculationMethod";
+import { getZoneLocationText } from "@/lib/data/zoneStore";
 
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
@@ -91,13 +92,11 @@ function PrayerTimePage(props: {
   } = waktuSolat?.prayerTime || {};
 
   const dateText = displayDate.toDateString();
-  const hijriText = getHijriDateText(displayDate);
 
   return (
     <View>
       <View style={{ padding: 20 }}>
         <MonoText style={{ padding: 5, fontSize: 20 }}>{dateText}</MonoText>
-        <MonoText style={{ padding: 5, fontSize: 16 }}>{hijriText}</MonoText>
         <MonoText style={{ paddingHorizontal: 5, fontSize: 14 }}>
           {subtitle}
         </MonoText>
@@ -153,10 +152,8 @@ export default function Index() {
   const { waktuSolatTomorrow, tomorrow } = useWaktuSolatTomorrow();
   useWaktuSolatWidgetUpdate();
 
-  const locationText = zone
-    ? `${zone.district}, ${zone.state}`
-    : "Location not set";
-  const zoneText = zone ? `${zone.zone} - ${zone.country}` : "Location not set";
+  const locationText = zone ? getZoneLocationText(zone) : "Location not set";
+  const zoneText = zone ? getZoneInfoText(zone) : "Location not set";
 
   return (
     <MonoScrollPage>

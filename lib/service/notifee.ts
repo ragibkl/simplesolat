@@ -7,7 +7,7 @@ import notifee, {
 } from "@notifee/react-native";
 
 import { PrayerTime, WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { Zone } from "@/lib/data/zoneStore";
+import { Zone, getZoneLocationText } from "@/lib/data/zoneStore";
 
 import {
   requestUpdateWaktuSolatWidgets,
@@ -68,7 +68,7 @@ async function scheduleWaktuSolatNotification(
         waktuSolat.zone,
       ].join("::"),
       title: `Waktu Solat - ${waktu} at ${dateText}`,
-      body: `It is now ${waktu} in ${zone.district}, ${zone.state}`,
+      body: `It is now ${waktu} in ${getZoneLocationText(zone)}`,
       android: {
         channelId,
         importance: AndroidImportance.HIGH,
