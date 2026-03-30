@@ -94,29 +94,6 @@ export async function requestAllPermissions(): Promise<void> {
         });
       }
     }
-
-    // Manufacturer power manager (Samsung, Xiaomi, etc.)
-    if (Platform.OS === "android") {
-      const powerManagerInfo = await notifee.getPowerManagerInfo();
-      if (powerManagerInfo.activity) {
-        await new Promise<void>((resolve) => {
-          Alert.alert(
-            "Background Restrictions",
-            `Your ${powerManagerInfo.manufacturer} device may restrict background notifications. Please allow this app to run in the background for reliable prayer time alerts.`,
-            [
-              {
-                text: "Ok",
-                style: "default",
-                onPress: async () => {
-                  await notifee.openPowerManagerSettings();
-                  resolve();
-                },
-              },
-            ],
-          );
-        });
-      }
-    }
   } catch (e) {
     console.log("Error requesting permissions", e);
   }
