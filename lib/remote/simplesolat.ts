@@ -1,4 +1,4 @@
-import { addYears, endOfYear } from "date-fns";
+import { addMonths, endOfMonth } from "date-fns";
 
 export type Prayer = {
   date: string;
@@ -28,7 +28,7 @@ export async function getWaktuSolatByZone(
   zone: string,
 ): Promise<WaktuSolatResponse> {
   console.log(`getWaktuSolatByZone(${date}, ${zone})`);
-  const to = endOfYear(addYears(date, 1));
+  const to = endOfMonth(addMonths(date, 1));
   const params = new URLSearchParams({
     from: toDateString(date),
     to: toDateString(to),
