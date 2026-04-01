@@ -89,7 +89,7 @@ Sri Lanka (LK01-13)
 
 Prayer times that just work. Simple.
 
-[Get it on Google Play](https://play.google.com/store/apps/details?id=com.simplesolat.app)
+[Get it on Google Play](https://play.google.com/store/apps/details?id=com.simplesolat.app) | [Architecture](architecture.md)
 
 ---
 

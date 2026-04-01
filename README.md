@@ -15,6 +15,8 @@ Free, no ads.
 - Client-side calculation fallback for unsupported regions
 - Works offline after initial setup
 
+See [Architecture](docs/architecture.md) for details on how the app works internally.
+
 ## How Zone Resolution Works
 
 When the app detects your GPS location, it determines your prayer zone using a country-first approach:
