@@ -1,6 +1,6 @@
 # simplesolat - Prayer times that just work
 
-Prayer times app for Malaysia, Singapore, Indonesia, Brunei, and worldwide with widget that auto-updates when you travel.
+Prayer times app for Malaysia, Singapore, Indonesia, Brunei, Sri Lanka, and worldwide with widget that auto-updates when you travel.
 
 Free, no ads.
 
@@ -11,10 +11,10 @@ Get accurate prayer times including Imsak, Syuruk, and all 7 daily prayer times.
 ✅ Qibla compass - find the direction of the Kaaba
 ✅ Home screen widgets - multiple styles to choose from
 ✅ Dark mode support
-✅ All 60 Malaysian zones + Singapore + 4 Brunei zones + 517 Indonesian zones
+✅ All 60 Malaysian zones + Singapore + 4 Brunei zones + 517 Indonesian zones + 13 Sri Lankan zones
 ✅ Worldwide prayer times via client-side calculation
 ✅ Automatic zone detection based on GPS
-✅ Official JAKIM e-Solat data (Malaysia), MUIS data (Singapore), KHEU data (Brunei), and Kemenag data (Indonesia)
+✅ Official JAKIM e-Solat data (Malaysia), MUIS data (Singapore), KHEU data (Brunei), Kemenag data (Indonesia), and ACJU data (Sri Lanka)
 ✅ Region-specific calculation methods for other countries
 ✅ Clean, minimal design
 ✅ Works offline after initial setup
@@ -35,7 +35,7 @@ Shows all 7 daily prayer times:
 Swipe to see tomorrow's prayer times — plan your day ahead.
 
 📍 Automatic Zone Detection
-Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah, Singapore, 4 Brunei zones, and 517 Indonesian zones from Aceh to Papua.
+Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah, Singapore, 4 Brunei zones, 517 Indonesian zones from Aceh to Papua, and 13 Sri Lankan zones.
 
 🧭 Qibla Compass
 Built-in compass to find the direction of the Kaaba from your location. Smooth rotation with accuracy indicator.
@@ -49,7 +49,7 @@ Multiple widget styles to suit your home screen:
   All widgets support dark mode and update automatically.
 
 📡 Official Data Sources
-Prayer times are sourced from JAKIM e-Solat (Malaysia), MUIS (Singapore), KHEU (Brunei), and Kemenag via equran.id (Indonesia), ensuring accuracy and reliability.
+Prayer times are sourced from JAKIM e-Solat (Malaysia), MUIS (Singapore), KHEU (Brunei), Kemenag via equran.id (Indonesia), and ACJU (Sri Lanka), ensuring accuracy and reliability.
 
 🌍 Worldwide Calculation
 For countries without official data sources, prayer times are calculated locally using region-appropriate methods (Umm Al-Qura, Egyptian, Diyanet, ISNA, and more). All calculation is offline — no internet needed.
@@ -85,6 +85,8 @@ Brunei (BRN01-04)
 
 Indonesia (517 zones across 34 provinces)
 
+Sri Lanka (LK01-13)
+
 Prayer times that just work. Simple.
 
 [Get it on Google Play](https://play.google.com/store/apps/details?id=com.simplesolat.app)
@@ -97,7 +99,8 @@ Data sources:
 - Prayer times (Singapore): [MUIS](https://www.muis.gov.sg)
 - Prayer times (Brunei): KHEU
 - Prayer times (Indonesia): [Kemenag](https://kemenag.go.id) via [equran.id](https://equran.id)
+- Prayer times (Sri Lanka): [ACJU](https://acju.lk)
 - Prayer times (worldwide): [adhan-js](https://github.com/batoulapps/adhan-js) (client-side calculation)
 - Zone boundaries (Malaysia): MPT Waktu Solat
-- Zone boundaries (Singapore, Brunei, Indonesia): [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
+- Zone boundaries (Singapore, Brunei, Indonesia, Sri Lanka): [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
 - Country boundaries: [Natural Earth](https://www.naturalearthdata.com) (public domain)
