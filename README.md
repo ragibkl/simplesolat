@@ -1,6 +1,6 @@
 # simplesolat
 
-Prayer times app for Malaysia, Singapore, Indonesia, Brunei, and worldwide. Widgets auto-update when you travel.
+Prayer times app for Malaysia, Singapore, Indonesia, Brunei, Sri Lanka, and worldwide. Widgets auto-update when you travel.
 
 Free, no ads.
 
@@ -20,11 +20,12 @@ Free, no ads.
 When the app detects your GPS location, it determines your prayer zone using a country-first approach:
 
 1. **Country detection** — GPS coordinates are checked against a global country boundary dataset (Natural Earth ADM0)
-2. **Official zone lookup** (MY, SG, ID, BN) — For supported countries, a local geojson polygon lookup resolves your exact zone:
+2. **Official zone lookup** (MY, SG, ID, BN, LK) — For supported countries, a local geojson polygon lookup resolves your exact zone:
    - **Malaysia**: JAKIM district boundaries → 60 zones (e.g., SGR01, WLY01)
    - **Singapore**: Country boundary → single zone (SGP01)
    - **Indonesia**: geoBoundaries ADM2 districts → 517 zones (e.g., DKI02, JTM38)
    - **Brunei**: geoBoundaries ADM1 districts → 4 zones (BRN01–BRN04)
+   - **Sri Lanka**: geoBoundaries ADM2 districts → 13 zones (LK01–LK13)
 3. **Prayer time source** — Official zones fetch from the [simplesolat API](https://api.simplesolat.com), which aggregates data from each country's official authority
 
 ## Calculation Fallback (Worldwide)
@@ -67,7 +68,8 @@ npx expo start
 - Prayer times (Singapore): [MUIS](https://www.muis.gov.sg)
 - Prayer times (Indonesia): [Kemenag](https://kemenag.go.id) via [equran.id](https://equran.id)
 - Prayer times (Brunei): [KHEU](https://www.kheu.gov.bn)
+- Prayer times (Sri Lanka): [ACJU](https://acju.lk)
 - Prayer times (worldwide): [adhan-js](https://github.com/batoulapps/adhan-js) (client-side calculation)
 - Zone boundaries (Malaysia): MPT Waktu Solat
-- Zone boundaries (Singapore, Indonesia, Brunei): [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
+- Zone boundaries (Singapore, Indonesia, Brunei, Sri Lanka): [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
 - Country boundaries: [Natural Earth](https://www.naturalearthdata.com) (public domain)

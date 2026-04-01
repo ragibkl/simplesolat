@@ -15,12 +15,15 @@ import indonesiaGeoData from "@/assets/geodata/indonesia-adm2.json";
 import indonesiaZoneMapping from "@/assets/geodata/adm2_zone_mapping_id.json";
 import bruneiGeoData from "@/assets/geodata/brunei-adm1.json";
 import bruneiZoneMapping from "@/assets/geodata/adm1_zone_mapping_bn.json";
+import sriLankaGeoData from "@/assets/geodata/sri-lanka-adm2.json";
+import sriLankaZoneMapping from "@/assets/geodata/adm2_zone_mapping_lk.json";
 
 const countriesLookup = new PolygonLookup(countriesGeoData as any);
 const jakimLookup = new PolygonLookup(jakimGeoData as any);
 const singaporeLookup = new PolygonLookup(singaporeGeoData as any);
 const indonesiaLookup = new PolygonLookup(indonesiaGeoData as any);
 const bruneiLookup = new PolygonLookup(bruneiGeoData as any);
+const sriLankaLookup = new PolygonLookup(sriLankaGeoData as any);
 
 function lookupCountry(
   lat: number,
@@ -95,6 +98,25 @@ function lookupIndonesiaZone(lat: number, lng: number): OfficialZone | null {
   };
 }
 
+function lookupSriLankaZone(lat: number, lng: number): OfficialZone | null {
+  const result = sriLankaLookup.search(lng, lat);
+  if (!result || !result.properties) return null;
+
+  const shapeName = result.properties.shapeName;
+  const mapping = (
+    sriLankaZoneMapping as Record<string, { zone: string; district: string }>
+  )[shapeName];
+  if (!mapping) return null;
+
+  return {
+    type: "official",
+    zone: mapping.zone,
+    country: "LK",
+    state: "Sri Lanka",
+    district: mapping.district,
+  };
+}
+
 function buildCalculatedZone(
   lat: number,
   lng: number,
@@ -128,6 +150,11 @@ export function lookupZoneByGps(lat: number, lng: number): Zone {
     }
     case "ID": {
       const zone = lookupIndonesiaZone(lat, lng);
+      if (zone) return zone;
+      break;
+    }
+    case "LK": {
+      const zone = lookupSriLankaZone(lat, lng);
       if (zone) return zone;
       break;
     }
