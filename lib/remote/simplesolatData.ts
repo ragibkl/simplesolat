@@ -46,15 +46,8 @@ export async function fetchZones(countryCode: string): Promise<ZoneConfig[]> {
   return parsed.zones;
 }
 
-function resolveUrl(url: string): string {
-  if (url.startsWith("http")) return url;
-  const path = url.startsWith("data/") ? url.slice(5) : url;
-  return `${BASE_URL}/${path}`;
-}
-
 export async function fetchGeoJson(url: string): Promise<any> {
-  const fullUrl = resolveUrl(url);
-  const response = await fetch(fullUrl);
+  const response = await fetch(url);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return await response.json();
 }
@@ -62,8 +55,7 @@ export async function fetchGeoJson(url: string): Promise<any> {
 export async function fetchMapping(
   url: string,
 ): Promise<Record<string, { zone: string; state: string }>> {
-  const fullUrl = resolveUrl(url);
-  const response = await fetch(fullUrl);
+  const response = await fetch(url);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return await response.json();
 }
