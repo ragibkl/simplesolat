@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "build": "eas build --platform android --profile development",
+    "build": "eas build --platform android --profile development --no-wait",
     "build::preview": "eas build --platform android --profile preview --no-wait",
     "build::production": "eas build --platform android --profile production --no-wait",
     "reset-project": "node ./scripts/reset-project.js",
