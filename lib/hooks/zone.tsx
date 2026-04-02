@@ -9,7 +9,7 @@ export function useZone() {
 
   const updateZoneViaGps = useCallback(
     async (lat: number, lng: number): Promise<Zone | null> => {
-      const zoneData = lookupZoneByGps(lat, lng);
+      const zoneData = await lookupZoneByGps(lat, lng);
       setZone(zoneData);
 
       return zoneData;
