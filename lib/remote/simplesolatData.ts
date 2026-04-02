@@ -34,18 +34,26 @@ export async function fetchCountries(): Promise<CountryConfig[]> {
   const response = await fetch(`${BASE_URL}/countries.yaml`);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const text = await response.text();
-  return yaml.load(text) as CountryConfig[];
+  const parsed = yaml.load(text) as { countries: CountryConfig[] };
+  return parsed.countries;
 }
 
 export async function fetchZones(countryCode: string): Promise<ZoneConfig[]> {
   const response = await fetch(`${BASE_URL}/zones/${countryCode}.yaml`);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const text = await response.text();
-  return yaml.load(text) as ZoneConfig[];
+  const parsed = yaml.load(text) as { zones: ZoneConfig[] };
+  return parsed.zones;
+}
+
+function resolveUrl(url: string): string {
+  if (url.startsWith("http")) return url;
+  const path = url.startsWith("data/") ? url.slice(5) : url;
+  return `${BASE_URL}/${path}`;
 }
 
 export async function fetchGeoJson(url: string): Promise<any> {
-  const fullUrl = url.startsWith("http") ? url : `${BASE_URL}/${url}`;
+  const fullUrl = resolveUrl(url);
   const response = await fetch(fullUrl);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return await response.json();
@@ -54,7 +62,7 @@ export async function fetchGeoJson(url: string): Promise<any> {
 export async function fetchMapping(
   url: string,
 ): Promise<Record<string, { zone: string; state: string }>> {
-  const fullUrl = url.startsWith("http") ? url : `${BASE_URL}/${url}`;
+  const fullUrl = resolveUrl(url);
   const response = await fetch(fullUrl);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return await response.json();
