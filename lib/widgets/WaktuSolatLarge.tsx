@@ -9,7 +9,7 @@ import {
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { PrayerTime } from "@/lib/data/waktuSolatStore";
 import { Zone, getZoneDisplayName } from "@/lib/data/zoneStore";
-import { getPrayerData } from "@/lib/service/waktuSolatWidget";
+import { getPrayerData } from "@/lib/service/prayerData";
 
 import { Empty } from "./Empty";
 import { WaktuColumn } from "./WaktuColumn";
