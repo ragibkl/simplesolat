@@ -1,6 +1,6 @@
 import yaml from "js-yaml";
 
-const BASE_URL = "https://ragibkl.github.io/simplesolat-data";
+const BASE_URL = "https://simplesolat-data.netlify.app";
 
 export type CountryConfig = {
   code: string;
