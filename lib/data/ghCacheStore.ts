@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
+import { File, Directory, Paths } from "expo-file-system/next";
 
 const GH_CACHE_PREFIX = "GH_CACHE:";
-const GH_FILE_DIR = `${FileSystem.documentDirectory}gh-cache/`;
+const ghCacheDir = new Directory(Paths.document, "gh-cache");
 
 // --- AsyncStorage-based cache (small data: countries.yaml, zones yaml) ---
 
@@ -39,15 +39,13 @@ export async function getCachedOrFetch<T>(
 // --- Filesystem-based cache (large data: geojson, mappings) ---
 
 function urlToFilename(url: string): string {
-  // Use the last path segment as filename (already datestamped and unique)
   const segments = url.split("/");
   return segments[segments.length - 1];
 }
 
-async function ensureDir(): Promise<void> {
-  const info = await FileSystem.getInfoAsync(GH_FILE_DIR);
-  if (!info.exists) {
-    await FileSystem.makeDirectoryAsync(GH_FILE_DIR, { intermediates: true });
+function ensureDir(): void {
+  if (!ghCacheDir.exists) {
+    ghCacheDir.create();
   }
 }
 
@@ -55,13 +53,12 @@ export async function getCachedFileOrFetch<T>(
   url: string,
   fetchFn: () => Promise<T>,
 ): Promise<T> {
-  await ensureDir();
-  const filepath = `${GH_FILE_DIR}${urlToFilename(url)}`;
+  ensureDir();
+  const file = new File(ghCacheDir, urlToFilename(url));
 
   try {
-    const info = await FileSystem.getInfoAsync(filepath);
-    if (info.exists) {
-      const raw = await FileSystem.readAsStringAsync(filepath);
+    if (file.exists) {
+      const raw = file.text();
       return JSON.parse(raw) as T;
     }
   } catch {
@@ -69,20 +66,19 @@ export async function getCachedFileOrFetch<T>(
   }
 
   const data = await fetchFn();
-  await FileSystem.writeAsStringAsync(filepath, JSON.stringify(data));
+  file.create();
+  file.write(JSON.stringify(data));
   return data;
 }
 
 export async function clearStaleFiles(currentUrls: string[]): Promise<void> {
-  await ensureDir();
+  ensureDir();
   const currentFilenames = new Set(currentUrls.map(urlToFilename));
 
-  const files = await FileSystem.readDirectoryAsync(GH_FILE_DIR);
-  for (const file of files) {
-    if (!currentFilenames.has(file)) {
-      await FileSystem.deleteAsync(`${GH_FILE_DIR}${file}`, {
-        idempotent: true,
-      });
+  const contents = ghCacheDir.list();
+  for (const item of contents) {
+    if (!currentFilenames.has(item.name)) {
+      item.delete();
     }
   }
 }
