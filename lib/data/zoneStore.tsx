@@ -35,6 +35,6 @@ export function getZoneLocationText(zone: Zone): string {
 }
 
 export const zoneStore = createDataStore<Zone | null>(
-  "ZONE_STORE_V3_KEY",
+  "ZONE_STORE_V4_KEY",
   null,
 );
