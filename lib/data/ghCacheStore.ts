@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
 
 const GH_CACHE_PREFIX = "GH_CACHE:";
-const GH_FILE_DIR = `${FileSystem.cacheDirectory}gh-cache/`;
+const GH_FILE_DIR = `${FileSystem.documentDirectory}gh-cache/`;
 
 // --- AsyncStorage-based cache (small data: countries.yaml, zones yaml) ---
 
