@@ -139,6 +139,12 @@ function useWaktuSolatForDate(date: Date) {
         return;
       }
 
+      // Stale zone from old cache version — missing timezone
+      if (zone.type === "official" && !zone.timezone) {
+        setWaktuSolat(null);
+        return;
+      }
+
       if (zone.type === "calculated") {
         const w = calculateWaktuSolat(
           date,
