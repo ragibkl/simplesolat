@@ -5,6 +5,7 @@ const BASE_URL = "https://ragibkl.github.io/simplesolat-data";
 export type CountryConfig = {
   code: string;
   name: string;
+  source: string;
   geojson: string;
   mapping: string;
   shape_property: string;

@@ -1,4 +1,5 @@
 import { createDataStore } from "./dataStore";
+import { getCalculationMethod } from "@/lib/service/calculationMethod";
 
 export type OfficialZone = {
   type: "official";
@@ -7,6 +8,7 @@ export type OfficialZone = {
   state: string;
   district: string;
   timezone: string;
+  source: string;
 };
 
 export type CalculatedZone = {
@@ -32,6 +34,13 @@ export function getZoneDisplayName(zone: Zone): string {
 export function getZoneLocationText(zone: Zone): string {
   if (zone.type === "official") return `${zone.district}, ${zone.state}`;
   return zone.countryName;
+}
+
+export function getZoneInfoText(zone: Zone): string {
+  if (zone.type === "official") {
+    return `${zone.zone} - Source: ${zone.source}`;
+  }
+  return `Calculated (${getCalculationMethod(zone.country).label})`;
 }
 
 export const zoneStore = createDataStore<Zone | null>(

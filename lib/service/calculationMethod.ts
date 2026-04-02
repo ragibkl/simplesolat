@@ -1,5 +1,3 @@
-import { Zone } from "@/lib/data/zoneStore";
-
 const COUNTRY_METHODS: Record<string, { method: string; label: string }> = {
   // Built-in adhan methods
   SA: { method: "UmmAlQura", label: "Umm Al-Qura" },
@@ -31,29 +29,10 @@ const DEFAULT_METHOD = {
   label: "Muslim World League",
 };
 
-const OFFICIAL_SOURCES: Record<string, string> = {
-  MY: "JAKIM",
-  SG: "MUIS",
-  BN: "KHEU",
-  ID: "Kemenag (equran.id)",
-  LK: "ACJU",
-};
-
-export function getOfficialSource(countryIso: string): string {
-  return OFFICIAL_SOURCES[countryIso] ?? countryIso;
-}
-
 export function getCalculationMethod(countryIso: string | null): {
   method: string;
   label: string;
 } {
   if (!countryIso) return DEFAULT_METHOD;
   return COUNTRY_METHODS[countryIso] ?? DEFAULT_METHOD;
-}
-
-export function getZoneInfoText(zone: Zone): string {
-  if (zone.type === "official") {
-    return `${zone.zone} - Source: ${getOfficialSource(zone.country)}`;
-  }
-  return `Calculated (${getCalculationMethod(zone.country).label})`;
 }

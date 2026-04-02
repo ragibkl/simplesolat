@@ -1,8 +1,7 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-import { getZoneInfoText } from "@/lib/service/calculationMethod";
-import { getZoneLocationText } from "@/lib/data/zoneStore";
+import { getZoneInfoText, getZoneLocationText } from "@/lib/data/zoneStore";
 
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";

@@ -145,6 +145,7 @@ export async function lookupZoneByGpsGH(
     state: zoneEntry.state,
     district: shapeName,
     timezone: zoneConfig?.timezone,
+    source: countryConfig.source,
   };
 
   return officialZone;
