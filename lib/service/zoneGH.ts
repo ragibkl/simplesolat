@@ -97,6 +97,7 @@ export async function lookupZoneByGpsGH(
   lng: number,
 ): Promise<Zone> {
   const country = lookupCountry(lat, lng);
+  console.log("[zoneGH] country:", country);
 
   if (!country) {
     return buildCalculatedZone(lat, lng, null, null);
@@ -104,9 +105,12 @@ export async function lookupZoneByGpsGH(
 
   // Check if this country is officially supported
   const countries = await getCountries();
+  console.log("[zoneGH] countries count:", countries.length);
   const countryConfig = countries.find((c) => c.code === country.iso);
+  console.log("[zoneGH] countryConfig:", countryConfig?.code);
 
   if (!countryConfig) {
+    console.log("[zoneGH] country not supported, using calculated");
     return buildCalculatedZone(lat, lng, country.iso, country.name);
   }
 
@@ -117,20 +121,26 @@ export async function lookupZoneByGpsGH(
   // Resolve zone via polygon lookup
   const lookup = await getPolygonLookup(countryConfig);
   const result = lookup.search(lng, lat);
+  console.log("[zoneGH] polygon result:", result?.properties);
 
   if (!result || !result.properties) {
+    console.log("[zoneGH] no polygon match");
     return buildCalculatedZone(lat, lng, country.iso, country.name);
   }
 
   const shapeName = result.properties[countryConfig.shape_property];
+  console.log("[zoneGH] shapeName:", shapeName);
   if (!shapeName) {
+    console.log("[zoneGH] no shapeName in properties");
     return buildCalculatedZone(lat, lng, country.iso, country.name);
   }
 
   const mapping = await getMapping(countryConfig);
   const zoneEntry = mapping[shapeName];
+  console.log("[zoneGH] zoneEntry:", zoneEntry);
 
   if (!zoneEntry) {
+    console.log("[zoneGH] no mapping for shapeName");
     return buildCalculatedZone(lat, lng, country.iso, country.name);
   }
 
