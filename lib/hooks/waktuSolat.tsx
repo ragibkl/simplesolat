@@ -41,7 +41,9 @@ async function fetchAndMergeGHPrayerTimes(
 ): Promise<WaktuSolatStore> {
   const timezone = zone.timezone;
   if (!timezone) {
-    throw new Error(`No timezone for zone ${zone.zone}`);
+    // Zone was loaded from stale cache without timezone — skip fetch,
+    // the zone resolver will re-resolve and trigger a re-render
+    return store;
   }
 
   // Fetch current month + next month
