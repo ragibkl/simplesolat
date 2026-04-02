@@ -66,7 +66,9 @@ export async function getCachedFileOrFetch<T>(
   }
 
   const data = await fetchFn();
-  file.create();
+  if (!file.exists) {
+    file.create();
+  }
   file.write(JSON.stringify(data));
   return data;
 }
