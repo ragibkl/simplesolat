@@ -1,21 +1,20 @@
-import { addDays } from "date-fns";
+import { addDays, addMonths } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { WaktuSolat, waktuSolatStore } from "@/lib/data/waktuSolatStore";
-import { getZoneCode } from "@/lib/data/zoneStore";
-import { getWaktuSolatByZone } from "@/lib/remote/simplesolat";
-import { calculateWaktuSolat } from "@/lib/service/adhanCalculator";
 import {
-  getWaktuSolatFromStore,
-  mergeWaktuSolatResponseIntoStore,
-} from "@/lib/service/waktuSolat";
+  WaktuSolat,
+  WaktuSolatStore,
+  waktuSolatStore,
+} from "@/lib/data/waktuSolatStore";
+import { getZoneCode, OfficialZone } from "@/lib/data/zoneStore";
+import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolatData";
+import { calculateWaktuSolat } from "@/lib/service/adhanCalculator";
+import { localTimeToEpoch } from "@/lib/service/timeConvert";
+import { getWaktuSolatFromStore } from "@/lib/service/waktuSolat";
 import { useCurrentDate } from "./date";
 import { useZone } from "./zone";
 
 // Per-zone mutex to prevent concurrent fetches for the same zone.
-// Must be module-level so it is shared across all hook instances.
-// useRef is per-component, so useWaktuSolatCurrent and useWaktuSolatTomorrow
-// would each get their own ref and the mutex would not work.
 const mutexByZone = new Map<string, Promise<void>>();
 
 async function withLock<T>(zone: string, fn: () => Promise<T>): Promise<T> {
@@ -31,59 +30,102 @@ async function withLock<T>(zone: string, fn: () => Promise<T>): Promise<T> {
   }
 }
 
+/**
+ * Fetch prayer times from GitHub Pages for current + next month,
+ * convert HH:MM to epoch seconds, and merge into the waktuSolat store.
+ */
+async function fetchAndMergeGHPrayerTimes(
+  store: WaktuSolatStore,
+  zone: OfficialZone,
+  date: Date,
+): Promise<WaktuSolatStore> {
+  const timezone = zone.timezone;
+  if (!timezone) {
+    throw new Error(`No timezone for zone ${zone.zone}`);
+  }
+
+  // Fetch current month + next month
+  const months = [
+    { year: date.getFullYear(), month: date.getMonth() + 1 },
+    {
+      year: addMonths(date, 1).getFullYear(),
+      month: addMonths(date, 1).getMonth() + 1,
+    },
+  ];
+
+  const newStore = { ...store };
+
+  for (const { year, month } of months) {
+    const entries = await fetchPrayerTimesMonth(
+      zone.country,
+      zone.zone,
+      year,
+      month,
+    );
+
+    for (const entry of entries) {
+      const [y, m, d] = entry.date.split("-").map(Number);
+      const key = `${y}::${m}::${d}::${zone.zone}`;
+
+      newStore[key] = {
+        year: y,
+        month: m,
+        date: d,
+        zone: zone.zone,
+        prayerTime: {
+          imsak: localTimeToEpoch(entry.date, entry.imsak, timezone),
+          fajr: localTimeToEpoch(entry.date, entry.fajr, timezone),
+          syuruk: localTimeToEpoch(entry.date, entry.syuruk, timezone),
+          dhuhr: localTimeToEpoch(entry.date, entry.dhuhr, timezone),
+          asr: localTimeToEpoch(entry.date, entry.asr, timezone),
+          maghrib: localTimeToEpoch(entry.date, entry.maghrib, timezone),
+          isha: localTimeToEpoch(entry.date, entry.isha, timezone),
+        },
+      };
+    }
+  }
+
+  return newStore;
+}
+
 export function useWaktuSolat() {
   const { data, setData } = waktuSolatStore.use();
 
-  // We use a ref to hold the latest `data` so that getOrRetrieveWaktuSolat
-  // can read it without needing `data` as a useCallback dependency.
-  //
-  // The problem with having `data` as a dep: every time a fetch completes and
-  // setData is called, `data` changes → getOrRetrieveWaktuSolat recreates →
-  // all useEffects that depend on it re-run → potential duplicate API calls.
-  //
-  // By reading from dataRef.current inside the callback instead, the callback
-  // identity stays stable. Effects only re-run when zone or date actually
-  // change — which is the correct trigger.
   const dataRef = useRef(data);
   dataRef.current = data;
 
-  const fetchOfficialWaktuSolat = useCallback(
-    async (zoneCode: string, date: Date): Promise<WaktuSolat | null> => {
-      const cached = getWaktuSolatFromStore(dataRef.current, zoneCode, date);
+  const fetchGHWaktuSolat = useCallback(
+    async (zone: OfficialZone, date: Date): Promise<WaktuSolat | null> => {
+      const cached = getWaktuSolatFromStore(dataRef.current, zone.zone, date);
       if (cached) {
-        console.log(
-          `Found WaktuSolat from store. zone=${zoneCode} date=${date}`,
-        );
         return cached;
       }
 
-      return withLock(zoneCode, async () => {
-        // Re-check after acquiring lock — a previous waiter may have already fetched
+      return withLock(zone.zone, async () => {
         const cachedAfterWait = getWaktuSolatFromStore(
           dataRef.current,
-          zoneCode,
+          zone.zone,
           date,
         );
         if (cachedAfterWait) return cachedAfterWait;
 
-        console.log(
-          `Fetch new WaktuSolat from api. zone=${zoneCode} date=${date}`,
+        const newStore = await fetchAndMergeGHPrayerTimes(
+          dataRef.current,
+          zone,
+          date,
         );
-        const res = await getWaktuSolatByZone(date, zoneCode);
-        const newStore = mergeWaktuSolatResponseIntoStore(dataRef.current, res);
-        console.log(`Update WaktuSolat into store`);
         setData(newStore);
-        return getWaktuSolatFromStore(newStore, zoneCode, date);
+        return getWaktuSolatFromStore(newStore, zone.zone, date);
       });
     },
-    [setData], // setData is stable (created with useCallback(fn, []) in Provider)
+    [setData],
   );
 
-  return { setWaktuSolatData: setData, fetchOfficialWaktuSolat };
+  return { setWaktuSolatData: setData, fetchGHWaktuSolat };
 }
 
 function useWaktuSolatForDate(date: Date) {
-  const { fetchOfficialWaktuSolat } = useWaktuSolat();
+  const { fetchGHWaktuSolat } = useWaktuSolat();
   const { zone } = useZone();
 
   const [waktuSolat, setWaktuSolat] = useState<WaktuSolat | null>(null);
@@ -107,14 +149,14 @@ function useWaktuSolatForDate(date: Date) {
         return;
       }
 
-      const w = await fetchOfficialWaktuSolat(zone.zone, date);
+      const w = await fetchGHWaktuSolat(zone, date);
       if (w) {
         setWaktuSolat(w);
       }
     }
 
     effect();
-  }, [zone, fetchOfficialWaktuSolat, date]);
+  }, [zone, fetchGHWaktuSolat, date]);
 
   return { waktuSolat };
 }

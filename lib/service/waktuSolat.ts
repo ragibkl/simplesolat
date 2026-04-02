@@ -1,4 +1,4 @@
-import { compareAsc, startOfYesterday } from "date-fns";
+import { addMonths, compareAsc, startOfYesterday } from "date-fns";
 
 import {
   WaktuSolat,
@@ -6,11 +6,9 @@ import {
   waktuSolatStore,
 } from "@/lib/data/waktuSolatStore";
 import { zoneStore, getZoneCode } from "@/lib/data/zoneStore";
-import {
-  getWaktuSolatByZone,
-  WaktuSolatResponse,
-} from "@/lib/remote/simplesolat";
+import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolatData";
 import { calculateWaktuSolat } from "./adhanCalculator";
+import { localTimeToEpoch } from "./timeConvert";
 
 function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
   return [
@@ -54,33 +52,47 @@ function trimWaktuSolatStore(store: WaktuSolatStore): WaktuSolatStore {
   return newStore;
 }
 
-export function mergeWaktuSolatResponseIntoStore(
+async function fetchAndMergeGHPrayerTimes(
   store: WaktuSolatStore,
-  res: WaktuSolatResponse,
-): WaktuSolatStore {
+  zoneCode: string,
+  country: string,
+  timezone: string,
+  date: Date,
+): Promise<WaktuSolatStore> {
   const trimmedStore = trimWaktuSolatStore(store);
   const newStore: WaktuSolatStore = {};
 
-  res.data.forEach((p) => {
-    const [year, month, day] = p.date.split("-") as [string, string, string];
-    const waktuSolat: WaktuSolat = {
-      year: parseInt(year),
-      month: parseInt(month),
-      date: parseInt(day),
-      zone: p.zone,
-      prayerTime: {
-        imsak: p.imsak,
-        fajr: p.fajr,
-        syuruk: p.syuruk,
-        dhuhr: p.dhuhr,
-        asr: p.asr,
-        maghrib: p.maghrib,
-        isha: p.isha,
-      },
-    };
-    const key = getWaktuSolatKey(waktuSolat);
-    newStore[key] = waktuSolat;
-  });
+  const months = [
+    { year: date.getFullYear(), month: date.getMonth() + 1 },
+    {
+      year: addMonths(date, 1).getFullYear(),
+      month: addMonths(date, 1).getMonth() + 1,
+    },
+  ];
+
+  for (const { year, month } of months) {
+    const entries = await fetchPrayerTimesMonth(country, zoneCode, year, month);
+
+    for (const entry of entries) {
+      const [y, m, d] = entry.date.split("-").map(Number);
+      const ws: WaktuSolat = {
+        year: y,
+        month: m,
+        date: d,
+        zone: zoneCode,
+        prayerTime: {
+          imsak: localTimeToEpoch(entry.date, entry.imsak, timezone),
+          fajr: localTimeToEpoch(entry.date, entry.fajr, timezone),
+          syuruk: localTimeToEpoch(entry.date, entry.syuruk, timezone),
+          dhuhr: localTimeToEpoch(entry.date, entry.dhuhr, timezone),
+          asr: localTimeToEpoch(entry.date, entry.asr, timezone),
+          maghrib: localTimeToEpoch(entry.date, entry.maghrib, timezone),
+          isha: localTimeToEpoch(entry.date, entry.isha, timezone),
+        },
+      };
+      newStore[getWaktuSolatKey(ws)] = ws;
+    }
+  }
 
   return { ...trimmedStore, ...newStore };
 }
@@ -102,13 +114,21 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
   const store = await waktuSolatStore.load();
   const waktuSolat = getWaktuSolatFromStore(store, zone.zone, date);
   if (waktuSolat) {
-    console.log(`Found WaktuSolat from store. zone=${zone.zone} date=${date}`);
     return waktuSolat;
   }
 
-  const res = await getWaktuSolatByZone(date, zone.zone);
-  const newStore = mergeWaktuSolatResponseIntoStore(store, res);
-  console.log(`Update WaktuSolat into store`);
+  if (!zone.timezone) {
+    console.log(`No timezone for zone ${zone.zone}, cannot fetch`);
+    return null;
+  }
+
+  const newStore = await fetchAndMergeGHPrayerTimes(
+    store,
+    zone.zone,
+    zone.country,
+    zone.timezone,
+    date,
+  );
   await waktuSolatStore.save(newStore);
 
   return getWaktuSolatFromStore(newStore, zone.zone, date);
