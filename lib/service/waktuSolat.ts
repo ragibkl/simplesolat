@@ -117,11 +117,6 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
     return waktuSolat;
   }
 
-  if (!zone.timezone) {
-    console.log(`No timezone for zone ${zone.zone}, cannot fetch`);
-    return null;
-  }
-
   const newStore = await fetchAndMergeGHPrayerTimes(
     store,
     zone.zone,

@@ -39,12 +39,7 @@ async function fetchAndMergeGHPrayerTimes(
   zone: OfficialZone,
   date: Date,
 ): Promise<WaktuSolatStore> {
-  const timezone = zone.timezone;
-  if (!timezone) {
-    // Zone was loaded from stale cache without timezone — skip fetch,
-    // the zone resolver will re-resolve and trigger a re-render
-    return store;
-  }
+  const { timezone } = zone;
 
   // Fetch current month + next month
   const months = [
@@ -135,12 +130,6 @@ function useWaktuSolatForDate(date: Date) {
   useEffect(() => {
     async function effect() {
       if (!zone) {
-        setWaktuSolat(null);
-        return;
-      }
-
-      // Stale zone from old cache version — missing timezone
-      if (zone.type === "official" && !zone.timezone) {
         setWaktuSolat(null);
         return;
       }
