@@ -1,33 +1,14 @@
 import { startOfMinute } from "date-fns";
 
-import { WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { Zone, zoneStore } from "@/lib/data/zoneStore";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { Zone } from "@/lib/domain/zone";
 import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
 import { requestWaktuSolatCompactUpdate } from "@/lib/widgets/WaktuSolatCompact";
 import { requestWaktuSolatImsakWidgetUpdate } from "@/lib/widgets/WaktuSolatImsak";
-import { requestWaktuSolatLargeUpdate } from "@/lib/widgets/WaktuSolatLarge";
 import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTransparent";
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
-import { getOrRetrieveWaktuSolat } from "./waktuSolat";
-import { getUpdatedZone } from "./zone";
-
-export async function getPrayerData(
-  date: Date,
-  updateZone: boolean,
-): Promise<{ zone: Zone; waktuSolat: WaktuSolat } | null> {
-  const zone = updateZone ? await getUpdatedZone() : await zoneStore.load();
-  if (!zone) {
-    return null;
-  }
-
-  const waktuSolat = await getOrRetrieveWaktuSolat(date);
-  if (!waktuSolat) {
-    return null;
-  }
-
-  return { zone, waktuSolat };
-}
+import { getPrayerData } from "./prayerData";
 
 export async function requestUpdateWaktuSolatWidgets(
   date: Date,
@@ -38,7 +19,6 @@ export async function requestUpdateWaktuSolatWidgets(
     requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime),
     requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime),
     requestWaktuSolatImsakWidgetUpdate(date, zone, waktuSolat.prayerTime),
-    requestWaktuSolatLargeUpdate(date, zone, waktuSolat.prayerTime),
     requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime),
   ]);
 }

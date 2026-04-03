@@ -1,45 +1,75 @@
-import { addMonths, endOfMonth } from "date-fns";
+import yaml from "js-yaml";
 
-export type Prayer = {
+const BASE_URL = "https://simplesolat-data.netlify.app";
+
+export type CountryConfig = {
+  code: string;
+  name: string;
+  source: string;
+  geojson: string;
+  mapping: string;
+  shape_property: string;
+};
+
+export type ZoneConfig = {
+  code: string;
+  country: string;
+  state: string;
+  location: string;
+  timezone: string;
+  shapes: string[];
+};
+
+export type PrayerTimeEntry = {
   date: string;
-  zone: string;
-  imsak: number;
-  fajr: number;
-  syuruk: number;
-  dhuhr: number;
-  asr: number;
-  maghrib: number;
-  isha: number;
+  imsak: string;
+  fajr: string;
+  syuruk: string;
+  dhuhr: string;
+  asr: string;
+  maghrib: string;
+  isha: string;
 };
 
-export type WaktuSolatResponse = {
-  data: Prayer[];
-};
-
-function toDateString(date: Date): string {
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // getMonth() is 0-indexed
-  const day = date.getDate().toString().padStart(2, "0");
-  return `${year}-${month}-${day}`;
+export async function fetchCountries(): Promise<CountryConfig[]> {
+  const response = await fetch(`${BASE_URL}/countries.yaml`);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const text = await response.text();
+  const parsed = yaml.load(text) as { countries: CountryConfig[] };
+  return parsed.countries;
 }
 
-export async function getWaktuSolatByZone(
-  date: Date,
-  zone: string,
-): Promise<WaktuSolatResponse> {
-  console.log(`getWaktuSolatByZone(${date}, ${zone})`);
-  const to = endOfMonth(addMonths(date, 1));
-  const params = new URLSearchParams({
-    from: toDateString(date),
-    to: toDateString(to),
-  });
-  const url = `https://api.simplesolat.com/prayer-times/by-zone/${zone}?${params.toString()}`;
-  console.log(`getWaktuSolatByZone - GET ${url}`);
-  const response = await fetch(url);
+export async function fetchZones(countryCode: string): Promise<ZoneConfig[]> {
+  const response = await fetch(`${BASE_URL}/zones/${countryCode}.yaml`);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const text = await response.text();
+  const parsed = yaml.load(text) as { zones: ZoneConfig[] };
+  return parsed.zones;
+}
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
-  }
-  const jsonData = await response.json();
-  return jsonData as WaktuSolatResponse;
+export async function fetchGeoJson(url: string): Promise<any> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return await response.json();
+}
+
+export async function fetchMapping(
+  url: string,
+): Promise<Record<string, { zone: string; state: string }>> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return await response.json();
+}
+
+export async function fetchPrayerTimesMonth(
+  country: string,
+  zone: string,
+  year: number,
+  month: number,
+): Promise<PrayerTimeEntry[]> {
+  const monthStr = month.toString().padStart(2, "0");
+  const url = `${BASE_URL}/prayer-times/${country}/${zone}/${year}-${monthStr}.json`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return await response.json();
 }

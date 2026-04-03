@@ -48,7 +48,6 @@ export async function getLocation(): Promise<Location.LocationObject | null> {
       accuracy: Location.Accuracy.Lowest,
     });
   } catch (e) {
-    console.log("Cannot get location", e);
     return null;
   }
 }

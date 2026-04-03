@@ -8,9 +8,9 @@ import {
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { getMonoStyle } from "@/lib/components/monoui";
-import { PrayerTime } from "@/lib/data/waktuSolatStore";
-import { Zone, getZoneDisplayName } from "@/lib/data/zoneStore";
-import { getPrayerData } from "@/lib/service/waktuSolatWidget";
+import { PrayerTime } from "@/lib/domain/prayerTime";
+import { Zone, getZoneDisplayName } from "@/lib/domain/zone";
+import { getPrayerData } from "@/lib/service/prayerData";
 
 import { Empty } from "./Empty";
 import { WaktuColumn, WaktuColumnProps } from "./WaktuColumn";
@@ -31,35 +31,52 @@ export function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
   const { backgroundColor } = getMonoStyle();
 
   return (
-    <WidgetContainer style={{ backgroundColor, borderRadius: 0, padding: 5 }}>
+    <WidgetContainer
+      style={{
+        borderRadius: 0,
+        padding: 0,
+        justifyContent: "center",
+        backgroundColor: "#00000000",
+      }}
+    >
       <FlexWidget
         style={{
-          flexDirection: "row",
+          flexDirection: "column",
           width: "match_parent",
-          justifyContent: "space-between",
-          alignItems: "center",
+          backgroundColor,
+          borderRadius: 5,
+          padding: 5,
         }}
       >
-        <MonoTextWidget style={{ fontSize: 10 }}>
-          {date.toDateString()}
-        </MonoTextWidget>
-        <MonoTextWidget style={{ fontSize: 10 }}>
-          {getZoneDisplayName(zone)}
-        </MonoTextWidget>
-      </FlexWidget>
+        <FlexWidget
+          style={{
+            flexDirection: "row",
+            width: "match_parent",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 3,
+          }}
+        >
+          <MonoTextWidget style={{ fontSize: 10 }}>
+            {date.toDateString()}
+          </MonoTextWidget>
+          <MonoTextWidget style={{ fontSize: 10 }}>
+            {getZoneDisplayName(zone)}
+          </MonoTextWidget>
+        </FlexWidget>
 
-      <FlexWidget
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          width: "match_parent",
-        }}
-      >
-        <Column date={date} label="Fajr" start={fajr} end={syuruk} />
-        <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
-        <Column date={date} label="Asr" start={asr} end={maghrib} />
-        <Column date={date} label="Maghrib" start={maghrib} end={isha} />
-        <Column date={date} label="Isha" start={isha} />
+        <FlexWidget
+          style={{
+            flexDirection: "row",
+            width: "match_parent",
+          }}
+        >
+          <Column date={date} label="Fajr" start={fajr} end={syuruk} />
+          <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
+          <Column date={date} label="Asr" start={asr} end={maghrib} />
+          <Column date={date} label="Maghrib" start={maghrib} end={isha} />
+          <Column date={date} label="Isha" start={isha} />
+        </FlexWidget>
       </FlexWidget>
     </WidgetContainer>
   );
@@ -69,11 +86,9 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
   const date = startOfMinute(new Date());
   const data = await getPrayerData(date, false);
   if (!data) {
-    console.log("Missing PrayerData, returning");
     return;
   }
 
-  console.log("Found PrayerData, rendering widget");
   props.renderWidget(
     <WaktuSolatCompact
       date={date}
@@ -86,8 +101,6 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
 export async function waktuSolatCompactTaskHandler(
   props: WidgetTaskHandlerProps,
 ) {
-  console.log(props.widgetAction, props.widgetInfo);
-
   switch (props.widgetAction) {
     case "WIDGET_ADDED":
       props.renderWidget(<Empty />);

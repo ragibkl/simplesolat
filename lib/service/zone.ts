@@ -1,29 +1,35 @@
 import PolygonLookup from "polygon-lookup";
 
+import { getCachedOrFetch } from "@/lib/data/asyncCacheStore";
 import {
-  zoneStore,
-  Zone,
-  OfficialZone,
-  CalculatedZone,
-} from "@/lib/data/zoneStore";
-import { getLocation } from "./location";
+  getCachedFileOrFetch,
+  clearStaleFiles,
+} from "@/lib/data/fileCacheStore";
+import { zoneStore } from "@/lib/data/zoneStore";
+import { CalculatedZone, Zone } from "@/lib/domain/zone";
+import {
+  fetchCountries,
+  fetchZones,
+  fetchGeoJson,
+  fetchMapping,
+  CountryConfig,
+  ZoneConfig,
+} from "@/lib/remote/simplesolat";
 
 import countriesGeoData from "@/assets/geodata/countries-adm0.json";
-import jakimGeoData from "@/assets/geodata/malaysia-district-jakim.json";
-import singaporeGeoData from "@/assets/geodata/singapore-adm0.json";
-import indonesiaGeoData from "@/assets/geodata/indonesia-adm2.json";
-import indonesiaZoneMapping from "@/assets/geodata/adm2_zone_mapping_id.json";
-import bruneiGeoData from "@/assets/geodata/brunei-adm1.json";
-import bruneiZoneMapping from "@/assets/geodata/adm1_zone_mapping_bn.json";
-import sriLankaGeoData from "@/assets/geodata/sri-lanka-adm2.json";
-import sriLankaZoneMapping from "@/assets/geodata/adm2_zone_mapping_lk.json";
 
+import { getLocation } from "./location";
+
+const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+
+// Bundled ADM0 for fast country detection
 const countriesLookup = new PolygonLookup(countriesGeoData as any);
-const jakimLookup = new PolygonLookup(jakimGeoData as any);
-const singaporeLookup = new PolygonLookup(singaporeGeoData as any);
-const indonesiaLookup = new PolygonLookup(indonesiaGeoData as any);
-const bruneiLookup = new PolygonLookup(bruneiGeoData as any);
-const sriLankaLookup = new PolygonLookup(sriLankaGeoData as any);
+
+// In-memory cache for PolygonLookup instances (per country)
+const lookupCache = new Map<
+  string,
+  { lookup: PolygonLookup; geojsonUrl: string }
+>();
 
 function lookupCountry(
   lat: number,
@@ -37,84 +43,39 @@ function lookupCountry(
   };
 }
 
-function lookupMalaysiaZone(lat: number, lng: number): OfficialZone | null {
-  const result = jakimLookup.search(lng, lat);
-  if (!result || !result.properties) return null;
-
-  return {
-    type: "official",
-    zone: result.properties.jakim_code,
-    country: "MY",
-    state: result.properties.state,
-    district: result.properties.name,
-  };
+async function getCountries(): Promise<CountryConfig[]> {
+  return getCachedOrFetch("countries", ONE_MONTH_MS, fetchCountries);
 }
 
-function lookupSingaporeZone(): OfficialZone {
-  return {
-    type: "official",
-    zone: "SGP01",
-    country: "SG",
-    state: "Singapore",
-    district: "Singapore",
-  };
+async function getZonesForCountry(countryCode: string): Promise<ZoneConfig[]> {
+  return getCachedOrFetch(`zones:${countryCode}`, ONE_MONTH_MS, () =>
+    fetchZones(countryCode),
+  );
 }
 
-function lookupBruneiZone(lat: number, lng: number): OfficialZone | null {
-  const result = bruneiLookup.search(lng, lat);
-  if (!result || !result.properties) return null;
+async function getPolygonLookup(
+  country: CountryConfig,
+): Promise<PolygonLookup> {
+  const cached = lookupCache.get(country.code);
+  if (cached && cached.geojsonUrl === country.geojson) {
+    return cached.lookup;
+  }
 
-  const shapeName = result.properties.shapeName;
-  const mapping = (
-    bruneiZoneMapping as Record<string, { zone: string; district: string }>
-  )[shapeName];
-  if (!mapping) return null;
+  const geojson = await getCachedFileOrFetch(country.geojson, () =>
+    fetchGeoJson(country.geojson),
+  );
 
-  return {
-    type: "official",
-    zone: mapping.zone,
-    country: "BN",
-    state: "Brunei",
-    district: mapping.district,
-  };
+  const lookup = new PolygonLookup(geojson as any);
+  lookupCache.set(country.code, { lookup, geojsonUrl: country.geojson });
+  return lookup;
 }
 
-function lookupIndonesiaZone(lat: number, lng: number): OfficialZone | null {
-  const result = indonesiaLookup.search(lng, lat);
-  if (!result || !result.properties) return null;
-
-  const shapeName = result.properties.shapeName;
-  const mapping = (
-    indonesiaZoneMapping as Record<string, { zone: string; province: string }>
-  )[shapeName];
-  if (!mapping) return null;
-
-  return {
-    type: "official",
-    zone: mapping.zone,
-    country: "ID",
-    state: mapping.province,
-    district: shapeName,
-  };
-}
-
-function lookupSriLankaZone(lat: number, lng: number): OfficialZone | null {
-  const result = sriLankaLookup.search(lng, lat);
-  if (!result || !result.properties) return null;
-
-  const shapeName = result.properties.shapeName;
-  const mapping = (
-    sriLankaZoneMapping as Record<string, { zone: string; district: string }>
-  )[shapeName];
-  if (!mapping) return null;
-
-  return {
-    type: "official",
-    zone: mapping.zone,
-    country: "LK",
-    state: "Sri Lanka",
-    district: mapping.district,
-  };
+async function getMapping(
+  country: CountryConfig,
+): Promise<Record<string, { zone: string; state: string }>> {
+  return getCachedFileOrFetch(country.mapping, () =>
+    fetchMapping(country.mapping),
+  );
 }
 
 function buildCalculatedZone(
@@ -132,40 +93,61 @@ function buildCalculatedZone(
   };
 }
 
-export function lookupZoneByGps(lat: number, lng: number): Zone {
+export async function lookupZoneByGps(lat: number, lng: number): Promise<Zone> {
   const country = lookupCountry(lat, lng);
 
-  switch (country?.iso) {
-    case "MY": {
-      const zone = lookupMalaysiaZone(lat, lng);
-      if (zone) return zone;
-      break;
-    }
-    case "SG":
-      return lookupSingaporeZone();
-    case "BN": {
-      const zone = lookupBruneiZone(lat, lng);
-      if (zone) return zone;
-      break;
-    }
-    case "ID": {
-      const zone = lookupIndonesiaZone(lat, lng);
-      if (zone) return zone;
-      break;
-    }
-    case "LK": {
-      const zone = lookupSriLankaZone(lat, lng);
-      if (zone) return zone;
-      break;
-    }
+  if (!country) {
+    return buildCalculatedZone(lat, lng, null, null);
   }
 
-  return buildCalculatedZone(
-    lat,
-    lng,
-    country?.iso ?? null,
-    country?.name ?? null,
-  );
+  const countries = await getCountries();
+  const countryConfig = countries.find((c) => c.code === country.iso);
+
+  if (!countryConfig) {
+    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  }
+
+  // Clean up stale geojson/mapping files
+  const allUrls = countries.flatMap((c) => [c.geojson, c.mapping]);
+  clearStaleFiles(allUrls).catch(() => {});
+
+  // Resolve zone via polygon lookup
+  const lookup = await getPolygonLookup(countryConfig);
+  const result = lookup.search(lng, lat);
+
+  if (!result || !result.properties) {
+    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  }
+
+  const lookupKey = result.properties[countryConfig.shape_property];
+  const district = result.properties.shapeName;
+  if (!lookupKey) {
+    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  }
+
+  const mapping = await getMapping(countryConfig);
+  const zoneEntry = mapping[lookupKey];
+
+  if (!zoneEntry) {
+    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  }
+
+  const zones = await getZonesForCountry(country.iso);
+  const zoneConfig = zones.find((z) => z.code === zoneEntry.zone);
+
+  if (!zoneConfig) {
+    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  }
+
+  return {
+    type: "official",
+    zone: zoneEntry.zone,
+    country: country.iso,
+    state: zoneEntry.state,
+    district,
+    timezone: zoneConfig.timezone,
+    source: countryConfig.source,
+  };
 }
 
 export async function updateZoneViaGps(
@@ -173,7 +155,7 @@ export async function updateZoneViaGps(
   lng: number,
 ): Promise<Zone> {
   const existingZone = await zoneStore.load();
-  const newZone = lookupZoneByGps(lat, lng);
+  const newZone = await lookupZoneByGps(lat, lng);
 
   if (
     existingZone &&

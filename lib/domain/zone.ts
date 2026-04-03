@@ -1,4 +1,4 @@
-import { createDataStore } from "./dataStore";
+import { getCalculationMethod } from "./adhanCalculator";
 
 export type OfficialZone = {
   type: "official";
@@ -6,6 +6,8 @@ export type OfficialZone = {
   country: string;
   state: string;
   district: string;
+  timezone: string;
+  source: string;
 };
 
 export type CalculatedZone = {
@@ -33,7 +35,9 @@ export function getZoneLocationText(zone: Zone): string {
   return zone.countryName;
 }
 
-export const zoneStore = createDataStore<Zone | null>(
-  "ZONE_STORE_V3_KEY",
-  null,
-);
+export function getZoneInfoText(zone: Zone): string {
+  if (zone.type === "official") {
+    return `${zone.zone} - Source: ${zone.source}`;
+  }
+  return `Calculated (${getCalculationMethod(zone.country).label})`;
+}

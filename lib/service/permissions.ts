@@ -3,14 +3,14 @@ import notifee, { AndroidNotificationSetting } from "@notifee/react-native";
 import { Alert, Platform } from "react-native";
 
 export async function requestAllPermissions(): Promise<void> {
+  // Foreground location
   try {
-    // Foreground location
     const fgStatus = await Location.getForegroundPermissionsAsync();
     if (fgStatus.status !== "granted") {
       await new Promise<void>((resolve) => {
         Alert.alert(
           "Location Permission",
-          "This app needs your location to determine which of the JAKIM prayer zones you're in, so it can display accurate prayer times for your area.",
+          "This app needs your location to determine your prayer zone and display accurate prayer times for your area.",
           [
             {
               text: "Ok",
@@ -24,14 +24,21 @@ export async function requestAllPermissions(): Promise<void> {
         );
       });
     }
+  } catch {
+    Alert.alert(
+      "Location Error",
+      "Failed to request location permission. Prayer zone detection may not work.",
+    );
+  }
 
-    // Background location
+  // Background location
+  try {
     const bgStatus = await Location.getBackgroundPermissionsAsync();
     if (bgStatus.status !== "granted") {
       await new Promise<void>((resolve) => {
         Alert.alert(
           "Background Location Permission",
-          "This app needs background location access to keep your prayer times widget updated with the correct JAKIM prayer zone as you move around Malaysia, even when the app is not open.",
+          "This app needs background location access to keep your prayer times and widgets updated as you travel, even when the app is not open.",
           [
             {
               text: "Ok",
@@ -45,11 +52,25 @@ export async function requestAllPermissions(): Promise<void> {
         );
       });
     }
+  } catch {
+    Alert.alert(
+      "Background Location Error",
+      "Failed to request background location permission. Widgets may not update automatically.",
+    );
+  }
 
-    // Notifications
+  // Notifications
+  try {
     await notifee.requestPermission();
+  } catch {
+    Alert.alert(
+      "Notification Error",
+      "Failed to initialize notifications. Prayer time alerts may not work. Please restart the app or reinstall if the issue persists.",
+    );
+  }
 
-    // Exact alarms (Android 12+)
+  // Exact alarms (Android 12+)
+  try {
     if (Platform.OS === "android") {
       const settings = await notifee.getNotificationSettings();
       if (settings.android.alarm !== AndroidNotificationSetting.ENABLED) {
@@ -58,6 +79,11 @@ export async function requestAllPermissions(): Promise<void> {
             "Exact Alarm Permission",
             "This app needs exact alarm permission to notify you precisely when each prayer time begins.",
             [
+              {
+                text: "Skip",
+                style: "cancel",
+                onPress: () => resolve(),
+              },
               {
                 text: "Ok",
                 style: "default",
@@ -71,8 +97,10 @@ export async function requestAllPermissions(): Promise<void> {
         });
       }
     }
+  } catch {}
 
-    // Battery optimization (Android 6+)
+  // Battery optimization (Android 6+)
+  try {
     if (Platform.OS === "android") {
       const batteryOptimized = await notifee.isBatteryOptimizationEnabled();
       if (batteryOptimized) {
@@ -81,6 +109,11 @@ export async function requestAllPermissions(): Promise<void> {
             "Battery Optimization",
             'To ensure prayer time notifications arrive on time, please find "simplesolat" in the list, tap on it, and select "Unrestricted".',
             [
+              {
+                text: "Skip",
+                style: "cancel",
+                onPress: () => resolve(),
+              },
               {
                 text: "Ok",
                 style: "default",
@@ -94,7 +127,5 @@ export async function requestAllPermissions(): Promise<void> {
         });
       }
     }
-  } catch (e) {
-    console.log("Error requesting permissions", e);
-  }
+  } catch {}
 }

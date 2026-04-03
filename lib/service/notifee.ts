@@ -2,17 +2,11 @@ import notifee, {
   AlarmType,
   AndroidImportance,
   AuthorizationStatus,
-  EventType,
   TriggerType,
 } from "@notifee/react-native";
 
-import { PrayerTime, WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { Zone, getZoneLocationText } from "@/lib/data/zoneStore";
-
-import {
-  requestUpdateWaktuSolatWidgets,
-  updateWaktuSolatAndWidgets,
-} from "./waktuSolatWidget";
+import { PrayerTime, WaktuSolat } from "@/lib/domain/prayerTime";
+import { Zone, getZoneLocationText } from "@/lib/domain/zone";
 
 export const WAKTU_SOLAT_CHANNEL = "waktu_solat";
 
@@ -140,17 +134,3 @@ export async function scheduleAllWaktuSolatNotifications(
     }
   }
 }
-
-notifee.onBackgroundEvent(async ({ type, detail }) => {
-  if (type === EventType.DELIVERED) {
-    const data = detail?.notification?.data || {};
-
-    if (data && "waktuSolat" in data && "zone" in data) {
-      const waktuSolat = data.waktuSolat as WaktuSolat;
-      const zone = data.zone as Zone;
-      await requestUpdateWaktuSolatWidgets(new Date(), zone, waktuSolat);
-    } else {
-      await updateWaktuSolatAndWidgets(false, false);
-    }
-  }
-});

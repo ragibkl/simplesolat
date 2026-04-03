@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 
-import { zoneStore, Zone } from "@/lib/data/zoneStore";
+import { zoneStore } from "@/lib/data/zoneStore";
+import { Zone } from "@/lib/domain/zone";
 import { lookupZoneByGps } from "@/lib/service/zone";
 import { useLocation } from "@/lib/hooks/location";
 
@@ -9,7 +10,7 @@ export function useZone() {
 
   const updateZoneViaGps = useCallback(
     async (lat: number, lng: number): Promise<Zone | null> => {
-      const zoneData = lookupZoneByGps(lat, lng);
+      const zoneData = await lookupZoneByGps(lat, lng);
       setZone(zoneData);
 
       return zoneData;
