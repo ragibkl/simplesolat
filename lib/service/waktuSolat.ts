@@ -5,7 +5,7 @@ import { zoneStore } from "@/lib/data/zoneStore";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode } from "@/lib/domain/zone";
 import { localTimeToEpoch } from "@/lib/domain/datetime";
-import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolatData";
+import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolat";
 import { calculateWaktuSolat } from "./adhanCalculator";
 
 function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
