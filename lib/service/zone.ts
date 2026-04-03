@@ -119,13 +119,14 @@ export async function lookupZoneByGps(lat: number, lng: number): Promise<Zone> {
     return buildCalculatedZone(lat, lng, country.iso, country.name);
   }
 
-  const shapeName = result.properties[countryConfig.shape_property];
-  if (!shapeName) {
+  const lookupKey = result.properties[countryConfig.shape_property];
+  const district = result.properties.shapeName;
+  if (!lookupKey) {
     return buildCalculatedZone(lat, lng, country.iso, country.name);
   }
 
   const mapping = await getMapping(countryConfig);
-  const zoneEntry = mapping[shapeName];
+  const zoneEntry = mapping[lookupKey];
 
   if (!zoneEntry) {
     return buildCalculatedZone(lat, lng, country.iso, country.name);
@@ -143,7 +144,7 @@ export async function lookupZoneByGps(lat: number, lng: number): Promise<Zone> {
     zone: zoneEntry.zone,
     country: country.iso,
     state: zoneEntry.state,
-    district: shapeName,
+    district,
     timezone: zoneConfig.timezone,
     source: countryConfig.source,
   };
