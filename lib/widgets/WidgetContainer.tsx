@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { FlexWidget, FlexWidgetStyle } from "react-native-android-widget";
-import { getMonoStyle } from "../components/monoui";
+import { getMonoStyle } from "@/lib/components/monoui";
 
 type WidgetContainerProps = {
   children: ReactNode | ReactNode[];
