@@ -31,35 +31,52 @@ export function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
   const { backgroundColor } = getMonoStyle();
 
   return (
-    <WidgetContainer style={{ backgroundColor, borderRadius: 0, padding: 5 }}>
+    <WidgetContainer
+      style={{
+        borderRadius: 0,
+        padding: 0,
+        justifyContent: "center",
+        backgroundColor: "#00000000",
+      }}
+    >
       <FlexWidget
         style={{
-          flexDirection: "row",
+          flexDirection: "column",
           width: "match_parent",
-          justifyContent: "space-between",
-          alignItems: "center",
+          backgroundColor,
+          borderRadius: 5,
+          padding: 5,
         }}
       >
-        <MonoTextWidget style={{ fontSize: 10 }}>
-          {date.toDateString()}
-        </MonoTextWidget>
-        <MonoTextWidget style={{ fontSize: 10 }}>
-          {getZoneDisplayName(zone)}
-        </MonoTextWidget>
-      </FlexWidget>
+        <FlexWidget
+          style={{
+            flexDirection: "row",
+            width: "match_parent",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 3,
+          }}
+        >
+          <MonoTextWidget style={{ fontSize: 10 }}>
+            {date.toDateString()}
+          </MonoTextWidget>
+          <MonoTextWidget style={{ fontSize: 10 }}>
+            {getZoneDisplayName(zone)}
+          </MonoTextWidget>
+        </FlexWidget>
 
-      <FlexWidget
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          width: "match_parent",
-        }}
-      >
-        <Column date={date} label="Fajr" start={fajr} end={syuruk} />
-        <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
-        <Column date={date} label="Asr" start={asr} end={maghrib} />
-        <Column date={date} label="Maghrib" start={maghrib} end={isha} />
-        <Column date={date} label="Isha" start={isha} />
+        <FlexWidget
+          style={{
+            flexDirection: "row",
+            width: "match_parent",
+          }}
+        >
+          <Column date={date} label="Fajr" start={fajr} end={syuruk} />
+          <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
+          <Column date={date} label="Asr" start={asr} end={maghrib} />
+          <Column date={date} label="Maghrib" start={maghrib} end={isha} />
+          <Column date={date} label="Isha" start={isha} />
+        </FlexWidget>
       </FlexWidget>
     </WidgetContainer>
   );
