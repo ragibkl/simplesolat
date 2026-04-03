@@ -1,4 +1,4 @@
-import { getCalculationMethod } from "./calculationMethod";
+import { getCalculationMethod } from "./adhanCalculator";
 
 export type OfficialZone = {
   type: "official";

@@ -6,7 +6,7 @@ import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
 import { localTimeToEpoch } from "@/lib/domain/datetime";
 import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolat";
-import { calculateWaktuSolat } from "@/lib/service/adhanCalculator";
+import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 import { getWaktuSolatFromStore } from "@/lib/service/waktuSolat";
 import { useCurrentDate } from "./date";
 import { useZone } from "./zone";
