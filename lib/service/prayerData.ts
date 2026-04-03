@@ -5,10 +5,15 @@ import { Zone } from "@/lib/domain/zone";
 import { getOrRetrieveWaktuSolat } from "./waktuSolat";
 import { getUpdatedZone } from "./zone";
 
+export type PrayerData = {
+  zone: Zone;
+  waktuSolat: WaktuSolat;
+};
+
 export async function getPrayerData(
   date: Date,
   updateZone: boolean,
-): Promise<{ zone: Zone; waktuSolat: WaktuSolat } | null> {
+): Promise<PrayerData | null> {
   const zone = updateZone ? await getUpdatedZone() : await zoneStore.load();
   if (!zone) {
     return null;
