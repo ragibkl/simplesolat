@@ -8,8 +8,8 @@ import {
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { getMonoStyle } from "@/lib/components/monoui";
-import { PrayerTime } from "@/lib/data/waktuSolatStore";
-import { Zone, getZoneDisplayName } from "@/lib/data/zoneStore";
+import { PrayerTime } from "@/lib/domain/prayerTime";
+import { Zone, getZoneDisplayName } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
 
 import { Empty } from "./Empty";

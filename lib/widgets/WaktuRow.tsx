@@ -1,7 +1,7 @@
 import { FlexWidget, TextWidgetStyle } from "react-native-android-widget";
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
-import { getTimeText } from "./utils";
+import { getTimeText } from "@/lib/domain/prayerTime";
 
 export type WaktuRowProps = {
   date: Date;

@@ -1,15 +1,12 @@
 import { addDays, addMonths } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import {
-  WaktuSolat,
-  WaktuSolatStore,
-  waktuSolatStore,
-} from "@/lib/data/waktuSolatStore";
-import { getZoneCode, OfficialZone } from "@/lib/data/zoneStore";
+import { WaktuSolatStore, waktuSolatStore } from "@/lib/data/waktuSolatStore";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
+import { localTimeToEpoch } from "@/lib/domain/datetime";
 import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolatData";
 import { calculateWaktuSolat } from "@/lib/service/adhanCalculator";
-import { localTimeToEpoch } from "@/lib/service/timeConvert";
 import { getWaktuSolatFromStore } from "@/lib/service/waktuSolat";
 import { useCurrentDate } from "./date";
 import { useZone } from "./zone";

@@ -1,14 +1,12 @@
 import { addMonths, compareAsc, startOfYesterday } from "date-fns";
 
-import {
-  WaktuSolat,
-  WaktuSolatStore,
-  waktuSolatStore,
-} from "@/lib/data/waktuSolatStore";
-import { zoneStore, getZoneCode } from "@/lib/data/zoneStore";
+import { WaktuSolatStore, waktuSolatStore } from "@/lib/data/waktuSolatStore";
+import { zoneStore } from "@/lib/data/zoneStore";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { getZoneCode } from "@/lib/domain/zone";
+import { localTimeToEpoch } from "@/lib/domain/datetime";
 import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolatData";
 import { calculateWaktuSolat } from "./adhanCalculator";
-import { localTimeToEpoch } from "./timeConvert";
 
 function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
   return [

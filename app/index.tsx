@@ -1,13 +1,13 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-import { getZoneInfoText, getZoneLocationText } from "@/lib/data/zoneStore";
+import { getTimeText, WaktuSolat } from "@/lib/domain/prayerTime";
+import { getZoneInfoText, getZoneLocationText } from "@/lib/domain/zone";
 
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
 import { MonoView } from "@/lib/components/MonoView";
-import { WaktuSolat } from "@/lib/data/waktuSolatStore";
 import { useCurrentDate } from "@/lib/hooks/date";
 import {
   useWaktuSolatCurrent,
@@ -15,15 +15,6 @@ import {
 } from "@/lib/hooks/waktuSolat";
 import { useWaktuSolatWidgetUpdate } from "@/lib/hooks/waktuSolatWidget";
 import { useUpdatedZone } from "@/lib/hooks/zone";
-
-function getTimeText(epochSeconds: number) {
-  const date = new Date(0);
-  date.setUTCSeconds(epochSeconds);
-  return date.toLocaleString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function LabelText(props: { children: string; bold: boolean }) {
   return (

@@ -8,8 +8,8 @@ import {
 } from "react-native-android-widget";
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
-import { PrayerTime } from "@/lib/data/waktuSolatStore";
-import { Zone, getZoneDisplayName } from "@/lib/data/zoneStore";
+import { PrayerTime } from "@/lib/domain/prayerTime";
+import { Zone, getZoneDisplayName } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
 
 import { EmptyTransparent } from "./EmptyTransparent";

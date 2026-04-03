@@ -1,7 +1,7 @@
 import { startOfMinute } from "date-fns";
 
-import { WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { Zone } from "@/lib/data/zoneStore";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { Zone } from "@/lib/domain/zone";
 import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
 import { requestWaktuSolatCompactUpdate } from "@/lib/widgets/WaktuSolatCompact";
 import { requestWaktuSolatImsakWidgetUpdate } from "@/lib/widgets/WaktuSolatImsak";

@@ -1,5 +1,6 @@
-import { WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { Zone, zoneStore } from "@/lib/data/zoneStore";
+import { zoneStore } from "@/lib/data/zoneStore";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { Zone } from "@/lib/domain/zone";
 
 import { getOrRetrieveWaktuSolat } from "./waktuSolat";
 import { getUpdatedZone } from "./zone";

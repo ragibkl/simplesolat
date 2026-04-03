@@ -1,7 +1,7 @@
 import notifee, { EventType } from "@notifee/react-native";
 
-import { WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { Zone } from "@/lib/data/zoneStore";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { Zone } from "@/lib/domain/zone";
 import {
   requestUpdateWaktuSolatWidgets,
   updateWaktuSolatAndWidgets,

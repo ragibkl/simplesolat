@@ -6,8 +6,8 @@ import {
   CalculationParameters,
 } from "adhan";
 
-import { WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { getCalculationMethod } from "./calculationMethod";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { getCalculationMethod } from "@/lib/domain/calculationMethod";
 
 function customMethod(fajrAngle: number, ishaAngle: number) {
   return () => {

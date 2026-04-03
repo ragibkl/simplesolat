@@ -1,4 +1,5 @@
-import { zoneStore, Zone } from "@/lib/data/zoneStore";
+import { zoneStore } from "@/lib/data/zoneStore";
+import { Zone } from "@/lib/domain/zone";
 import { getLocation } from "./location";
 import { lookupZoneByGpsGH } from "./zoneGH";
 

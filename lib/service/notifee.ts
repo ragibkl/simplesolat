@@ -5,8 +5,8 @@ import notifee, {
   TriggerType,
 } from "@notifee/react-native";
 
-import { PrayerTime, WaktuSolat } from "@/lib/data/waktuSolatStore";
-import { Zone, getZoneLocationText } from "@/lib/data/zoneStore";
+import { PrayerTime, WaktuSolat } from "@/lib/domain/prayerTime";
+import { Zone, getZoneLocationText } from "@/lib/domain/zone";
 
 export const WAKTU_SOLAT_CHANNEL = "waktu_solat";
 

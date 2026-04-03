@@ -1,5 +1,3 @@
-import { createDataStore } from "./dataStore";
-
 export type PrayerTime = {
   imsak: number;
   fajr: number;
@@ -18,11 +16,11 @@ export type WaktuSolat = {
   prayerTime: PrayerTime;
 };
 
-export type WaktuSolatStore = {
-  [key: string]: WaktuSolat;
-};
-
-export const waktuSolatStore = createDataStore<WaktuSolatStore>(
-  "WAKTU_SOLAT_STORE_V3_KEY",
-  {},
-);
+export function getTimeText(epochSeconds: number): string {
+  const date = new Date(0);
+  date.setUTCSeconds(epochSeconds);
+  return date.toLocaleString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
