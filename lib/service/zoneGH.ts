@@ -138,18 +138,19 @@ export async function lookupZoneByGpsGH(
   const zones = await getZonesForCountry(country.iso);
   const zoneConfig = zones.find((z) => z.code === zoneEntry.zone);
 
+  if (!zoneConfig) {
+    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  }
+
   const officialZone: OfficialZone = {
     type: "official",
     zone: zoneEntry.zone,
     country: country.iso,
     state: zoneEntry.state,
     district: shapeName,
-    timezone: zoneConfig?.timezone,
+    timezone: zoneConfig.timezone,
     source: countryConfig.source,
   };
 
   return officialZone;
 }
-
-/** Export for use in prayer time fetching */
-export { getZonesForCountry };

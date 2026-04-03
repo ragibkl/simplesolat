@@ -58,7 +58,7 @@ export async function getCachedFileOrFetch<T>(
 
   try {
     if (file.exists) {
-      const raw = file.text();
+      const raw = await file.text();
       return JSON.parse(raw) as T;
     }
   } catch {
