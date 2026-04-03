@@ -1,6 +1,6 @@
 # simplesolat - Prayer times that just work
 
-Prayer times app for Malaysia, Singapore, Indonesia, Brunei, Sri Lanka, and worldwide with widget that auto-updates when you travel.
+Prayer times app with widgets that auto-update when you travel. Works worldwide.
 
 Free, no ads.
 
@@ -11,11 +11,9 @@ Get accurate prayer times including Imsak, Syuruk, and all 7 daily prayer times.
 ✅ Qibla compass - find the direction of the Kaaba
 ✅ Home screen widgets - multiple styles to choose from
 ✅ Dark mode support
-✅ All 60 Malaysian zones + Singapore + 4 Brunei zones + 517 Indonesian zones + 13 Sri Lankan zones
-✅ Worldwide prayer times via client-side calculation
+✅ Official prayer times for multiple countries, more being added regularly
+✅ Worldwide prayer times via local calculation
 ✅ Automatic zone detection based on GPS
-✅ Official JAKIM e-Solat data (Malaysia), MUIS data (Singapore), KHEU data (Brunei), Kemenag data (Indonesia), and ACJU data (Sri Lanka)
-✅ Region-specific calculation methods for other countries
 ✅ Clean, minimal design
 ✅ Works offline after initial setup
 
@@ -35,7 +33,7 @@ Shows all 7 daily prayer times:
 Swipe to see tomorrow's prayer times — plan your day ahead.
 
 📍 Automatic Zone Detection
-Simply allow location access and simplesolat automatically detects your prayer zone. Covers all 60 Malaysian zones from Perlis to Sabah, Singapore, 4 Brunei zones, 517 Indonesian zones from Aceh to Papua, and 13 Sri Lankan zones.
+Simply allow location access and simplesolat automatically detects your prayer zone. Supports hundreds of official zones across multiple countries, with worldwide calculation fallback.
 
 🧭 Qibla Compass
 Built-in compass to find the direction of the Kaaba from your location. Smooth rotation with accuracy indicator.
@@ -49,7 +47,7 @@ Multiple widget styles to suit your home screen:
   All widgets support dark mode and update automatically.
 
 📡 Official Data Sources
-Prayer times are sourced from JAKIM e-Solat (Malaysia), MUIS (Singapore), KHEU (Brunei), Kemenag via equran.id (Indonesia), and ACJU (Sri Lanka), ensuring accuracy and reliability.
+Prayer times are sourced from official authorities including JAKIM (Malaysia), MUIS (Singapore), Kemenag (Indonesia), KHEU (Brunei), ACJU (Sri Lanka), and more being added regularly.
 
 🌍 Worldwide Calculation
 For countries without official data sources, prayer times are calculated locally using region-appropriate methods (Umm Al-Qura, Egyptian, Diyanet, ISNA, and more). All calculation is offline — no internet needed.
@@ -60,33 +58,6 @@ Clean, distraction-free interface with dark mode support. No ads, no clutter, ju
 🌐 Offline Support
 Works without internet connection after initial data sync.
 
-SUPPORTED ZONES:
-All 60 Malaysian prayer zones including:
-
-- Johor (JHR01-04)
-- Kedah (KDH01-07)
-- Kelantan (KTN01-02)
-- Melaka (MLK01)
-- Negeri Sembilan (NGS01-03)
-- Pahang (PHG01-07)
-- Perlis (PLS01)
-- Pulau Pinang (PNG01)
-- Perak (PRK01-07)
-- Sabah (SBH01-09)
-- Selangor (SGR01-03)
-- Sarawak (SWK01-09)
-- Terengganu (TRG01-04)
-- W.P. Kuala Lumpur (WLY01)
-- W.P. Labuan (WLY02)
-
-Singapore (SGP01)
-
-Brunei (BRN01-04)
-
-Indonesia (517 zones across 34 provinces)
-
-Sri Lanka (LK01-13)
-
 Prayer times that just work. Simple.
 
 [Get it on Google Play](https://play.google.com/store/apps/details?id=com.simplesolat.app) | [Architecture](architecture.md)
@@ -95,12 +66,7 @@ Prayer times that just work. Simple.
 
 Data sources:
 
-- Prayer times (Malaysia): [JAKIM e-Solat](https://www.e-solat.gov.my)
-- Prayer times (Singapore): [MUIS](https://www.muis.gov.sg)
-- Prayer times (Brunei): KHEU
-- Prayer times (Indonesia): [Kemenag](https://kemenag.go.id) via [equran.id](https://equran.id)
-- Prayer times (Sri Lanka): [ACJU](https://acju.lk)
+- Prayer times (official): [simplesolat-data](https://github.com/ragibkl/simplesolat-data) — aggregates from JAKIM, MUIS, Kemenag, KHEU, ACJU, and more
 - Prayer times (worldwide): [adhan-js](https://github.com/batoulapps/adhan-js) (client-side calculation)
-- Zone boundaries (Malaysia): MPT Waktu Solat
-- Zone boundaries (Singapore, Brunei, Indonesia, Sri Lanka): [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
+- Zone boundaries: [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
 - Country boundaries: [Natural Earth](https://www.naturalearthdata.com) (public domain)
