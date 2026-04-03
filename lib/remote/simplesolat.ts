@@ -20,7 +20,7 @@ export type ZoneConfig = {
   shapes: string[];
 };
 
-export type GHPrayerTimeEntry = {
+export type PrayerTimeEntry = {
   date: string;
   imsak: string;
   fajr: string;
@@ -66,7 +66,7 @@ export async function fetchPrayerTimesMonth(
   zone: string,
   year: number,
   month: number,
-): Promise<GHPrayerTimeEntry[]> {
+): Promise<PrayerTimeEntry[]> {
   const monthStr = month.toString().padStart(2, "0");
   const url = `${BASE_URL}/prayer-times/${country}/${zone}/${year}-${monthStr}.json`;
   const response = await fetch(url);

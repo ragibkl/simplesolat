@@ -94,11 +94,9 @@ async function updateWaktuSolatLargeAndRender(props: WidgetTaskHandlerProps) {
   const date = startOfMinute(new Date());
   const data = await getPrayerData(date, false);
   if (!data) {
-    console.log("Missing PrayerData, returning");
     return;
   }
 
-  console.log("Found PrayerData, rendering large widget");
   props.renderWidget(
     <WaktuSolatLarge
       date={date}
@@ -111,8 +109,6 @@ async function updateWaktuSolatLargeAndRender(props: WidgetTaskHandlerProps) {
 export async function waktuSolatLargeTaskHandler(
   props: WidgetTaskHandlerProps,
 ) {
-  console.log(props.widgetAction, props.widgetInfo);
-
   switch (props.widgetAction) {
     case "WIDGET_ADDED":
       props.renderWidget(<Empty />);

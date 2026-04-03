@@ -6,7 +6,7 @@ import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
 import {
-  fetchAndMergeGHPrayerTimes,
+  fetchAndMergePrayerTimes,
   getWaktuSolatFromStore,
 } from "@/lib/service/waktuSolat";
 import { useCurrentDate } from "./date";
@@ -34,7 +34,7 @@ export function useWaktuSolat() {
   const dataRef = useRef(data);
   dataRef.current = data;
 
-  const fetchGHWaktuSolat = useCallback(
+  const fetchWaktuSolat = useCallback(
     async (zone: OfficialZone, date: Date): Promise<WaktuSolat | null> => {
       const cached = getWaktuSolatFromStore(dataRef.current, zone.zone, date);
       if (cached) {
@@ -49,7 +49,7 @@ export function useWaktuSolat() {
         );
         if (cachedAfterWait) return cachedAfterWait;
 
-        const newStore = await fetchAndMergeGHPrayerTimes(
+        const newStore = await fetchAndMergePrayerTimes(
           dataRef.current,
           zone,
           date,
@@ -61,11 +61,11 @@ export function useWaktuSolat() {
     [setData],
   );
 
-  return { setWaktuSolatData: setData, fetchGHWaktuSolat };
+  return { setWaktuSolatData: setData, fetchWaktuSolat };
 }
 
 function useWaktuSolatForDate(date: Date) {
-  const { fetchGHWaktuSolat } = useWaktuSolat();
+  const { fetchWaktuSolat } = useWaktuSolat();
   const { zone } = useZone();
 
   const [waktuSolat, setWaktuSolat] = useState<WaktuSolat | null>(null);
@@ -89,14 +89,14 @@ function useWaktuSolatForDate(date: Date) {
         return;
       }
 
-      const w = await fetchGHWaktuSolat(zone, date);
+      const w = await fetchWaktuSolat(zone, date);
       if (w) {
         setWaktuSolat(w);
       }
     }
 
     effect();
-  }, [zone, fetchGHWaktuSolat, date]);
+  }, [zone, fetchWaktuSolat, date]);
 
   return { waktuSolat };
 }

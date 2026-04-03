@@ -94,7 +94,5 @@ export async function requestAllPermissions(): Promise<void> {
         });
       }
     }
-  } catch (e) {
-    console.log("Error requesting permissions", e);
-  }
+  } catch (e) {}
 }

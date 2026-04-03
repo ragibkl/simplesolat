@@ -50,7 +50,7 @@ function trimWaktuSolatStore(store: WaktuSolatStore): WaktuSolatStore {
   return newStore;
 }
 
-export async function fetchAndMergeGHPrayerTimes(
+export async function fetchAndMergePrayerTimes(
   store: WaktuSolatStore,
   zone: OfficialZone,
   date: Date,
@@ -119,7 +119,7 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
     return waktuSolat;
   }
 
-  const newStore = await fetchAndMergeGHPrayerTimes(store, zone, date);
+  const newStore = await fetchAndMergePrayerTimes(store, zone, date);
   await waktuSolatStore.save(newStore);
 
   return getWaktuSolatFromStore(newStore, zone.zone, date);

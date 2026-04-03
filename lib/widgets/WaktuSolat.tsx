@@ -70,11 +70,9 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
   const date = startOfMinute(new Date());
   const data = await getPrayerData(date, false);
   if (!data) {
-    console.log("Missing PrayerData, returning");
     return;
   }
 
-  console.log("Found PrayerData, rendering widget");
   props.renderWidget(
     <WaktuSolat
       date={date}
@@ -87,8 +85,6 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
 export async function waktuSolatWidgetTaskHandler(
   props: WidgetTaskHandlerProps,
 ) {
-  console.log(props.widgetAction, props.widgetInfo);
-
   switch (props.widgetAction) {
     case "WIDGET_ADDED":
       props.renderWidget(<Empty />);
