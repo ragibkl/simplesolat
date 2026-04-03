@@ -2,9 +2,9 @@ import { addMonths, compareAsc, startOfYesterday } from "date-fns";
 
 import { WaktuSolatStore, waktuSolatStore } from "@/lib/data/waktuSolatStore";
 import { zoneStore } from "@/lib/data/zoneStore";
-import { WaktuSolat } from "@/lib/domain/prayerTime";
-import { getZoneCode } from "@/lib/domain/zone";
 import { localTimeToEpoch } from "@/lib/domain/datetime";
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
 import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolat";
 import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 
@@ -50,13 +50,12 @@ function trimWaktuSolatStore(store: WaktuSolatStore): WaktuSolatStore {
   return newStore;
 }
 
-async function fetchAndMergeGHPrayerTimes(
+export async function fetchAndMergeGHPrayerTimes(
   store: WaktuSolatStore,
-  zoneCode: string,
-  country: string,
-  timezone: string,
+  zone: OfficialZone,
   date: Date,
 ): Promise<WaktuSolatStore> {
+  const { timezone } = zone;
   const trimmedStore = trimWaktuSolatStore(store);
   const newStore: WaktuSolatStore = {};
 
@@ -69,7 +68,12 @@ async function fetchAndMergeGHPrayerTimes(
   ];
 
   for (const { year, month } of months) {
-    const entries = await fetchPrayerTimesMonth(country, zoneCode, year, month);
+    const entries = await fetchPrayerTimesMonth(
+      zone.country,
+      zone.zone,
+      year,
+      month,
+    );
 
     for (const entry of entries) {
       const [y, m, d] = entry.date.split("-").map(Number);
@@ -77,7 +81,7 @@ async function fetchAndMergeGHPrayerTimes(
         year: y,
         month: m,
         date: d,
-        zone: zoneCode,
+        zone: zone.zone,
         prayerTime: {
           imsak: localTimeToEpoch(entry.date, entry.imsak, timezone),
           fajr: localTimeToEpoch(entry.date, entry.fajr, timezone),
@@ -115,13 +119,7 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
     return waktuSolat;
   }
 
-  const newStore = await fetchAndMergeGHPrayerTimes(
-    store,
-    zone.zone,
-    zone.country,
-    zone.timezone,
-    date,
-  );
+  const newStore = await fetchAndMergeGHPrayerTimes(store, zone, date);
   await waktuSolatStore.save(newStore);
 
   return getWaktuSolatFromStore(newStore, zone.zone, date);

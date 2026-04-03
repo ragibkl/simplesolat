@@ -1,13 +1,14 @@
-import { addDays, addMonths } from "date-fns";
+import { addDays } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { WaktuSolatStore, waktuSolatStore } from "@/lib/data/waktuSolatStore";
+import { waktuSolatStore } from "@/lib/data/waktuSolatStore";
+import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
-import { localTimeToEpoch } from "@/lib/domain/datetime";
-import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolat";
-import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
-import { getWaktuSolatFromStore } from "@/lib/service/waktuSolat";
+import {
+  fetchAndMergeGHPrayerTimes,
+  getWaktuSolatFromStore,
+} from "@/lib/service/waktuSolat";
 import { useCurrentDate } from "./date";
 import { useZone } from "./zone";
 
@@ -25,61 +26,6 @@ async function withLock<T>(zone: string, fn: () => Promise<T>): Promise<T> {
   } finally {
     release();
   }
-}
-
-/**
- * Fetch prayer times from GitHub Pages for current + next month,
- * convert HH:MM to epoch seconds, and merge into the waktuSolat store.
- */
-async function fetchAndMergeGHPrayerTimes(
-  store: WaktuSolatStore,
-  zone: OfficialZone,
-  date: Date,
-): Promise<WaktuSolatStore> {
-  const { timezone } = zone;
-
-  // Fetch current month + next month
-  const months = [
-    { year: date.getFullYear(), month: date.getMonth() + 1 },
-    {
-      year: addMonths(date, 1).getFullYear(),
-      month: addMonths(date, 1).getMonth() + 1,
-    },
-  ];
-
-  const newStore = { ...store };
-
-  for (const { year, month } of months) {
-    const entries = await fetchPrayerTimesMonth(
-      zone.country,
-      zone.zone,
-      year,
-      month,
-    );
-
-    for (const entry of entries) {
-      const [y, m, d] = entry.date.split("-").map(Number);
-      const key = `${y}::${m}::${d}::${zone.zone}`;
-
-      newStore[key] = {
-        year: y,
-        month: m,
-        date: d,
-        zone: zone.zone,
-        prayerTime: {
-          imsak: localTimeToEpoch(entry.date, entry.imsak, timezone),
-          fajr: localTimeToEpoch(entry.date, entry.fajr, timezone),
-          syuruk: localTimeToEpoch(entry.date, entry.syuruk, timezone),
-          dhuhr: localTimeToEpoch(entry.date, entry.dhuhr, timezone),
-          asr: localTimeToEpoch(entry.date, entry.asr, timezone),
-          maghrib: localTimeToEpoch(entry.date, entry.maghrib, timezone),
-          isha: localTimeToEpoch(entry.date, entry.isha, timezone),
-        },
-      };
-    }
-  }
-
-  return newStore;
 }
 
 export function useWaktuSolat() {
