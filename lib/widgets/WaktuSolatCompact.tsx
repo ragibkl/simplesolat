@@ -8,7 +8,7 @@ import {
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { PrayerTime } from "@/lib/domain/prayerTime";
-import { Zone, getZoneDisplayName } from "@/lib/domain/zone";
+import { getZoneDisplayName, Zone } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
 
 import { Empty } from "./Empty";
@@ -17,7 +17,13 @@ import { WaktuSolatWidgetProps } from "./WaktuSolat";
 import { WidgetContainer } from "./WidgetContainer";
 
 function Column(props: WaktuColumnProps) {
-  return <WaktuColumn textStyle={{ fontSize: 10 }} {...props} />;
+  return (
+    <WaktuColumn
+      textStyle={{ fontSize: 10 }}
+      wrapperStyle={{ marginVertical: 1 }}
+      {...props}
+    />
+  );
 }
 
 export function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
@@ -35,7 +41,6 @@ export function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
           width: "match_parent",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 3,
         }}
       >
         <MonoTextWidget style={{ fontSize: 10 }}>
@@ -50,6 +55,7 @@ export function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
         style={{
           flexDirection: "row",
           width: "match_parent",
+          marginTop: 2,
         }}
       >
         <Column date={date} label="Fajr" start={fajr} end={syuruk} />

@@ -9,7 +9,7 @@ import {
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { PrayerTime } from "@/lib/domain/prayerTime";
-import { Zone, getZoneDisplayName } from "@/lib/domain/zone";
+import { getZoneDisplayName, Zone } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
 
 import { EmptyTransparent } from "./EmptyTransparent";
@@ -57,6 +57,7 @@ export function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
           flexDirection: "row",
           width: "match_parent",
           borderRadius: 4,
+          marginTop: 4,
         }}
       >
         <Column date={date} label="Fajr" start={fajr} end={syuruk} />

@@ -26,7 +26,7 @@ export function WidgetContainer(props: WidgetContainerProps) {
           flexDirection: "column",
           width: "match_parent",
           borderRadius: 5,
-          padding: 10,
+          padding: 8,
           backgroundColor: props.transparent ? undefined : backgroundColor,
           ...(props.style || {}),
         }}

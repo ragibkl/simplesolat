@@ -9,7 +9,7 @@ import {
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { getMonoStyle } from "@/lib/components/monoui";
 import { PrayerTime } from "@/lib/domain/prayerTime";
-import { Zone, getZoneDisplayName } from "@/lib/domain/zone";
+import { getZoneDisplayName, Zone } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
 
 import { Empty } from "./Empty";
@@ -53,6 +53,7 @@ export function WaktuSolatImsak(props: WaktuSolatImsakWidgetProps) {
           borderRadius: 4,
           borderColor,
           borderWidth: 1,
+          marginTop: 4,
         }}
       >
         <WaktuColumn date={date} label="Imsak" start={imsak} end={fajr} />
