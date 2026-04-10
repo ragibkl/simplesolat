@@ -1,4 +1,5 @@
 import { File, Directory, Paths } from "expo-file-system/next";
+import { coalesce } from "./coalesce";
 
 const cacheDir = new Directory(Paths.document, "file-cache");
 
@@ -29,12 +30,14 @@ export async function getCachedFileOrFetch<T>(
     // Cache miss or read error, fetch fresh
   }
 
-  const data = await fetchFn();
-  if (!file.exists) {
-    file.create();
-  }
-  file.write(JSON.stringify(data));
-  return data;
+  return coalesce(url, async () => {
+    const data = await fetchFn();
+    if (!file.exists) {
+      file.create();
+    }
+    file.write(JSON.stringify(data));
+    return data;
+  });
 }
 
 export async function clearStaleFiles(currentUrls: string[]): Promise<void> {

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { coalesce } from "./coalesce";
 
 const CACHE_PREFIX = "CACHE:";
 
@@ -26,8 +27,10 @@ export async function getCachedOrFetch<T>(
     // Cache miss or parse error, fetch fresh
   }
 
-  const data = await fetchFn();
-  const entry: CacheEntry<T> = { data, timestamp: Date.now() };
-  await AsyncStorage.setItem(cacheKey, JSON.stringify(entry));
-  return data;
+  return coalesce(cacheKey, async () => {
+    const data = await fetchFn();
+    const entry: CacheEntry<T> = { data, timestamp: Date.now() };
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(entry));
+    return data;
+  });
 }

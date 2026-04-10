@@ -1,21 +1,29 @@
-import { FlexWidget, TextWidgetStyle } from "react-native-android-widget";
+import {
+  FlexWidget,
+  FlexWidgetStyle,
+  TextWidgetStyle,
+} from "react-native-android-widget";
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { getTimeText } from "@/lib/domain/prayerTime";
 
-function ColumnText(props: {
+type ColumnTextProps = {
   children: string;
   bold: boolean;
   textStyle?: TextWidgetStyle;
-}) {
+  wrapperStyle?: FlexWidgetStyle;
+};
+
+function ColumnText(props: ColumnTextProps) {
   const fontWeight = props.bold ? "extrabold" : "regular";
 
   return (
     <FlexWidget
       style={{
-        flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        marginVertical: 2,
+        ...(props.wrapperStyle || {}),
       }}
     >
       <MonoTextWidget style={props.textStyle} fontWeight={fontWeight}>
@@ -31,10 +39,11 @@ export type WaktuColumnProps = {
   start: number;
   end?: number;
   textStyle?: TextWidgetStyle;
+  wrapperStyle?: FlexWidgetStyle;
 };
 
 export function WaktuColumn(props: WaktuColumnProps) {
-  const { date, label, start, end = Infinity, textStyle } = props;
+  const { date, label, start, end = Infinity, textStyle, wrapperStyle } = props;
   const epoch = date.getTime() / 1000;
   const bold = epoch >= start && epoch < end;
 
@@ -43,15 +52,14 @@ export function WaktuColumn(props: WaktuColumnProps) {
       style={{
         flex: 1,
         flexDirection: "column",
-        height: "match_parent",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <ColumnText textStyle={textStyle} bold={bold}>
+      <ColumnText textStyle={textStyle} wrapperStyle={wrapperStyle} bold={bold}>
         {label}
       </ColumnText>
-      <ColumnText textStyle={textStyle} bold={bold}>
+      <ColumnText textStyle={textStyle} wrapperStyle={wrapperStyle} bold={bold}>
         {getTimeText(start)}
       </ColumnText>
     </FlexWidget>

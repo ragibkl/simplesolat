@@ -3,9 +3,7 @@ import { WidgetContainer } from "./WidgetContainer";
 
 export function EmptyTransparent() {
   return (
-    <WidgetContainer
-      style={{ alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0)" }}
-    >
+    <WidgetContainer transparent style={{ alignItems: "center" }}>
       <MonoTextWidget
         style={{
           fontSize: 20,
