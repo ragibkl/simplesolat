@@ -36,7 +36,7 @@ export function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
   } = props;
 
   return (
-    <WidgetContainer style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}>
+    <WidgetContainer transparent>
       <FlexWidget
         style={{
           flexDirection: "row",

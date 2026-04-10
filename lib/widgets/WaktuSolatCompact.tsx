@@ -7,7 +7,6 @@ import {
 } from "react-native-android-widget";
 
 import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
-import { getMonoStyle } from "@/lib/components/monoui";
 import { PrayerTime } from "@/lib/domain/prayerTime";
 import { Zone, getZoneDisplayName } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
@@ -28,55 +27,36 @@ export function WaktuSolatCompact(props: WaktuSolatWidgetProps) {
     zone,
   } = props;
 
-  const { backgroundColor } = getMonoStyle();
-
   return (
-    <WidgetContainer
-      style={{
-        borderRadius: 0,
-        padding: 0,
-        justifyContent: "center",
-        backgroundColor: "#00000000",
-      }}
-    >
+    <WidgetContainer style={{ padding: 5 }}>
       <FlexWidget
         style={{
-          flexDirection: "column",
+          flexDirection: "row",
           width: "match_parent",
-          backgroundColor,
-          borderRadius: 5,
-          padding: 5,
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 3,
         }}
       >
-        <FlexWidget
-          style={{
-            flexDirection: "row",
-            width: "match_parent",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 3,
-          }}
-        >
-          <MonoTextWidget style={{ fontSize: 10 }}>
-            {date.toDateString()}
-          </MonoTextWidget>
-          <MonoTextWidget style={{ fontSize: 10 }}>
-            {getZoneDisplayName(zone)}
-          </MonoTextWidget>
-        </FlexWidget>
+        <MonoTextWidget style={{ fontSize: 10 }}>
+          {date.toDateString()}
+        </MonoTextWidget>
+        <MonoTextWidget style={{ fontSize: 10 }}>
+          {getZoneDisplayName(zone)}
+        </MonoTextWidget>
+      </FlexWidget>
 
-        <FlexWidget
-          style={{
-            flexDirection: "row",
-            width: "match_parent",
-          }}
-        >
-          <Column date={date} label="Fajr" start={fajr} end={syuruk} />
-          <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
-          <Column date={date} label="Asr" start={asr} end={maghrib} />
-          <Column date={date} label="Maghrib" start={maghrib} end={isha} />
-          <Column date={date} label="Isha" start={isha} />
-        </FlexWidget>
+      <FlexWidget
+        style={{
+          flexDirection: "row",
+          width: "match_parent",
+        }}
+      >
+        <Column date={date} label="Fajr" start={fajr} end={syuruk} />
+        <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
+        <Column date={date} label="Asr" start={asr} end={maghrib} />
+        <Column date={date} label="Maghrib" start={maghrib} end={isha} />
+        <Column date={date} label="Isha" start={isha} />
       </FlexWidget>
     </WidgetContainer>
   );
