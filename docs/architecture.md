@@ -31,6 +31,7 @@ GPS → Country Detection (bundled ADM0) → Zone Resolution (fetched geojson) �
 `lookupZoneByGps(lat, lng)` in `lib/service/zone.ts`:
 
 1. **Country detection** — Bundled Natural Earth ADM0 geojson (729KB) → country ISO code (sync, instant)
+   - `ISO_A2` comes from Natural Earth's `ISO_A2` field, except where that is `-99`: there it takes `ISO_A2_EH`, which has the real code for France (FR), Norway (NO), Kosovo (XK) and a few territories. Without this, France never matched its UOIF method. The 13 features still at `-99` are disputed areas and bases with no ISO code.
 2. **Country config** — Fetch `countries.yaml` from CDN (cached 1 month) → check if country is officially supported
 3. **Zone lookup** — Fetch country's geojson + mapping from CDN (cached indefinitely by URL) → `PolygonLookup.search()` → shapeName → mapping → zone code
 4. **Zone timezone** — Fetch `zones/{CC}.yaml` from CDN (cached 1 month) → IANA timezone for the zone
