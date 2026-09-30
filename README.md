@@ -44,5 +44,9 @@ npx expo start
 
 - Prayer times (official): [simplesolat-data](https://github.com/ragibkl/simplesolat-data) — aggregates from JAKIM, MUIS, Kemenag, KHEU, ACJU, and more
 - Prayer times (worldwide): [adhan-js](https://github.com/batoulapps/adhan-js) (client-side calculation)
-- Zone boundaries: [geoBoundaries](https://www.geoboundaries.org) (CC-BY 4.0)
+- Zone boundaries: [geoBoundaries](https://www.geoboundaries.org) (licence varies by country: ODbL, CC BY or public domain; see [simplesolat-data](https://github.com/ragibkl/simplesolat-data#license))
 - Country boundaries: [Natural Earth](https://www.naturalearthdata.com) (public domain)
+
+## License
+
+The code is under the [MIT License](LICENSE). Map and prayer-time data keep their own terms (see Data Sources above).
