@@ -1,13 +1,14 @@
 import { createDataStore } from "./dataStore";
 import { PrayerTime } from "@/lib/domain/prayerTime";
 
-export type WidgetSecondColumn = "syuruk" | "dhuha";
+export type WidgetExtraTime = "syuruk" | "dhuha" | "imsak";
 
 export type Settings = {
   notifications: Record<keyof PrayerTime, boolean>;
-  // Second column of the WaktuSolat and WaktuSolatTransparent widgets.
-  // Dhuha falls back to Syuruk where there's no official dhuha.
-  widgetSecondColumn: WidgetSecondColumn;
+  // Extra time on the WaktuSolat and WaktuSolatTransparent widgets, next to
+  // the five prayers. Dhuha falls back to Syuruk where there's no official
+  // dhuha.
+  widgetExtraTime: WidgetExtraTime;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -21,7 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
     maghrib: true,
     isha: true,
   },
-  widgetSecondColumn: "syuruk",
+  widgetExtraTime: "syuruk",
 };
 
 export const settingsStore = createDataStore<Partial<Settings>>(

@@ -15,8 +15,8 @@ import { getPrayerData } from "@/lib/service/prayerData";
 
 import { EmptyTransparent } from "./EmptyTransparent";
 import { WaktuColumn, WaktuColumnProps } from "./WaktuColumn";
-import { getSecondColumn } from "./secondColumn";
 import { WaktuSolatWidgetProps } from "./WaktuSolat";
+import { getWidgetColumns } from "./widgetColumns";
 import { WidgetContainer } from "./WidgetContainer";
 
 const textStyle: TextWidgetStyle = {
@@ -31,9 +31,8 @@ function Column(props: WaktuColumnProps) {
 }
 
 export function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
-  const { date, prayerTime, zone, secondColumn } = props;
-  const { fajr, syuruk, dhuhr, asr, maghrib, isha } = prayerTime;
-  const second = getSecondColumn(prayerTime, secondColumn);
+  const { date, prayerTime, zone, extraTime } = props;
+  const columns = getWidgetColumns(prayerTime, extraTime);
 
   return (
     <WidgetContainer transparent>
@@ -60,17 +59,15 @@ export function WaktuSolatTransparent(props: WaktuSolatWidgetProps) {
           marginTop: 4,
         }}
       >
-        <Column date={date} label="Fajr" start={fajr} end={syuruk} />
-        <Column
-          date={date}
-          label={second.label}
-          start={second.start}
-          end={dhuhr}
-        />
-        <Column date={date} label="Dhuhr" start={dhuhr} end={asr} />
-        <Column date={date} label="Asr" start={asr} end={maghrib} />
-        <Column date={date} label="Maghrib" start={maghrib} end={isha} />
-        <Column date={date} label="Isha" start={isha} />
+        {columns.map((column) => (
+          <Column
+            key={column.label}
+            date={date}
+            label={column.label}
+            start={column.start}
+            end={column.end}
+          />
+        ))}
       </FlexWidget>
     </WidgetContainer>
   );
@@ -82,14 +79,14 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
   if (!data) {
     return;
   }
-  const { widgetSecondColumn } = await loadSettings();
+  const { widgetExtraTime } = await loadSettings();
 
   props.renderWidget(
     <WaktuSolatTransparent
       date={date}
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
-      secondColumn={widgetSecondColumn}
+      extraTime={widgetExtraTime}
     />,
   );
 }
@@ -125,7 +122,7 @@ export async function requestWaktuSolatTransparentUpdate(
   zone: Zone,
   prayerTime: PrayerTime,
 ) {
-  const { widgetSecondColumn } = await loadSettings();
+  const { widgetExtraTime } = await loadSettings();
   await requestWidgetUpdate({
     widgetName: "WaktuSolatTransparent",
     renderWidget: () => (
@@ -133,7 +130,7 @@ export async function requestWaktuSolatTransparentUpdate(
         date={date}
         zone={zone}
         prayerTime={prayerTime}
-        secondColumn={widgetSecondColumn}
+        extraTime={widgetExtraTime}
       />
     ),
     widgetNotFound: () => {},
