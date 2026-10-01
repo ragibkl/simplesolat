@@ -1,0 +1,4 @@
+# GitHub Pages for this folder (ragibkl.github.io/simplesolat). The site now
+# lives at simplesolat.com; old pages forward there with jekyll-redirect-from.
+plugins:
+  - jekyll-redirect-from
