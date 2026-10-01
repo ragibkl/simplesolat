@@ -1,13 +1,13 @@
 import { createDataStore } from "./dataStore";
 import { PrayerTime } from "@/lib/domain/prayerTime";
 
-export type WidgetExtraTime = "syuruk" | "dhuha" | "imsak";
+export type WidgetExtraTime = "imsak" | "syuruk" | "dhuha" | "none";
 
 export type Settings = {
   notifications: Record<keyof PrayerTime, boolean>;
   // Extra time on the WaktuSolat and WaktuSolatTransparent widgets, next to
-  // the five prayers. Dhuha falls back to Syuruk where there's no official
-  // dhuha.
+  // the five prayers, or none. Dhuha falls back to Syuruk where there's no
+  // official dhuha.
   widgetExtraTime: WidgetExtraTime;
 };
 
