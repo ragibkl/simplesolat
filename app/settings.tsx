@@ -8,7 +8,7 @@ import {
   saveSettings,
   Settings,
   useSettings,
-  WidgetSecondColumn,
+  WidgetExtraTime,
 } from "@/lib/data/settingsStore";
 import { PrayerTime } from "@/lib/domain/prayerTime";
 import { sendTestNotification } from "@/lib/service/notifee";
@@ -29,9 +29,10 @@ const PRAYERS: { key: keyof PrayerTime; label: string; note?: string }[] = [
   { key: "isha", label: "Isha" },
 ];
 
-const WIDGET_COLUMNS: { key: WidgetSecondColumn; label: string }[] = [
+const WIDGET_EXTRA_TIMES: { key: WidgetExtraTime; label: string }[] = [
   { key: "syuruk", label: "Syuruk" },
   { key: "dhuha", label: "Dhuha" },
+  { key: "imsak", label: "Imsak" },
 ];
 
 function SectionTitle(props: { children: string }) {
@@ -172,19 +173,20 @@ export default function SettingsScreen() {
 
         <SectionTitle>Widget</SectionTitle>
         <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
-          Second column of the Waktu Solat and Transparent widgets. Dhuha shows
-          Syuruk where there is no official dhuha time.
+          Extra time shown on the Waktu Solat and Transparent widgets, next to
+          the five prayers. Dhuha shows Syuruk where there is no official dhuha
+          time.
         </MonoText>
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          {WIDGET_COLUMNS.map((option) => (
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+          {WIDGET_EXTRA_TIMES.map((option) => (
             <Button
               key={option.key}
               label={
-                (settings.widgetSecondColumn === option.key ? "● " : "○ ") +
+                (settings.widgetExtraTime === option.key ? "● " : "○ ") +
                 option.label
               }
               onPress={() =>
-                update({ ...settings, widgetSecondColumn: option.key })
+                update({ ...settings, widgetExtraTime: option.key })
               }
             />
           ))}
