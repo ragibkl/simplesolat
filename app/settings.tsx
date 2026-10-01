@@ -92,7 +92,8 @@ function PermissionRow(props: { check: PermissionCheck; onFix: () => void }) {
 }
 
 export default function SettingsScreen() {
-  const { color } = useMonoStyle();
+  const { color, backgroundColor, colorScheme } = useMonoStyle();
+  const offTrackColor = colorScheme === "dark" ? "#555555" : "#BDBDBD";
   const { settings } = useSettings();
   const [checks, setChecks] = useState<PermissionCheck[]>([]);
   const [testSent, setTestSent] = useState(false);
@@ -167,7 +168,8 @@ export default function SettingsScreen() {
             <Switch
               value={settings.notifications[prayer.key]}
               onValueChange={(value) => toggleNotification(prayer.key, value)}
-              trackColor={{ true: color }}
+              trackColor={{ true: color, false: offTrackColor }}
+              thumbColor={backgroundColor}
             />
           </View>
         ))}
@@ -178,20 +180,22 @@ export default function SettingsScreen() {
           the five prayers. Dhuha shows Syuruk where there is no official dhuha
           time. None shows only the five prayers.
         </MonoText>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-          {WIDGET_EXTRA_TIMES.map((option) => (
-            <Button
-              key={option.key}
-              label={
-                (settings.widgetExtraTime === option.key ? "● " : "○ ") +
-                option.label
-              }
-              onPress={() =>
-                update({ ...settings, widgetExtraTime: option.key })
-              }
-            />
-          ))}
-        </View>
+        {WIDGET_EXTRA_TIMES.map((option) => (
+          <Pressable
+            key={option.key}
+            accessibilityRole="radio"
+            accessibilityState={{
+              checked: settings.widgetExtraTime === option.key,
+            }}
+            onPress={() => update({ ...settings, widgetExtraTime: option.key })}
+            style={{ paddingVertical: 8 }}
+          >
+            <MonoText style={{ fontSize: 16 }}>
+              {(settings.widgetExtraTime === option.key ? "● " : "○ ") +
+                option.label}
+            </MonoText>
+          </Pressable>
+        ))}
       </View>
     </MonoScrollPage>
   );
