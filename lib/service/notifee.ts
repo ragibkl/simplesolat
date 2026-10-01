@@ -10,13 +10,23 @@ import { Zone, getZoneLocationText } from "@/lib/domain/zone";
 
 export const WAKTU_SOLAT_CHANNEL = "waktu_solat";
 
-function sameWaktuSolat(left: WaktuSolat, right: WaktuSolat): boolean {
-  return (
-    left.year === right.year &&
-    left.month === right.month &&
-    left.date === right.date &&
-    left.zone === right.zone
-  );
+// Bump when the notification data format changes. Notifications scheduled
+// with an older version are cancelled and rescheduled.
+const NOTIFICATION_VERSION = "v2";
+
+function notificationIdPrefix(waktuSolat: WaktuSolat): string {
+  return [
+    WAKTU_SOLAT_CHANNEL,
+    NOTIFICATION_VERSION,
+    waktuSolat.year,
+    waktuSolat.month,
+    waktuSolat.date,
+    waktuSolat.zone,
+  ].join("::");
+}
+
+function notificationId(waktuSolat: WaktuSolat, waktu: keyof PrayerTime) {
+  return `${notificationIdPrefix(waktuSolat)}::${waktu}`;
 }
 
 export function getEpochDate(epochSeconds: number): Date {
@@ -53,24 +63,19 @@ async function scheduleWaktuSolatNotification(
   // Trigger a notification
   await notifee.createTriggerNotification(
     {
-      id: [
-        WAKTU_SOLAT_CHANNEL,
-        waktu,
-        waktuSolat.year,
-        waktuSolat.month,
-        waktuSolat.date,
-        waktuSolat.zone,
-      ].join("::"),
+      id: notificationId(waktuSolat, waktu),
       title: `Waktu Solat - ${waktu} at ${dateText}`,
       body: `It is now ${waktu} in ${getZoneLocationText(zone)}`,
       android: {
         channelId,
         importance: AndroidImportance.HIGH,
       },
+      // Plain strings only: notifee stores this as an Android Parcel, and
+      // nested values have failed to read back (BadParcelableException).
       data: {
-        waktuSolat,
+        waktuSolat: JSON.stringify(waktuSolat),
         waktu,
-        zone,
+        zone: JSON.stringify(zone),
       },
     },
     {
@@ -106,23 +111,20 @@ export async function scheduleAllWaktuSolatNotifications(
     isha: false,
   };
 
-  const notifications = await notifee.getTriggerNotifications();
-  for (const n of notifications) {
-    // Assert notification trigger channel is waktu_solat_*
-    if (
-      !n.notification.android?.channelId ||
-      n.notification.android.channelId !== WAKTU_SOLAT_CHANNEL
-    ) {
+  // Only read the ids. getTriggerNotifications() unparcels every stored
+  // notification, which crashes the app when one can't be read back.
+  const ids = await notifee.getTriggerNotificationIds();
+  const prefix = `${notificationIdPrefix(waktuSolat)}::`;
+  for (const id of ids) {
+    if (!id.startsWith(`${WAKTU_SOLAT_CHANNEL}::`)) {
       continue;
     }
 
-    // Check if notification matches the current WaktuSolat zone and date
-    if (
-      sameWaktuSolat(n.notification?.data?.waktuSolat as WaktuSolat, waktuSolat)
-    ) {
-      existingNotifs[n.notification?.data?.waktu as keyof PrayerTime] = true;
-    } else if (n.notification.id) {
-      await notifee.cancelTriggerNotification(n.notification.id);
+    const waktu = id.slice(prefix.length) as keyof PrayerTime;
+    if (id.startsWith(prefix) && waktu in existingNotifs) {
+      existingNotifs[waktu] = true;
+    } else {
+      await notifee.cancelTriggerNotification(id);
     }
   }
 
