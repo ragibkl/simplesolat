@@ -16,6 +16,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "$GOOGLE_SERVICE_ACCOUNT_KEY_PATH",
+        "track": "production",
+        "releaseStatus": "draft"
+      }
+    }
   }
 }
