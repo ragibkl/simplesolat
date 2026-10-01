@@ -1,6 +1,19 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import notifee, { AndroidNotificationSetting } from "@notifee/react-native";
 import { Alert, Platform } from "react-native";
+
+const PROMPTED_KEY = "PERMISSIONS_PROMPTED_V1";
+
+// Ask once, on first launch. After that, the settings page shows what's
+// missing instead of asking on every launch.
+export async function requestPermissionsOnFirstLaunch(): Promise<void> {
+  if (await AsyncStorage.getItem(PROMPTED_KEY)) {
+    return;
+  }
+  await requestAllPermissions();
+  await AsyncStorage.setItem(PROMPTED_KEY, "1");
+}
 
 export async function requestAllPermissions(): Promise<void> {
   // Foreground location

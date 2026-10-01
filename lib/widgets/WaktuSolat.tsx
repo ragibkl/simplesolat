@@ -10,9 +10,11 @@ import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
 import { getMonoStyle } from "@/lib/components/monoui";
 import { PrayerTime } from "@/lib/domain/prayerTime";
 import { getZoneDisplayName, Zone } from "@/lib/domain/zone";
+import { loadSettings, WidgetSecondColumn } from "@/lib/data/settingsStore";
 import { getPrayerData } from "@/lib/service/prayerData";
 
 import { Empty } from "./Empty";
+import { getSecondColumn } from "./secondColumn";
 import { WaktuColumn } from "./WaktuColumn";
 import { WidgetContainer } from "./WidgetContainer";
 
@@ -20,14 +22,13 @@ export type WaktuSolatWidgetProps = {
   date: Date;
   zone: Zone;
   prayerTime: PrayerTime;
+  secondColumn?: WidgetSecondColumn;
 };
 
 export function WaktuSolat(props: WaktuSolatWidgetProps) {
-  const {
-    date,
-    prayerTime: { fajr, syuruk, dhuhr, asr, maghrib, isha },
-    zone,
-  } = props;
+  const { date, prayerTime, zone, secondColumn } = props;
+  const { fajr, syuruk, dhuhr, asr, maghrib, isha } = prayerTime;
+  const second = getSecondColumn(prayerTime, secondColumn);
 
   const { borderColor } = getMonoStyle();
 
@@ -57,7 +58,12 @@ export function WaktuSolat(props: WaktuSolatWidgetProps) {
         }}
       >
         <WaktuColumn date={date} label="Fajr" start={fajr} end={syuruk} />
-        <WaktuColumn date={date} label="Syuruk" start={syuruk} end={dhuhr} />
+        <WaktuColumn
+          date={date}
+          label={second.label}
+          start={second.start}
+          end={dhuhr}
+        />
         <WaktuColumn date={date} label="Dhuhr" start={dhuhr} end={asr} />
         <WaktuColumn date={date} label="Asr" start={asr} end={maghrib} />
         <WaktuColumn date={date} label="Maghrib" start={maghrib} end={isha} />
@@ -73,12 +79,14 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
   if (!data) {
     return;
   }
+  const { widgetSecondColumn } = await loadSettings();
 
   props.renderWidget(
     <WaktuSolat
       date={date}
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
+      secondColumn={widgetSecondColumn}
     />,
   );
 }
@@ -114,10 +122,16 @@ export async function requestWaktuSolatWidgetUpdate(
   zone: Zone,
   prayerTime: PrayerTime,
 ) {
+  const { widgetSecondColumn } = await loadSettings();
   await requestWidgetUpdate({
     widgetName: "WaktuSolat",
     renderWidget: () => (
-      <WaktuSolat date={date} zone={zone} prayerTime={prayerTime} />
+      <WaktuSolat
+        date={date}
+        zone={zone}
+        prayerTime={prayerTime}
+        secondColumn={widgetSecondColumn}
+      />
     ),
     widgetNotFound: () => {},
   });
