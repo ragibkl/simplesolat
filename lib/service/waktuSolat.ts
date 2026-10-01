@@ -86,6 +86,9 @@ export async function fetchAndMergePrayerTimes(
           imsak: localTimeToEpoch(entry.date, entry.imsak, timezone),
           fajr: localTimeToEpoch(entry.date, entry.fajr, timezone),
           syuruk: localTimeToEpoch(entry.date, entry.syuruk, timezone),
+          ...(entry.dhuha && {
+            dhuha: localTimeToEpoch(entry.date, entry.dhuha, timezone),
+          }),
           dhuhr: localTimeToEpoch(entry.date, entry.dhuhr, timezone),
           asr: localTimeToEpoch(entry.date, entry.asr, timezone),
           maghrib: localTimeToEpoch(entry.date, entry.maghrib, timezone),

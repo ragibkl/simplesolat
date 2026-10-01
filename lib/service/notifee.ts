@@ -5,6 +5,7 @@ import notifee, {
   TriggerType,
 } from "@notifee/react-native";
 
+import { loadSettings } from "@/lib/data/settingsStore";
 import { PrayerTime, WaktuSolat } from "@/lib/domain/prayerTime";
 import { Zone, getZoneLocationText } from "@/lib/domain/zone";
 
@@ -41,6 +42,10 @@ async function scheduleWaktuSolatNotification(
   waktu: keyof PrayerTime,
 ) {
   const epochSeconds = waktuSolat.prayerTime[waktu];
+  if (epochSeconds === undefined) {
+    return;
+  }
+
   const date = getEpochDate(epochSeconds);
   const dateText = date.toLocaleString([], {
     hour: "2-digit",
@@ -90,6 +95,20 @@ async function scheduleWaktuSolatNotification(
   );
 }
 
+export async function sendTestNotification() {
+  const channelId = await notifee.createChannel({
+    id: WAKTU_SOLAT_CHANNEL,
+    name: "Prayer Times",
+    sound: "default",
+    importance: AndroidImportance.HIGH,
+  });
+  await notifee.displayNotification({
+    title: "simplesolat test",
+    body: "Prayer time notifications are working.",
+    android: { channelId, importance: AndroidImportance.HIGH },
+  });
+}
+
 export async function scheduleAllWaktuSolatNotifications(
   waktuSolat: WaktuSolat,
   zone: Zone,
@@ -99,17 +118,8 @@ export async function scheduleAllWaktuSolatNotifications(
     return;
   }
 
-  const existingNotifs: {
-    [k in keyof PrayerTime]: boolean;
-  } = {
-    imsak: false,
-    fajr: false,
-    syuruk: false,
-    dhuhr: false,
-    asr: false,
-    maghrib: false,
-    isha: false,
-  };
+  const { notifications: enabled } = await loadSettings();
+  const existingNotifs = new Set<keyof PrayerTime>();
 
   // Only read the ids. getTriggerNotifications() unparcels every stored
   // notification, which crashes the app when one can't be read back.
@@ -121,8 +131,8 @@ export async function scheduleAllWaktuSolatNotifications(
     }
 
     const waktu = id.slice(prefix.length) as keyof PrayerTime;
-    if (id.startsWith(prefix) && waktu in existingNotifs) {
-      existingNotifs[waktu] = true;
+    if (id.startsWith(prefix) && enabled[waktu]) {
+      existingNotifs.add(waktu);
     } else {
       await notifee.cancelTriggerNotification(id);
     }
@@ -130,8 +140,8 @@ export async function scheduleAllWaktuSolatNotifications(
 
   const waktuKeys = Object.keys(waktuSolat.prayerTime) as (keyof PrayerTime)[];
   for (const waktu of waktuKeys) {
-    // Schedule notification if not yet scheduled
-    if (!existingNotifs[waktu]) {
+    // Schedule notification if turned on and not yet scheduled
+    if (enabled[waktu] && !existingNotifs.has(waktu)) {
       await scheduleWaktuSolatNotification(waktuSolat, zone, waktu);
     }
   }

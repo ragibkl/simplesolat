@@ -2,6 +2,8 @@ export type PrayerTime = {
   imsak: number;
   fajr: number;
   syuruk: number;
+  // Only where the authority publishes it (JAKIM, KHEU).
+  dhuha?: number;
   dhuhr: number;
   asr: number;
   maghrib: number;

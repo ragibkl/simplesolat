@@ -75,6 +75,7 @@ function PrayerTimePage(props: {
     imsak = 0,
     fajr = 0,
     syuruk = 0,
+    dhuha,
     dhuhr = 0,
     asr = 0,
     maghrib = 0,
@@ -109,8 +110,16 @@ function PrayerTimePage(props: {
           date={currentDate}
           label="Syuruk"
           start={syuruk}
-          end={dhuhr}
+          end={dhuha ?? dhuhr}
         />
+        {dhuha !== undefined && (
+          <PrayerTimeRow
+            date={currentDate}
+            label="Dhuha"
+            start={dhuha}
+            end={dhuhr}
+          />
+        )}
         <PrayerTimeRow
           date={currentDate}
           label="Dhuhr"
