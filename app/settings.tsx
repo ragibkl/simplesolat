@@ -30,9 +30,10 @@ const PRAYERS: { key: keyof PrayerTime; label: string; note?: string }[] = [
 ];
 
 const WIDGET_EXTRA_TIMES: { key: WidgetExtraTime; label: string }[] = [
+  { key: "imsak", label: "Imsak" },
   { key: "syuruk", label: "Syuruk" },
   { key: "dhuha", label: "Dhuha" },
-  { key: "imsak", label: "Imsak" },
+  { key: "none", label: "None" },
 ];
 
 function SectionTitle(props: { children: string }) {
@@ -175,7 +176,7 @@ export default function SettingsScreen() {
         <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
           Extra time shown on the Waktu Solat and Transparent widgets, next to
           the five prayers. Dhuha shows Syuruk where there is no official dhuha
-          time.
+          time. None shows only the five prayers.
         </MonoText>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
           {WIDGET_EXTRA_TIMES.map((option) => (
