@@ -30,10 +30,10 @@ const PRAYERS: { key: keyof PrayerTime; label: string; note?: string }[] = [
 ];
 
 const WIDGET_EXTRA_TIMES: { key: WidgetExtraTime; label: string }[] = [
+  { key: "none", label: "None" },
   { key: "imsak", label: "Imsak" },
   { key: "syuruk", label: "Syuruk" },
   { key: "dhuha", label: "Dhuha" },
-  { key: "none", label: "None" },
 ];
 
 function SectionTitle(props: { children: string }) {
@@ -176,9 +176,9 @@ export default function SettingsScreen() {
 
         <SectionTitle>Widget</SectionTitle>
         <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
-          Extra time shown on the Waktu Solat and Transparent widgets, next to
-          the five prayers. Dhuha shows Syuruk where there is no official dhuha
-          time. None shows only the five prayers.
+          Extra time shown on the Waktu Solat widgets, next to the five prayers.
+          None shows only the five prayers. Dhuha is for Malaysia and Brunei
+          only; elsewhere the widget shows the five prayers.
         </MonoText>
         {WIDGET_EXTRA_TIMES.map((option) => (
           <Pressable
@@ -187,7 +187,13 @@ export default function SettingsScreen() {
             accessibilityState={{
               checked: settings.widgetExtraTime === option.key,
             }}
-            onPress={() => update({ ...settings, widgetExtraTime: option.key })}
+            onPress={() =>
+              update({
+                ...settings,
+                widgetExtraTime: option.key,
+                widgetExtraTimeChosen: true,
+              })
+            }
             style={{ paddingVertical: 8 }}
           >
             <MonoText style={{ fontSize: 16 }}>

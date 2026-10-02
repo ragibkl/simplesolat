@@ -11,7 +11,6 @@ import { useUpdatedZone } from "@/lib/hooks/zone";
 import { MonoView } from "@/lib/components/MonoView";
 import { WaktuSolat } from "@/lib/widgets/WaktuSolat";
 import { WaktuSolatCompact } from "@/lib/widgets/WaktuSolatCompact";
-import { WaktuSolatImsak } from "@/lib/widgets/WaktuSolatImsak";
 import { WaktuSolatTransparent } from "@/lib/widgets/WaktuSolatTransparent";
 
 export default function Index() {
@@ -59,10 +58,11 @@ export default function Index() {
         <MonoView style={{ borderWidth: 1, margin: 5 }}>
           <WidgetPreview
             renderWidget={() => (
-              <WaktuSolatImsak
+              <WaktuSolat
                 date={date}
                 zone={zone}
                 prayerTime={waktuSolat?.prayerTime}
+                extraTime="imsak"
               />
             )}
             width={350}
