@@ -1,5 +1,6 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { View } from "react-native";
 
@@ -20,6 +21,8 @@ export default function RootLayout() {
     <waktuSolatStore.Provider>
       <zoneStore.Provider>
         <settingsStore.Provider>
+          {/* Dark icons on the light header, light icons in dark mode. */}
+          <StatusBar style="auto" />
           <Stack
             screenOptions={{
               headerTintColor: color,
