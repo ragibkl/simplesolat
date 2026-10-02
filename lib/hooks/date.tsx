@@ -17,7 +17,7 @@ function msUntilNextMinute() {
 }
 
 export function useCurrentDate() {
-  const timer = useRef(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [time, setTime] = useState(startOfMinute(new Date()).getTime());
   const date = useMemo(() => new Date(time), [time]);
 
