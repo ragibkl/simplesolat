@@ -4,8 +4,9 @@ import { PrayerTime } from "@/lib/domain/prayerTime";
 export type WidgetColumn = { label: string; start: number; end?: number };
 
 // Columns for the WaktuSolat and WaktuSolatTransparent widgets: the five
-// prayers plus an optional extra time (Imsak, Syuruk or Dhuha). Dhuha falls
-// back to Syuruk where the zone has no official dhuha time.
+// prayers plus an optional extra time (Imsak, Syuruk or Dhuha). Where the zone
+// has no official dhuha, Dhuha shows just the five prayers: Syuruk is not the
+// start of Dhuha, so it mustn't stand in for it.
 export function getWidgetColumns(
   prayerTime: PrayerTime,
   extraTime: WidgetExtraTime = "syuruk",
@@ -13,7 +14,7 @@ export function getWidgetColumns(
   const { imsak, fajr, syuruk, dhuha, dhuhr, asr, maghrib, isha } = prayerTime;
 
   let head: WidgetColumn[];
-  if (extraTime === "none") {
+  if (extraTime === "none" || (extraTime === "dhuha" && dhuha === undefined)) {
     head = [{ label: "Fajr", start: fajr, end: syuruk }];
   } else if (extraTime === "imsak") {
     head = [

@@ -1,71 +1,22 @@
 import { startOfMinute } from "date-fns";
 import React from "react";
 import {
-  FlexWidget,
   requestWidgetUpdate,
   WidgetTaskHandlerProps,
 } from "react-native-android-widget";
 
-import { MonoTextWidget } from "@/lib/components/MonoTextWidget";
-import { getMonoStyle } from "@/lib/components/monoui";
+import { imsakWidgetExtraTime, loadSettings } from "@/lib/data/settingsStore";
 import { PrayerTime } from "@/lib/domain/prayerTime";
-import { getZoneDisplayName, Zone } from "@/lib/domain/zone";
+import { Zone } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
 
 import { Empty } from "./Empty";
-import { WaktuColumn } from "./WaktuColumn";
-import { WidgetContainer } from "./WidgetContainer";
+import { WaktuSolat } from "./WaktuSolat";
 
-export type WaktuSolatImsakWidgetProps = {
-  date: Date;
-  zone: Zone;
-  prayerTime: PrayerTime;
-};
-
-export function WaktuSolatImsak(props: WaktuSolatImsakWidgetProps) {
-  const {
-    date,
-    prayerTime: { imsak, fajr, syuruk, dhuhr, asr, maghrib, isha },
-    zone,
-  } = props;
-
-  const { borderColor } = getMonoStyle();
-
-  return (
-    <WidgetContainer>
-      <FlexWidget
-        style={{
-          flexDirection: "row",
-          width: "match_parent",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
-        <MonoTextWidget>{getZoneDisplayName(zone)}</MonoTextWidget>
-      </FlexWidget>
-
-      <FlexWidget
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          width: "match_parent",
-          borderRadius: 4,
-          borderColor,
-          borderWidth: 1,
-          marginTop: 4,
-        }}
-      >
-        <WaktuColumn date={date} label="Imsak" start={imsak} end={fajr} />
-        <WaktuColumn date={date} label="Fajr" start={fajr} end={syuruk} />
-        <WaktuColumn date={date} label="Dhuhr" start={dhuhr} end={asr} />
-        <WaktuColumn date={date} label="Asr" start={asr} end={maghrib} />
-        <WaktuColumn date={date} label="Maghrib" start={maghrib} end={isha} />
-        <WaktuColumn date={date} label="Isha" start={isha} />
-      </FlexWidget>
-    </WidgetContainer>
-  );
-}
+// The old "Waktu Solat with Imsak" widget. It's hidden from the widget picker
+// (plugins/withHiddenWidgets.js) but keeps working where it's already placed.
+// It looks like the Waktu Solat widget: Imsak until the user picks an extra
+// time in Settings, then whatever they picked.
 
 async function updateWaktuSolatImsakAndRender(props: WidgetTaskHandlerProps) {
   const date = startOfMinute(new Date());
@@ -73,12 +24,14 @@ async function updateWaktuSolatImsakAndRender(props: WidgetTaskHandlerProps) {
   if (!data) {
     return;
   }
+  const extraTime = imsakWidgetExtraTime(await loadSettings());
 
   props.renderWidget(
-    <WaktuSolatImsak
+    <WaktuSolat
       date={date}
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
+      extraTime={extraTime}
     />,
   );
 }
@@ -114,10 +67,16 @@ export async function requestWaktuSolatImsakWidgetUpdate(
   zone: Zone,
   prayerTime: PrayerTime,
 ) {
+  const extraTime = imsakWidgetExtraTime(await loadSettings());
   await requestWidgetUpdate({
     widgetName: "WaktuSolatImsak",
     renderWidget: () => (
-      <WaktuSolatImsak date={date} zone={zone} prayerTime={prayerTime} />
+      <WaktuSolat
+        date={date}
+        zone={zone}
+        prayerTime={prayerTime}
+        extraTime={extraTime}
+      />
     ),
     widgetNotFound: () => {},
   });
