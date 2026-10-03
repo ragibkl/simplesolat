@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "simplesolat",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.simplesolat.app"
@@ -17,7 +16,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"],
       "package": "com.simplesolat.app"
     },
@@ -116,7 +114,13 @@
         }
       ],
       "expo-background-task",
-      ["./plugins/withHiddenWidgets", { "widgets": ["WaktuSolatImsak"] }]
+      [
+        "./plugins/withHiddenWidgets",
+        {
+          "widgets": ["WaktuSolatImsak"]
+        }
+      ],
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true
