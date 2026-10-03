@@ -2,6 +2,7 @@ import { zoneStore } from "@/lib/data/zoneStore";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { Zone } from "@/lib/domain/zone";
 
+import { GetLocationOptions } from "./location";
 import { getOrRetrieveWaktuSolat } from "./waktuSolat";
 import { getUpdatedZone } from "./zone";
 
@@ -13,8 +14,11 @@ export type PrayerData = {
 export async function getPrayerData(
   date: Date,
   updateZone: boolean,
+  locationOptions: GetLocationOptions = {},
 ): Promise<PrayerData | null> {
-  const zone = updateZone ? await getUpdatedZone() : await zoneStore.load();
+  const zone = updateZone
+    ? await getUpdatedZone(locationOptions)
+    : await zoneStore.load();
   if (!zone) {
     return null;
   }

@@ -10,6 +10,7 @@ import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTran
 import { updateIosWidgets } from "@/lib/widgets/ios/updateIosWidgets";
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
+import { GetLocationOptions } from "./location";
 import { getPrayerData } from "./prayerData";
 import { getUpcomingWaktuSolat } from "./waktuSolat";
 
@@ -42,9 +43,10 @@ export async function getReminderDays(
 export async function updateWaktuSolatAndWidgets(
   updateZone: boolean,
   updateNotifs: boolean,
+  locationOptions: GetLocationOptions = {},
 ) {
   const date = startOfMinute(new Date());
-  const data = await getPrayerData(date, updateZone);
+  const data = await getPrayerData(date, updateZone, locationOptions);
   if (!data) {
     return;
   }

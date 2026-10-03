@@ -70,9 +70,9 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
     },
     {
       key: "backgroundLocation",
-      androidOnly: true,
-      label: "Location all the time",
-      help: "Keeps widgets on the right zone when you travel.",
+      label:
+        Platform.OS === "ios" ? "Location: Always" : "Location all the time",
+      help: "Keeps reminders and widgets on the right zone when you travel.",
       ok: bg.granted,
       fix: async () => {
         if (fg.granted && bg.canAskAgain) {
@@ -84,7 +84,6 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
     },
   ];
 
-  // iOS has no exact-alarm or battery settings, and simplesolat doesn't use
-  // location in the background there (the zone updates when the app opens).
+  // iOS has no exact-alarm or battery settings.
   return checks.filter((check) => isAndroid || !check.androidOnly);
 }
