@@ -50,12 +50,19 @@ type HeadingData = {
   accuracy: Accuracy;
 };
 
-function useHeading(): HeadingData | null {
+// Many tablets have no compass sensor: no heading ever arrives.
+const NO_COMPASS_AFTER_MS = 6000;
+
+function useHeading(): { data: HeadingData | null; noCompass: boolean } {
   const [data, setData] = useState<HeadingData | null>(null);
+  const [noCompass, setNoCompass] = useState(false);
   const smoothed = useRef<number | null>(null);
 
   useEffect(() => {
     let subscription: Location.LocationSubscription | null = null;
+    const timer = setTimeout(() => {
+      if (smoothed.current == null) setNoCompass(true);
+    }, NO_COMPASS_AFTER_MS);
 
     async function start() {
       subscription = await Location.watchHeadingAsync((update) => {
@@ -68,6 +75,7 @@ function useHeading(): HeadingData | null {
           smoothed.current = smoothAngle(smoothed.current, raw);
         }
 
+        setNoCompass(false);
         setData({
           heading: smoothed.current,
           accuracy: getAccuracyLabel(update.accuracy),
@@ -75,14 +83,15 @@ function useHeading(): HeadingData | null {
       });
     }
 
-    start();
+    start().catch(() => setNoCompass(true));
 
     return () => {
+      clearTimeout(timer);
       subscription?.remove();
     };
   }, []);
 
-  return data;
+  return { data, noCompass };
 }
 
 export type CompassData =
@@ -98,27 +107,29 @@ export type CompassData =
       heading: null;
       accuracy: null;
       location: null;
-      qiblaBearing: null;
+      // Known from the location alone, even without a compass.
+      qiblaBearing: number | null;
+      noCompass: boolean;
     };
 
 export function useCompass(): CompassData {
   const { location } = useLocation();
-  const headingData = useHeading();
+  const { data: headingData, noCompass } = useHeading();
+  const qiblaBearing =
+    location == null
+      ? null
+      : getQiblaBearing(location.coords.latitude, location.coords.longitude);
 
-  if (headingData == null || location == null) {
+  if (headingData == null || location == null || qiblaBearing == null) {
     return {
       ready: false,
       heading: null,
       accuracy: null,
       location: null,
-      qiblaBearing: null,
+      qiblaBearing,
+      noCompass,
     };
   }
-
-  const qiblaBearing = getQiblaBearing(
-    location.coords.latitude,
-    location.coords.longitude,
-  );
 
   return {
     ready: true,

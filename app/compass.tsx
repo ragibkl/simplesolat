@@ -94,17 +94,35 @@ function CardinalLabel(props: {
 }
 
 export default function Compass() {
-  const { ready, heading, qiblaBearing, accuracy } = useCompass();
+  const compass = useCompass();
 
-  if (!ready) {
+  if (!compass.ready) {
+    const { noCompass, qiblaBearing } = compass;
     return (
       <MonoScrollPage>
-        <View style={{ flex: 1, alignItems: "center", paddingTop: 40 }}>
-          <MonoText style={{ fontSize: 16 }}>Waiting for compass...</MonoText>
+        <View style={{ flex: 1, padding: 20, paddingTop: 40 }}>
+          {noCompass ? (
+            <>
+              <MonoText style={{ fontSize: 16 }}>
+                This device has no compass, so it can't point the way.
+              </MonoText>
+              {qiblaBearing != null && (
+                <MonoText style={{ fontSize: 16, marginTop: 10 }}>
+                  {`From where you are, the Kaaba is ${qiblaBearing.toFixed(0)}° clockwise from north.`}
+                </MonoText>
+              )}
+            </>
+          ) : (
+            <MonoText style={{ fontSize: 16, textAlign: "center" }}>
+              Waiting for compass...
+            </MonoText>
+          )}
         </View>
       </MonoScrollPage>
     );
   }
+
+  const { heading, qiblaBearing, accuracy } = compass;
 
   const diff = Math.abs(((heading - qiblaBearing + 540) % 360) - 180);
   const aligned = diff <= 2.0;
