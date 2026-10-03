@@ -122,11 +122,40 @@ export async function sendTestNotification() {
 }
 
 // iOS keeps at most 64 scheduled notifications per app.
-const IOS_MAX_SCHEDULED = 60;
+// iOS keeps at most 64 scheduled notifications per app. Leave one for the
+// "open the app" nudge.
+const IOS_MAX_SCHEDULED = 59;
+// On iOS, Imsak, Syuruk and Dhuha are scheduled only for the next two days,
+// so the five daily prayers can be scheduled further ahead (about 12 days).
+const IOS_EXTRAS_DAYS = 2;
+const FIVE_PRAYERS: (keyof PrayerTime)[] = [
+  "fajr",
+  "dhuhr",
+  "asr",
+  "maghrib",
+  "isha",
+];
+
+function nudgeId(epochMs: number): string {
+  return `${WAKTU_SOLAT_CHANNEL}::${NOTIFICATION_VERSION}::nudge::${epochMs}`;
+}
+
+// After the last scheduled reminder, ask the user to open the app, so
+// reminders don't stop silently if iOS never gave us background time.
+async function scheduleNudge(epochMs: number) {
+  await notifee.createTriggerNotification(
+    {
+      id: nudgeId(epochMs),
+      title: "simplesolat",
+      body: "Open simplesolat to keep your prayer time reminders coming.",
+    },
+    { type: TriggerType.TIMESTAMP, timestamp: epochMs },
+  );
+}
 
 // Schedules reminders for the given days (Android: today, rescheduled by the
-// background task; iOS: about a week, since background runs are rare) and
-// cancels any others.
+// background task; iOS: up to about 12 days, since background runs are rare)
+// and cancels any others.
 export async function scheduleAllWaktuSolatNotifications(
   days: WaktuSolat[],
   zone: Zone,
@@ -136,33 +165,47 @@ export async function scheduleAllWaktuSolatNotifications(
     return;
   }
 
+  const isIos = Platform.OS === "ios";
   const { notifications: enabled } = await loadSettings();
-  const wanted = new Map<
-    string,
-    { waktuSolat: WaktuSolat; waktu: keyof PrayerTime }
-  >();
   const now = Date.now();
-  for (const waktuSolat of days) {
+  let candidates: {
+    id: string;
+    at: number;
+    waktuSolat: WaktuSolat;
+    waktu: keyof PrayerTime;
+  }[] = [];
+  days.forEach((waktuSolat, dayIndex) => {
     const waktuKeys = Object.keys(
       waktuSolat.prayerTime,
     ) as (keyof PrayerTime)[];
     for (const waktu of waktuKeys) {
       const epochSeconds = waktuSolat.prayerTime[waktu];
-      if (
-        enabled[waktu] &&
-        epochSeconds !== undefined &&
-        epochSeconds * 1000 > now
-      ) {
-        wanted.set(notificationId(waktuSolat, waktu), { waktuSolat, waktu });
-      }
+      if (!enabled[waktu] || epochSeconds === undefined) continue;
+      if (epochSeconds * 1000 <= now) continue;
+      if (isIos && dayIndex >= IOS_EXTRAS_DAYS && !FIVE_PRAYERS.includes(waktu))
+        continue;
+      candidates.push({
+        id: notificationId(waktuSolat, waktu),
+        at: epochSeconds * 1000,
+        waktuSolat,
+        waktu,
+      });
     }
+  });
+  candidates.sort((a, b) => a.at - b.at);
+  if (isIos) {
+    candidates = candidates.slice(0, IOS_MAX_SCHEDULED);
   }
-  if (Platform.OS === "ios" && wanted.size > IOS_MAX_SCHEDULED) {
-    const keep = [...wanted.keys()].slice(0, IOS_MAX_SCHEDULED);
-    for (const id of [...wanted.keys()]) {
-      if (!keep.includes(id)) wanted.delete(id);
-    }
-  }
+  const wanted = new Map(candidates.map((c) => [c.id, c]));
+
+  // The nudge goes 10 minutes after the last reminder, only when several
+  // days are scheduled (iOS).
+  const last = candidates[candidates.length - 1];
+  const nudgeAt =
+    isIos && days.length > IOS_EXTRAS_DAYS && last
+      ? last.at + 10 * 60 * 1000
+      : null;
+  const wantedNudge = nudgeAt === null ? null : nudgeId(nudgeAt);
 
   // Only read the ids. getTriggerNotifications() unparcels every stored
   // notification, which crashes the app when one can't be read back.
@@ -172,7 +215,7 @@ export async function scheduleAllWaktuSolatNotifications(
     if (!id.startsWith(`${WAKTU_SOLAT_CHANNEL}::`)) {
       continue;
     }
-    if (wanted.has(id)) {
+    if (wanted.has(id) || id === wantedNudge) {
       existing.add(id);
     } else {
       await notifee.cancelTriggerNotification(id);
@@ -183,5 +226,8 @@ export async function scheduleAllWaktuSolatNotifications(
     if (!existing.has(id)) {
       await scheduleWaktuSolatNotification(waktuSolat, zone, waktu);
     }
+  }
+  if (nudgeAt !== null && wantedNudge && !existing.has(wantedNudge)) {
+    await scheduleNudge(nudgeAt);
   }
 }

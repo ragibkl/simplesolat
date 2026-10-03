@@ -124,7 +124,28 @@
           "widgets": ["WaktuSolatImsak"]
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-widgets",
+        {
+          "bundleIdentifier": "com.simplesolat.app.widgets",
+          "groupIdentifier": "group.com.simplesolat.app",
+          "widgets": [
+            {
+              "name": "WaktuSolat",
+              "displayName": "Waktu Solat",
+              "description": "Today's prayer times, with the current one highlighted",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryRectangular"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
