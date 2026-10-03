@@ -6,6 +6,7 @@ import {
   requestUpdateWaktuSolatWidgets,
 } from "@/lib/service/waktuSolatWidget";
 import { registerBackgroundTasks } from "@/lib/tasks/backgroundTasks";
+import { updateIosWidgets } from "@/lib/widgets/ios/updateIosWidgets";
 
 import { useCurrentDate } from "./date";
 import { useWaktuSolatCurrent } from "./waktuSolat";
@@ -27,6 +28,7 @@ export function useWaktuSolatWidgetUpdate() {
     async function effect() {
       if (zone && waktuSolat) {
         await requestUpdateWaktuSolatWidgets(date, zone, waktuSolat);
+        await updateIosWidgets(date, zone);
         await scheduleAllWaktuSolatNotifications(
           await getReminderDays(date, waktuSolat),
           zone,
