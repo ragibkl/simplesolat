@@ -3,7 +3,7 @@ import notifee, {
   AuthorizationStatus,
 } from "@notifee/react-native";
 import * as Location from "expo-location";
-import { Linking } from "react-native";
+import { Linking, Platform } from "react-native";
 
 export type PermissionCheck = {
   key: string;
@@ -15,16 +15,20 @@ export type PermissionCheck = {
 
 export async function getPermissionChecks(): Promise<PermissionCheck[]> {
   const settings = await notifee.getNotificationSettings();
-  const batteryOptimized = await notifee.isBatteryOptimizationEnabled();
+  const isAndroid = Platform.OS === "android";
+  const batteryOptimized =
+    isAndroid && (await notifee.isBatteryOptimizationEnabled());
   const fg = await Location.getForegroundPermissionsAsync();
   const bg = await Location.getBackgroundPermissionsAsync();
 
-  return [
+  const checks: (PermissionCheck & { androidOnly?: boolean })[] = [
     {
       key: "notifications",
       label: "Notifications",
       help: "Needed for prayer time reminders.",
-      ok: settings.authorizationStatus === AuthorizationStatus.AUTHORIZED,
+      ok:
+        settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+        settings.authorizationStatus === AuthorizationStatus.PROVISIONAL,
       fix: async () => {
         if (
           settings.authorizationStatus === AuthorizationStatus.NOT_DETERMINED
@@ -37,6 +41,7 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
     },
     {
       key: "alarms",
+      androidOnly: true,
       label: "Exact alarms",
       help: "Lets reminders arrive right at the prayer time.",
       ok: settings.android.alarm === AndroidNotificationSetting.ENABLED,
@@ -44,6 +49,7 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
     },
     {
       key: "battery",
+      androidOnly: true,
       label: "Battery unrestricted",
       help: 'Find "simplesolat" and choose "Unrestricted", so Android doesn\'t delay reminders and widget updates.',
       ok: !batteryOptimized,
@@ -64,6 +70,7 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
     },
     {
       key: "backgroundLocation",
+      androidOnly: true,
       label: "Location all the time",
       help: "Keeps widgets on the right zone when you travel.",
       ok: bg.granted,
@@ -76,4 +83,8 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
       },
     },
   ];
+
+  // iOS has no exact-alarm or battery settings, and simplesolat doesn't use
+  // location in the background there (the zone updates when the app opens).
+  return checks.filter((check) => isAndroid || !check.androidOnly);
 }

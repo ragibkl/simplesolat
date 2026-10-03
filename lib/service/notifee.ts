@@ -4,6 +4,7 @@ import notifee, {
   AuthorizationStatus,
   TriggerType,
 } from "@notifee/react-native";
+import { Platform } from "react-native";
 
 import { loadSettings } from "@/lib/data/settingsStore";
 import { PrayerTime, WaktuSolat } from "@/lib/domain/prayerTime";
@@ -120,8 +121,14 @@ export async function sendTestNotification() {
   });
 }
 
+// iOS keeps at most 64 scheduled notifications per app.
+const IOS_MAX_SCHEDULED = 60;
+
+// Schedules reminders for the given days (Android: today, rescheduled by the
+// background task; iOS: about a week, since background runs are rare) and
+// cancels any others.
 export async function scheduleAllWaktuSolatNotifications(
-  waktuSolat: WaktuSolat,
+  days: WaktuSolat[],
   zone: Zone,
 ) {
   const settings = await notifee.getNotificationSettings();
@@ -130,29 +137,50 @@ export async function scheduleAllWaktuSolatNotifications(
   }
 
   const { notifications: enabled } = await loadSettings();
-  const existingNotifs = new Set<keyof PrayerTime>();
+  const wanted = new Map<
+    string,
+    { waktuSolat: WaktuSolat; waktu: keyof PrayerTime }
+  >();
+  const now = Date.now();
+  for (const waktuSolat of days) {
+    const waktuKeys = Object.keys(
+      waktuSolat.prayerTime,
+    ) as (keyof PrayerTime)[];
+    for (const waktu of waktuKeys) {
+      const epochSeconds = waktuSolat.prayerTime[waktu];
+      if (
+        enabled[waktu] &&
+        epochSeconds !== undefined &&
+        epochSeconds * 1000 > now
+      ) {
+        wanted.set(notificationId(waktuSolat, waktu), { waktuSolat, waktu });
+      }
+    }
+  }
+  if (Platform.OS === "ios" && wanted.size > IOS_MAX_SCHEDULED) {
+    const keep = [...wanted.keys()].slice(0, IOS_MAX_SCHEDULED);
+    for (const id of [...wanted.keys()]) {
+      if (!keep.includes(id)) wanted.delete(id);
+    }
+  }
 
   // Only read the ids. getTriggerNotifications() unparcels every stored
   // notification, which crashes the app when one can't be read back.
   const ids = await notifee.getTriggerNotificationIds();
-  const prefix = `${notificationIdPrefix(waktuSolat)}::`;
+  const existing = new Set<string>();
   for (const id of ids) {
     if (!id.startsWith(`${WAKTU_SOLAT_CHANNEL}::`)) {
       continue;
     }
-
-    const waktu = id.slice(prefix.length) as keyof PrayerTime;
-    if (id.startsWith(prefix) && enabled[waktu]) {
-      existingNotifs.add(waktu);
+    if (wanted.has(id)) {
+      existing.add(id);
     } else {
       await notifee.cancelTriggerNotification(id);
     }
   }
 
-  const waktuKeys = Object.keys(waktuSolat.prayerTime) as (keyof PrayerTime)[];
-  for (const waktu of waktuKeys) {
-    // Schedule notification if turned on and not yet scheduled
-    if (enabled[waktu] && !existingNotifs.has(waktu)) {
+  for (const [id, { waktuSolat, waktu }] of wanted) {
+    if (!existing.has(id)) {
       await scheduleWaktuSolatNotification(waktuSolat, zone, waktu);
     }
   }

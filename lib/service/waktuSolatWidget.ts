@@ -1,4 +1,5 @@
 import { startOfMinute } from "date-fns";
+import { Platform } from "react-native";
 
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { Zone } from "@/lib/domain/zone";
@@ -9,6 +10,7 @@ import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTran
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
 import { getPrayerData } from "./prayerData";
+import { getUpcomingWaktuSolat } from "./waktuSolat";
 
 export async function requestUpdateWaktuSolatWidgets(
   date: Date,
@@ -21,6 +23,19 @@ export async function requestUpdateWaktuSolatWidgets(
     requestWaktuSolatImsakWidgetUpdate(date, zone, waktuSolat.prayerTime),
     requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime),
   ]);
+}
+
+// The days to schedule reminders for. Android reschedules from its frequent
+// background task, so today is enough; iOS runs background work rarely, so
+// schedule a week ahead.
+export async function getReminderDays(
+  date: Date,
+  waktuSolat: WaktuSolat,
+): Promise<WaktuSolat[]> {
+  if (Platform.OS !== "ios") {
+    return [waktuSolat];
+  }
+  return getUpcomingWaktuSolat(date, 7);
 }
 
 export async function updateWaktuSolatAndWidgets(
@@ -37,6 +52,9 @@ export async function updateWaktuSolatAndWidgets(
   requestUpdateWaktuSolatWidgets(date, zone, waktuSolat);
 
   if (updateNotifs) {
-    await scheduleAllWaktuSolatNotifications(waktuSolat, zone);
+    await scheduleAllWaktuSolatNotifications(
+      await getReminderDays(date, waktuSolat),
+      zone,
+    );
   }
 }
