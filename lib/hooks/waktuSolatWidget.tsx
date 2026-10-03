@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 
 import { scheduleAllWaktuSolatNotifications } from "@/lib/service/notifee";
-import { requestUpdateWaktuSolatWidgets } from "@/lib/service/waktuSolatWidget";
+import {
+  getReminderDays,
+  requestUpdateWaktuSolatWidgets,
+} from "@/lib/service/waktuSolatWidget";
 import { registerBackgroundTasks } from "@/lib/tasks/backgroundTasks";
 
 import { useCurrentDate } from "./date";
@@ -24,7 +27,10 @@ export function useWaktuSolatWidgetUpdate() {
     async function effect() {
       if (zone && waktuSolat) {
         await requestUpdateWaktuSolatWidgets(date, zone, waktuSolat);
-        await scheduleAllWaktuSolatNotifications(waktuSolat, zone);
+        await scheduleAllWaktuSolatNotifications(
+          await getReminderDays(date, waktuSolat),
+          zone,
+        );
       }
     }
     effect();

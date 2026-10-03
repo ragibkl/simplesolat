@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { AppState, Pressable, Switch, View } from "react-native";
+import { AppState, Platform, Pressable, Switch, View } from "react-native";
 
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
@@ -174,34 +174,39 @@ export default function SettingsScreen() {
           </View>
         ))}
 
-        <SectionTitle>Widget</SectionTitle>
-        <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
-          Extra time shown on the Waktu Solat widgets, next to the five prayers.
-          None shows only the five prayers. Dhuha is for Malaysia and Brunei
-          only; elsewhere the widget shows the five prayers.
-        </MonoText>
-        {WIDGET_EXTRA_TIMES.map((option) => (
-          <Pressable
-            key={option.key}
-            accessibilityRole="radio"
-            accessibilityState={{
-              checked: settings.widgetExtraTime === option.key,
-            }}
-            onPress={() =>
-              update({
-                ...settings,
-                widgetExtraTime: option.key,
-                widgetExtraTimeChosen: true,
-              })
-            }
-            style={{ paddingVertical: 8 }}
-          >
-            <MonoText style={{ fontSize: 16 }}>
-              {(settings.widgetExtraTime === option.key ? "● " : "○ ") +
-                option.label}
+        {/* iOS widgets come later (expo-widgets). */}
+        {Platform.OS === "android" && (
+          <>
+            <SectionTitle>Widget</SectionTitle>
+            <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
+              Extra time shown on the Waktu Solat widgets, next to the five
+              prayers. None shows only the five prayers. Dhuha is for Malaysia
+              and Brunei only; elsewhere the widget shows the five prayers.
             </MonoText>
-          </Pressable>
-        ))}
+            {WIDGET_EXTRA_TIMES.map((option) => (
+              <Pressable
+                key={option.key}
+                accessibilityRole="radio"
+                accessibilityState={{
+                  checked: settings.widgetExtraTime === option.key,
+                }}
+                onPress={() =>
+                  update({
+                    ...settings,
+                    widgetExtraTime: option.key,
+                    widgetExtraTimeChosen: true,
+                  })
+                }
+                style={{ paddingVertical: 8 }}
+              >
+                <MonoText style={{ fontSize: 16 }}>
+                  {(settings.widgetExtraTime === option.key ? "● " : "○ ") +
+                    option.label}
+                </MonoText>
+              </Pressable>
+            ))}
+          </>
+        )}
       </View>
     </MonoScrollPage>
   );

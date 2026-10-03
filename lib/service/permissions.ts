@@ -44,32 +44,36 @@ export async function requestAllPermissions(): Promise<void> {
     );
   }
 
-  // Background location
-  try {
-    const bgStatus = await Location.getBackgroundPermissionsAsync();
-    if (bgStatus.status !== "granted") {
-      await new Promise<void>((resolve) => {
-        Alert.alert(
-          "Background Location Permission",
-          "This app needs background location access to keep your prayer times and widgets updated as you travel, even when the app is not open.",
-          [
-            {
-              text: "Ok",
-              style: "default",
-              onPress: async () => {
-                await Location.requestBackgroundPermissionsAsync();
-                resolve();
+  // Background location: Android only. On iOS the zone updates when the app
+  // opens, and asking for "Always" without a background feature gets apps
+  // rejected.
+  if (Platform.OS === "android") {
+    try {
+      const bgStatus = await Location.getBackgroundPermissionsAsync();
+      if (bgStatus.status !== "granted") {
+        await new Promise<void>((resolve) => {
+          Alert.alert(
+            "Background Location Permission",
+            "This app needs background location access to keep your prayer times and widgets updated as you travel, even when the app is not open.",
+            [
+              {
+                text: "Ok",
+                style: "default",
+                onPress: async () => {
+                  await Location.requestBackgroundPermissionsAsync();
+                  resolve();
+                },
               },
-            },
-          ],
-        );
-      });
+            ],
+          );
+        });
+      }
+    } catch {
+      Alert.alert(
+        "Background Location Error",
+        "Failed to request background location permission. Widgets may not update automatically.",
+      );
     }
-  } catch {
-    Alert.alert(
-      "Background Location Error",
-      "Failed to request background location permission. Widgets may not update automatically.",
-    );
   }
 
   // Notifications
