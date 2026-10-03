@@ -5,6 +5,7 @@ import {
   getReminderDays,
   requestUpdateWaktuSolatWidgets,
 } from "@/lib/service/waktuSolatWidget";
+import { refreshTravelGeofence } from "@/lib/service/travelGeofence";
 import { registerBackgroundTasks } from "@/lib/tasks/backgroundTasks";
 import { updateIosWidgets } from "@/lib/widgets/ios/updateIosWidgets";
 
@@ -24,11 +25,24 @@ export function useWaktuSolatWidgetUpdate() {
     effect();
   }, []);
 
+  // iOS: redraw the travel circle when the app opens and when the zone
+  // changes (not every minute).
+  const zoneKey = zone ? JSON.stringify(zone) : null;
+  useEffect(() => {
+    if (zoneKey) refreshTravelGeofence();
+  }, [zoneKey]);
+
+  // iOS widget timeline (40 days): rebuild when the zone or the day changes.
+  const dayKey = date.toDateString();
+  useEffect(() => {
+    if (zone) updateIosWidgets(new Date(), zone);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoneKey, dayKey]);
+
   useEffect(() => {
     async function effect() {
       if (zone && waktuSolat) {
         await requestUpdateWaktuSolatWidgets(date, zone, waktuSolat);
-        await updateIosWidgets(date, zone);
         await scheduleAllWaktuSolatNotifications(
           await getReminderDays(date, waktuSolat),
           zone,

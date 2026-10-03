@@ -18,7 +18,7 @@ import {
 
 import countriesGeoData from "@/assets/geodata/countries-adm0.json";
 
-import { getLocation } from "./location";
+import { getLocation, GetLocationOptions } from "./location";
 
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -168,8 +168,10 @@ export async function updateZoneViaGps(
   return newZone;
 }
 
-export async function getUpdatedZone(): Promise<Zone | null> {
-  const location = await getLocation();
+export async function getUpdatedZone(
+  options: GetLocationOptions = {},
+): Promise<Zone | null> {
+  const location = await getLocation(options);
   if (location) {
     return await updateZoneViaGps(
       location.coords.latitude,
