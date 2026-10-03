@@ -59,37 +59,38 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
     );
   }
 
-  // systemMedium: like the Android Waktu Solat widget
+  // systemMedium: like the Android Waktu Solat widget, centred vertically
   return (
-    <VStack spacing={8}>
+    <VStack spacing={10}>
+      <Spacer />
       <HStack>
-        <Text modifiers={[mono(12, false), lineLimit(1)]}>
+        <Text modifiers={[mono(13, false), lineLimit(1)]}>
           {props.dateText}
         </Text>
         <Spacer />
         <Text
-          modifiers={[mono(12, false), lineLimit(1), minimumScaleFactor(0.7)]}
+          modifiers={[mono(13, false), lineLimit(1), minimumScaleFactor(0.7)]}
         >
           {props.place}
         </Text>
       </HStack>
-      <HStack spacing={4}>
+      <HStack spacing={2}>
         {props.columns.map((c, i) => (
           <VStack key={c.label} spacing={4}>
             <Text
               modifiers={[
-                mono(12, i === props.active),
+                mono(14, i === props.active),
                 lineLimit(1),
-                minimumScaleFactor(0.6),
+                minimumScaleFactor(0.5),
               ]}
             >
               {c.label}
             </Text>
             <Text
               modifiers={[
-                mono(12, i === props.active),
+                mono(13, i === props.active),
                 lineLimit(1),
-                minimumScaleFactor(0.6),
+                minimumScaleFactor(0.5),
                 i === props.active
                   ? foregroundStyle({ type: "hierarchical", style: "primary" })
                   : foregroundStyle({
@@ -103,6 +104,7 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
           </VStack>
         ))}
       </HStack>
+      <Spacer />
     </VStack>
   );
 };
