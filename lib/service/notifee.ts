@@ -30,6 +30,17 @@ function notificationId(waktuSolat: WaktuSolat, waktu: keyof PrayerTime) {
   return `${notificationIdPrefix(waktuSolat)}::${waktu}`;
 }
 
+const PRAYER_NAMES: Record<keyof PrayerTime, string> = {
+  imsak: "Imsak",
+  fajr: "Fajr",
+  syuruk: "Syuruk",
+  dhuha: "Dhuha",
+  dhuhr: "Dhuhr",
+  asr: "Asr",
+  maghrib: "Maghrib",
+  isha: "Isha",
+};
+
 export function getEpochDate(epochSeconds: number): Date {
   const date = new Date(0);
   date.setUTCSeconds(epochSeconds);
@@ -69,8 +80,8 @@ async function scheduleWaktuSolatNotification(
   await notifee.createTriggerNotification(
     {
       id: notificationId(waktuSolat, waktu),
-      title: `Waktu Solat - ${waktu} at ${dateText}`,
-      body: `It is now ${waktu} in ${getZoneLocationText(zone)}`,
+      title: `Waktu Solat - ${PRAYER_NAMES[waktu]} at ${dateText}`,
+      body: `It is now ${PRAYER_NAMES[waktu]} in ${getZoneLocationText(zone)}`,
       android: {
         channelId,
         importance: AndroidImportance.HIGH,
