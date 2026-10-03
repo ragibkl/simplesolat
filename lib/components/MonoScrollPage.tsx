@@ -10,10 +10,11 @@ type MonoScrollPageProps = {
 
 export function MonoScrollPage(props: MonoScrollPageProps) {
   return (
-    <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
-      <MonoView style={{ flex: 1 }}>
+    // The page colour goes behind the home indicator too (no light strip).
+    <MonoView style={{ flex: 1 }}>
+      <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
         <ScrollView>{props.children}</ScrollView>
-      </MonoView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </MonoView>
   );
 }

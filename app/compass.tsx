@@ -101,7 +101,12 @@ export default function Compass() {
     return (
       <MonoScrollPage>
         <View style={{ flex: 1, padding: 20, paddingTop: 40 }}>
-          {noCompass ? (
+          {noCompass && qiblaBearing == null ? (
+            // iOS only reports the heading once location is allowed.
+            <MonoText style={{ fontSize: 16 }}>
+              Allow location access (Settings) to use the Qibla compass.
+            </MonoText>
+          ) : noCompass ? (
             <>
               <MonoText style={{ fontSize: 16 }}>
                 This device has no compass, so it can't point the way.

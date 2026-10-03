@@ -99,7 +99,7 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
                     }),
               ]}
             >
-              {c.time}
+              {c.short}
             </Text>
           </VStack>
         ))}

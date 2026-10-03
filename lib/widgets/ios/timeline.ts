@@ -8,7 +8,8 @@ import { getWidgetColumns } from "../widgetColumns";
 export type IosWidgetProps = {
   dateText: string;
   place: string;
-  columns: { label: string; time: string }[];
+  // time: "5:53 am"; short: "5:53" (the medium widget is too narrow for am/pm)
+  columns: { label: string; time: string; short: string }[];
   // Index of the current prayer in columns, or -1 between prayers.
   active: number;
   // The next prayer, for the Lock Screen widget.
@@ -44,6 +45,7 @@ export function buildTimeline(
     const columns = cols.map((c) => ({
       label: c.label,
       time: timeText(c.start),
+      short: timeText(c.start).replace(/ [ap]m$/, ""),
     }));
     const dateText = new Date(dayStart).toDateString();
     const tomorrow = days[dayIndex + 1];
