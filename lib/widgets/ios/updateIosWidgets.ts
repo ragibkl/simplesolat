@@ -5,3 +5,7 @@ export async function updateIosWidgets(
   _date: Date,
   _zone: Zone,
 ): Promise<void> {}
+
+export async function getIosWidgetStatus(): Promise<string> {
+  return "";
+}

@@ -8,7 +8,7 @@ import {
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { useColorScheme, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 import * as SystemUI from "expo-system-ui";
 
 import { useMonoStyle } from "@/lib/components/monoui";
@@ -57,12 +57,17 @@ export default function RootLayout() {
                 options={{
                   title: "simplesolat",
                   headerRight: () => (
-                    <View style={{ flexDirection: "row", gap: 24 }}>
-                      <Link href="/compass">
-                        <FontAwesome6 name="kaaba" size={20} color={color} />
+                    <View style={{ flexDirection: "row", gap: 12 }}>
+                      {/* Padding + hitSlop: about 44 points to tap (Apple's minimum); the icon stays 20 points. */}
+                      <Link href="/compass" asChild>
+                        <Pressable hitSlop={8} style={{ padding: 6 }}>
+                          <FontAwesome6 name="kaaba" size={20} color={color} />
+                        </Pressable>
                       </Link>
-                      <Link href="/settings">
-                        <FontAwesome6 name="gear" size={20} color={color} />
+                      <Link href="/settings" asChild>
+                        <Pressable hitSlop={8} style={{ padding: 6 }}>
+                          <FontAwesome6 name="gear" size={20} color={color} />
+                        </Pressable>
                       </Link>
                     </View>
                   ),

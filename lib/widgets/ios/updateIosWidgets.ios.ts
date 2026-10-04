@@ -17,5 +17,21 @@ export async function updateIosWidgets(date: Date, zone: Zone): Promise<void> {
     getZoneDisplayName(zone),
     widgetExtraTime,
   );
-  if (entries.length) WaktuSolatWidget.updateTimeline(entries);
+  if (entries.length) {
+    WaktuSolatWidget.updateTimeline(entries);
+    WaktuSolatWidget.reload();
+  }
+}
+
+// Temporary, for TestFlight: what the widget has been given.
+export async function getIosWidgetStatus(): Promise<string> {
+  try {
+    const entries = await WaktuSolatWidget.getTimeline();
+    const future = entries.filter((e) => e.date.getTime() > Date.now());
+    const hasShort = entries.some((e) => e.props.columns?.[0]?.short);
+    const last = entries[entries.length - 1]?.date.toDateString() ?? "none";
+    return `Widget: ${entries.length} entries (${future.length} upcoming, until ${last}), short times: ${hasShort ? "yes" : "no"}`;
+  } catch (e) {
+    return `Widget: error ${String(e)}`;
+  }
 }

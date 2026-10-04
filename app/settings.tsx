@@ -17,6 +17,7 @@ import {
   PermissionCheck,
 } from "@/lib/service/permissionStatus";
 import { updateWaktuSolatAndWidgets } from "@/lib/service/waktuSolatWidget";
+import { getIosWidgetStatus } from "@/lib/widgets/ios/updateIosWidgets";
 
 const PRAYERS: { key: keyof PrayerTime; label: string; note?: string }[] = [
   { key: "imsak", label: "Imsak" },
@@ -97,6 +98,11 @@ export default function SettingsScreen() {
   const { settings } = useSettings();
   const [checks, setChecks] = useState<PermissionCheck[]>([]);
   const [testSent, setTestSent] = useState(false);
+  // Temporary (TestFlight): what the iOS widget has been given.
+  const [widgetStatus, setWidgetStatus] = useState("");
+  useEffect(() => {
+    getIosWidgetStatus().then(setWidgetStatus);
+  }, []);
 
   const refreshChecks = useCallback(async () => {
     setChecks(await getPermissionChecks());
@@ -204,6 +210,11 @@ export default function SettingsScreen() {
             </Pressable>
           ))}
         </>
+        {!!widgetStatus && (
+          <MonoText style={{ fontSize: 11, paddingTop: 24 }}>
+            {widgetStatus}
+          </MonoText>
+        )}
       </View>
     </MonoScrollPage>
   );
