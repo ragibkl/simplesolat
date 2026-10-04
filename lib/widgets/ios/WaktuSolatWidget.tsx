@@ -4,14 +4,16 @@ import {
   foregroundStyle,
   frame,
   lineLimit,
-  minimumScaleFactor,
   padding,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
 
 import type { IosWidgetProps } from "./timeline";
 
-// iOS home screen and Lock Screen widget. Runs in the widget's own runtime:
+// iOS home screen and Lock Screen widget. Keep it cheap to lay out: iOS
+// renders every timeline entry under a CPU budget, and shrink-to-fit text
+// (minimumScaleFactor) with flexible columns blew it.
+// Runs in the widget's own runtime:
 // only @expo/ui/swift-ui, no hooks or module-scope values.
 const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
   "widget";
@@ -22,11 +24,7 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
     return (
       <VStack alignment="leading">
         <Text modifiers={[mono(12, false), lineLimit(1)]}>{props.place}</Text>
-        <Text
-          modifiers={[mono(15, true), lineLimit(1), minimumScaleFactor(0.7)]}
-        >
-          {props.next}
-        </Text>
+        <Text modifiers={[mono(15, true), lineLimit(1)]}>{props.next}</Text>
       </VStack>
     );
   }
@@ -34,24 +32,14 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
   if (env.widgetFamily === "systemSmall") {
     return (
       <VStack alignment="leading" spacing={2}>
-        <Text
-          modifiers={[mono(10, false), lineLimit(1), minimumScaleFactor(0.7)]}
-        >
-          {props.place}
-        </Text>
+        <Text modifiers={[mono(10, false), lineLimit(1)]}>{props.place}</Text>
         {props.columns.map((c, i) => (
           <HStack key={c.label}>
             <Text modifiers={[mono(12, i === props.active), lineLimit(1)]}>
               {c.label}
             </Text>
             <Spacer />
-            <Text
-              modifiers={[
-                mono(12, i === props.active),
-                lineLimit(1),
-                minimumScaleFactor(0.7),
-              ]}
-            >
+            <Text modifiers={[mono(12, i === props.active), lineLimit(1)]}>
               {c.time}
             </Text>
           </HStack>
@@ -69,11 +57,7 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
           {props.dateText}
         </Text>
         <Spacer />
-        <Text
-          modifiers={[mono(13, false), lineLimit(1), minimumScaleFactor(0.7)]}
-        >
-          {props.place}
-        </Text>
+        <Text modifiers={[mono(13, false), lineLimit(1)]}>{props.place}</Text>
       </HStack>
       <HStack spacing={0}>
         {props.columns.map((c, i) => (
@@ -84,20 +68,13 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
             spacing={4}
             modifiers={[frame({ maxWidth: 1000 })]}
           >
-            <Text
-              modifiers={[
-                mono(14, i === props.active),
-                lineLimit(1),
-                minimumScaleFactor(0.5),
-              ]}
-            >
+            <Text modifiers={[mono(11, i === props.active), lineLimit(1)]}>
               {c.label}
             </Text>
             <Text
               modifiers={[
-                mono(13, i === props.active),
+                mono(12, i === props.active),
                 lineLimit(1),
-                minimumScaleFactor(0.5),
                 i === props.active
                   ? foregroundStyle({ type: "hierarchical", style: "primary" })
                   : foregroundStyle({
