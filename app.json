@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.simplesolat.app"
+      "bundleIdentifier": "com.simplesolat.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -40,9 +43,10 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "simplesolat needs your location in order to display the correct JAKIM prayer times for your location",
+          "locationAlwaysAndWhenInUsePermission": "simplesolat uses your location to find your prayer times zone, and to keep it right when you travel. Your location stays on your device.",
           "isAndroidBackgroundLocationEnabled": true,
-          "isAndroidForegroundServiceEnabled": false
+          "isAndroidForegroundServiceEnabled": false,
+          "locationWhenInUsePermission": "simplesolat uses your location to find your prayer times zone. Your location stays on your device."
         }
       ],
       "expo-router",
@@ -120,7 +124,28 @@
           "widgets": ["WaktuSolatImsak"]
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-widgets",
+        {
+          "bundleIdentifier": "com.simplesolat.app.widgets",
+          "groupIdentifier": "group.com.simplesolat.app",
+          "widgets": [
+            {
+              "name": "WaktuSolat",
+              "displayName": "Waktu Solat",
+              "description": "Today's prayer times, with the current one highlighted",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "accessoryRectangular"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -14,6 +14,13 @@ export function MonoText(props: MonoTextProps) {
   const fontFamily = getFontFamily(props.fontWeight);
 
   return (
-    <Text style={[{ fontFamily, color }, props.style]}>{props.children}</Text>
+    // Grow with the system text size, but not so far that the time rows
+    // wrap and misalign at the largest accessibility sizes.
+    <Text
+      style={[{ fontFamily, color }, props.style]}
+      maxFontSizeMultiplier={1.5}
+    >
+      {props.children}
+    </Text>
   );
 }

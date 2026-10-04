@@ -174,34 +174,36 @@ export default function SettingsScreen() {
           </View>
         ))}
 
-        <SectionTitle>Widget</SectionTitle>
-        <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
-          Extra time shown on the Waktu Solat widgets, next to the five prayers.
-          None shows only the five prayers. Dhuha is for Malaysia and Brunei
-          only; elsewhere the widget shows the five prayers.
-        </MonoText>
-        {WIDGET_EXTRA_TIMES.map((option) => (
-          <Pressable
-            key={option.key}
-            accessibilityRole="radio"
-            accessibilityState={{
-              checked: settings.widgetExtraTime === option.key,
-            }}
-            onPress={() =>
-              update({
-                ...settings,
-                widgetExtraTime: option.key,
-                widgetExtraTimeChosen: true,
-              })
-            }
-            style={{ paddingVertical: 8 }}
-          >
-            <MonoText style={{ fontSize: 16 }}>
-              {(settings.widgetExtraTime === option.key ? "● " : "○ ") +
-                option.label}
-            </MonoText>
-          </Pressable>
-        ))}
+        <>
+          <SectionTitle>Widget</SectionTitle>
+          <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
+            Extra time shown on the Waktu Solat widgets, next to the five
+            prayers. None shows only the five prayers. Dhuha is for Malaysia and
+            Brunei only; elsewhere the widget shows the five prayers.
+          </MonoText>
+          {WIDGET_EXTRA_TIMES.map((option) => (
+            <Pressable
+              key={option.key}
+              accessibilityRole="radio"
+              accessibilityState={{
+                checked: settings.widgetExtraTime === option.key,
+              }}
+              onPress={() =>
+                update({
+                  ...settings,
+                  widgetExtraTime: option.key,
+                  widgetExtraTimeChosen: true,
+                })
+              }
+              style={{ paddingVertical: 8 }}
+            >
+              <MonoText style={{ fontSize: 16 }}>
+                {(settings.widgetExtraTime === option.key ? "● " : "○ ") +
+                  option.label}
+              </MonoText>
+            </Pressable>
+          ))}
+        </>
       </View>
     </MonoScrollPage>
   );

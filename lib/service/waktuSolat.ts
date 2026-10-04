@@ -1,4 +1,4 @@
-import { addMonths, compareAsc, startOfYesterday } from "date-fns";
+import { addDays, addMonths, compareAsc, startOfYesterday } from "date-fns";
 
 import { WaktuSolatStore, waktuSolatStore } from "@/lib/data/waktuSolatStore";
 import { zoneStore } from "@/lib/data/zoneStore";
@@ -126,4 +126,19 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
   await waktuSolatStore.save(newStore);
 
   return getWaktuSolatFromStore(newStore, zone.zone, date);
+}
+
+// Today and the following days, for scheduling reminders ahead (iOS).
+export async function getUpcomingWaktuSolat(
+  date: Date,
+  days: number,
+): Promise<WaktuSolat[]> {
+  const result: WaktuSolat[] = [];
+  for (let i = 0; i < days; i++) {
+    const waktuSolat = await getOrRetrieveWaktuSolat(addDays(date, i));
+    if (waktuSolat) {
+      result.push(waktuSolat);
+    }
+  }
+  return result;
 }

@@ -44,14 +44,17 @@ export async function requestAllPermissions(): Promise<void> {
     );
   }
 
-  // Background location
+  // Background location ("Always" on iOS): lets reminders and widgets follow
+  // the user when they travel (Android: background task; iOS: a geofence).
   try {
     const bgStatus = await Location.getBackgroundPermissionsAsync();
     if (bgStatus.status !== "granted") {
       await new Promise<void>((resolve) => {
         Alert.alert(
           "Background Location Permission",
-          "This app needs background location access to keep your prayer times and widgets updated as you travel, even when the app is not open.",
+          Platform.OS === "ios"
+            ? 'To keep your prayer times, reminders and widget right when you travel, choose "Change to Always Allow" next. Your location stays on your device.'
+            : "This app needs background location access to keep your prayer times and widgets updated as you travel, even when the app is not open.",
           [
             {
               text: "Ok",
