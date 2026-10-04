@@ -1,4 +1,4 @@
-import { File, Directory, Paths } from "expo-file-system/next";
+import { File, Directory, Paths } from "expo-file-system";
 import { coalesce } from "./coalesce";
 
 const cacheDir = new Directory(Paths.document, "file-cache");
