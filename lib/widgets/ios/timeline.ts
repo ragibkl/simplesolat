@@ -19,9 +19,13 @@ export type IosWidgetProps = {
 export type IosWidgetEntry = { date: Date; props: IosWidgetProps };
 
 function timeText(epochSeconds: number): string {
-  return new Date(epochSeconds * 1000)
-    .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
-    .toLowerCase();
+  return (
+    new Date(epochSeconds * 1000)
+      .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+      // iOS puts a narrow no-break space (U+202F) before AM/PM.
+      .replace(/\s+/g, " ")
+      .toLowerCase()
+  );
 }
 
 function startOfDay(ws: WaktuSolat): number {
@@ -45,7 +49,7 @@ export function buildTimeline(
     const columns = cols.map((c) => ({
       label: c.label,
       time: timeText(c.start),
-      short: timeText(c.start).replace(/ [ap]m$/, ""),
+      short: timeText(c.start).replace(/\s*[ap]m$/, ""),
     }));
     const dateText = new Date(dayStart).toDateString();
     const tomorrow = days[dayIndex + 1];
