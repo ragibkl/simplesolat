@@ -9,7 +9,7 @@ export type IosWidgetProps = {
   dateText: string;
   place: string;
   // time: "5:53 am"; short: "5:53" (the medium widget is too narrow for am/pm)
-  columns: { label: string; time: string; short: string }[];
+  columns: { label: string; time: string; short?: string }[];
   // Index of the current prayer in columns, or -1 between prayers.
   active: number;
   // The next prayer, for the Lock Screen widget.
