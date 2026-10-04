@@ -2,6 +2,7 @@ import { HStack, Spacer, Text, VStack } from "@expo/ui/swift-ui";
 import {
   font,
   foregroundStyle,
+  frame,
   lineLimit,
   minimumScaleFactor,
   padding,
@@ -74,9 +75,15 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
           {props.place}
         </Text>
       </HStack>
-      <HStack spacing={2}>
+      <HStack spacing={0}>
         {props.columns.map((c, i) => (
-          <VStack key={c.label} spacing={4}>
+          // Equal-width columns: each may grow, so they share the row evenly
+          // (a huge max width stands in for .infinity).
+          <VStack
+            key={c.label}
+            spacing={4}
+            modifiers={[frame({ maxWidth: 1000 })]}
+          >
             <Text
               modifiers={[
                 mono(14, i === props.active),
