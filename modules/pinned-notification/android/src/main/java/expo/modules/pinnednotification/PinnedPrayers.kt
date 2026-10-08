@@ -63,20 +63,21 @@ object PinnedPrayers {
     scheduleNext(context, day, now)
   }
 
-  // The next prayer start in any stored day, for the countdown.
-  private fun nextStart(days: org.json.JSONArray?, now: Long): Long? {
-    var next: Long? = null
+  // The next prayer in any stored day, for the countdown.
+  private fun nextStart(days: org.json.JSONArray?, now: Long): JSONObject? {
+    var next: JSONObject? = null
     for (i in 0 until (days?.length() ?: 0)) {
       val columns = days!!.getJSONObject(i).optJSONArray("columns") ?: continue
       for (j in 0 until columns.length()) {
-        val start = columns.getJSONObject(j).getLong("start")
-        if (start > now && (next == null || start < next)) next = start
+        val column = columns.getJSONObject(j)
+        val start = column.getLong("start")
+        if (start > now && (next == null || start < next.getLong("start"))) next = column
       }
     }
     return next
   }
 
-  private fun show(context: Context, data: JSONObject, day: JSONObject?, next: Long?, now: Long) {
+  private fun show(context: Context, data: JSONObject, day: JSONObject?, next: JSONObject?, now: Long) {
     val manager = NotificationManagerCompat.from(context)
     if (!manager.areNotificationsEnabled()) return
     createChannel(context)
@@ -99,11 +100,14 @@ object PinnedPrayers {
 
     // Some phones (realme) show "x minutes ago" regardless, so show a
     // countdown to the next prayer there instead.
+    // Header: "simplesolat • Kuala Lumpur · Asr in 1:42:33".
+    val zone = data.optString("subText")
     if (next != null) {
-      builder.setShowWhen(true).setWhen(next)
+      builder.setShowWhen(true).setWhen(next.getLong("start"))
         .setUsesChronometer(true).setChronometerCountDown(true)
+        .setSubText("$zone · ${next.getString("label")} in")
     } else {
-      builder.setShowWhen(false)
+      builder.setShowWhen(false).setSubText(zone)
     }
 
     if (day == null) {
@@ -113,7 +117,6 @@ object PinnedPrayers {
     } else {
       val views = columnsView(context, day, now)
       builder
-        .setSubText(data.optString("subText"))
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())
         .setCustomContentView(views)
         .setCustomBigContentView(views)
