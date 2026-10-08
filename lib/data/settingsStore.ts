@@ -12,6 +12,8 @@ export type Settings = {
   // Set once the user picks an extra time. Until then the old "with Imsak"
   // widget keeps showing Imsak.
   widgetExtraTimeChosen?: boolean;
+  // Android: today's five prayer times pinned at the top of the notifications.
+  pinnedNotification?: boolean;
 };
 
 export const DEFAULT_SETTINGS: Settings = {

@@ -11,6 +11,7 @@ import { updateIosWidgets } from "@/lib/widgets/ios/updateIosWidgets";
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
 import { GetLocationOptions } from "./location";
+import { updatePinnedNotification } from "./pinnedNotification";
 import { getPrayerData } from "./prayerData";
 import { getUpcomingWaktuSolat } from "./waktuSolat";
 
@@ -54,6 +55,7 @@ export async function updateWaktuSolatAndWidgets(
   const { zone, waktuSolat } = data;
   requestUpdateWaktuSolatWidgets(date, zone, waktuSolat);
   await updateIosWidgets(date, zone);
+  await updatePinnedNotification(date, zone);
 
   if (updateNotifs) {
     await scheduleAllWaktuSolatNotifications(
