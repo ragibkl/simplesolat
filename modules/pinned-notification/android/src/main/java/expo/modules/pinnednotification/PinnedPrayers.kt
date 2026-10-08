@@ -11,6 +11,7 @@ import android.os.Build
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
+import android.text.style.TypefaceSpan
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -58,11 +59,24 @@ object PinnedPrayers {
       if (d.optString("date") == today) day = d
     }
 
-    show(context, data, day, now)
+    show(context, data, day, nextStart(days, now), now)
     scheduleNext(context, day, now)
   }
 
-  private fun show(context: Context, data: JSONObject, day: JSONObject?, now: Long) {
+  // The next prayer start in any stored day, for the countdown.
+  private fun nextStart(days: org.json.JSONArray?, now: Long): Long? {
+    var next: Long? = null
+    for (i in 0 until (days?.length() ?: 0)) {
+      val columns = days!!.getJSONObject(i).optJSONArray("columns") ?: continue
+      for (j in 0 until columns.length()) {
+        val start = columns.getJSONObject(j).getLong("start")
+        if (start > now && (next == null || start < next)) next = start
+      }
+    }
+    return next
+  }
+
+  private fun show(context: Context, data: JSONObject, day: JSONObject?, next: Long?, now: Long) {
     val manager = NotificationManagerCompat.from(context)
     if (!manager.areNotificationsEnabled()) return
     createChannel(context)
@@ -77,12 +91,20 @@ object PinnedPrayers {
       .setOngoing(true)
       .setOnlyAlertOnce(true)
       .setSilent(true)
-      .setShowWhen(false)
       .setCategory(NotificationCompat.CATEGORY_STATUS)
       .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
       .setContentIntent(contentIntent)
       .setDeleteIntent(refreshIntent(context, 2))
+
+    // Some phones (realme) show "x minutes ago" regardless, so show a
+    // countdown to the next prayer there instead.
+    if (next != null) {
+      builder.setShowWhen(true).setWhen(next)
+        .setUsesChronometer(true).setChronometerCountDown(true)
+    } else {
+      builder.setShowWhen(false)
+    }
 
     if (day == null) {
       builder
@@ -123,10 +145,14 @@ object PinnedPrayers {
     return row
   }
 
+  // The font as a span: some phones ignore android:fontFamily in
+  // notification layouts.
   private fun styled(text: String, bold: Boolean): CharSequence {
-    if (!bold) return text
     return SpannableString(text).apply {
-      setSpan(StyleSpan(Typeface.BOLD), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      setSpan(TypefaceSpan("monospace"), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      if (bold) {
+        setSpan(StyleSpan(Typeface.BOLD), 0, text.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      }
     }
   }
 

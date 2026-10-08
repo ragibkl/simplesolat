@@ -23,7 +23,8 @@ function dayColumns(waktuSolat: WaktuSolat) {
     { label: "Isha", start: isha },
   ].map(({ label, start, end }) => ({
     label,
-    time: getTimeText(start).replace(/\s+/g, " "),
+    // No am/pm, so five columns fit across a phone.
+    time: getTimeText(start).replace(/\s*[ap]\.?\s?m\.?$/i, ""),
     start: start * 1000,
     end: end === undefined ? null : end * 1000,
   }));
