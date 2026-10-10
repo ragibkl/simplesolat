@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Labels and times shrink to fit their column (monospace "Maghrib" is too
+     wide for a fifth of some phones at 13sp). Auto-size needs a fixed height. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="0dp"
   android:layout_height="wrap_content"
   android:layout_weight="1"
   android:gravity="center_horizontal"
-  android:orientation="vertical">
+  android:orientation="vertical"
+  android:paddingStart="1dp"
+  android:paddingEnd="1dp">
 
   <TextView
     android:id="@+id/pinned_label"
     style="@style/TextAppearance.Compat.Notification.Info"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="20dp"
+    android:autoSizeMaxTextSize="13sp"
+    android:autoSizeMinTextSize="8sp"
+    android:autoSizeTextType="uniform"
     android:fontFamily="monospace"
+    android:gravity="center"
     android:maxLines="1"
     android:textSize="13sp" />
 
   <TextView
     android:id="@+id/pinned_time"
     style="@style/TextAppearance.Compat.Notification.Title"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="22dp"
+    android:autoSizeMaxTextSize="13sp"
+    android:autoSizeMinTextSize="8sp"
+    android:autoSizeTextType="uniform"
     android:fontFamily="monospace"
+    android:gravity="center"
     android:maxLines="1"
     android:textSize="13sp" />
 </LinearLayout>
