@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { AppState, Pressable, Switch, View } from "react-native";
+import { AppState, Platform, Pressable, Switch, View } from "react-native";
 
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
@@ -204,6 +204,38 @@ export default function SettingsScreen() {
             </Pressable>
           ))}
         </>
+
+        {Platform.OS === "android" && (
+          <>
+            <SectionTitle>Pinned notification</SectionTitle>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingVertical: 4,
+              }}
+            >
+              <View style={{ flex: 1, paddingRight: 12 }}>
+                <MonoText style={{ fontSize: 16 }}>
+                  Prayer times in notifications
+                </MonoText>
+                <MonoText style={{ fontSize: 12 }}>
+                  The five prayer times for today, always at the top of your
+                  notifications. Silent.
+                </MonoText>
+              </View>
+              <Switch
+                value={!!settings.pinnedNotification}
+                onValueChange={(value) =>
+                  update({ ...settings, pinnedNotification: value })
+                }
+                trackColor={{ true: color, false: offTrackColor }}
+                thumbColor={backgroundColor}
+              />
+            </View>
+          </>
+        )}
       </View>
     </MonoScrollPage>
   );

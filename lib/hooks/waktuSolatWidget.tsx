@@ -5,6 +5,7 @@ import {
   getReminderDays,
   requestUpdateWaktuSolatWidgets,
 } from "@/lib/service/waktuSolatWidget";
+import { updatePinnedNotification } from "@/lib/service/pinnedNotification";
 import { refreshTravelGeofence } from "@/lib/service/travelGeofence";
 import { registerBackgroundTasks } from "@/lib/tasks/backgroundTasks";
 import { updateIosWidgets } from "@/lib/widgets/ios/updateIosWidgets";
@@ -35,7 +36,10 @@ export function useWaktuSolatWidgetUpdate() {
   // iOS widget timeline (40 days): rebuild when the zone or the day changes.
   const dayKey = date.toDateString();
   useEffect(() => {
-    if (zone) updateIosWidgets(new Date(), zone);
+    if (zone) {
+      updateIosWidgets(new Date(), zone);
+      updatePinnedNotification(new Date(), zone);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoneKey, dayKey]);
 
