@@ -151,7 +151,8 @@
         {
           "android": {
             "enableMinifyInReleaseBuilds": true,
-            "enableShrinkResourcesInReleaseBuilds": true
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "extraProguardRules": "# expo-modules-core names its headless app loader only in AndroidManifest meta-data (org.unimodules.core.AppLoader#react-native-headless), so R8 removes it and background tasks (expo-task-manager) can't start JS.\n-keep class expo.modules.adapters.react.apploader.RNHeadlessAppLoader { *; }"
           }
         }
       ]
