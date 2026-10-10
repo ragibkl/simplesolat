@@ -1,0 +1,33 @@
+diff --git a/node_modules/react-native-screens/android/src/main/cpp/jni-adapter.cpp b/node_modules/react-native-screens/android/src/main/cpp/jni-adapter.cpp
+index bc8dddd..6a8f8ae 100644
+--- a/node_modules/react-native-screens/android/src/main/cpp/jni-adapter.cpp
++++ b/node_modules/react-native-screens/android/src/main/cpp/jni-adapter.cpp
+@@ -8,6 +8,12 @@ using namespace facebook;
+ 
+ jobject globalThis;
+ 
++// nativeInstall can run on two threads at once when two React instances start
++// together (e.g. a widget update or a headless task while the app launches).
++// It writes globalThis and RNScreensTurboModule's static std::functions, so
++// unguarded that races and crashes (SIGABRT/SIGSEGV in the constructor).
++static std::mutex installMutex;
++
+ extern "C" JNIEXPORT void JNICALL
+ Java_com_swmansion_rnscreens_ScreensModule_nativeInstall(
+     JNIEnv *env,
+@@ -17,6 +23,7 @@ Java_com_swmansion_rnscreens_ScreensModule_nativeInstall(
+   if (!runtime) {
+     return;
+   }
++  std::lock_guard<std::mutex> lock(installMutex);
+   jsi::Runtime &rt = *runtime;
+   if (globalThis) {
+     env->DeleteGlobalRef(globalThis);
+@@ -98,6 +105,7 @@ extern "C" JNIEXPORT void JNICALL
+ Java_com_swmansion_rnscreens_ScreensModule_nativeUninstall(
+     JNIEnv *env,
+     jobject thiz) {
++  std::lock_guard<std::mutex> lock(installMutex);
+   if (globalThis != nullptr) {
+     env->DeleteGlobalRef(globalThis);
+     globalThis = nullptr;
