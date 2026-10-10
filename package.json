@@ -37,6 +37,7 @@
     "date-fns-tz": "^3.2.0",
     "expo": "^57.0.26",
     "expo-background-task": "~57.0.21",
+    "expo-build-properties": "~57.0.22",
     "expo-constants": "~57.0.20",
     "expo-dev-client": "~57.0.19",
     "expo-file-system": "~57.0.7",
