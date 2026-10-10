@@ -97,6 +97,9 @@ object PinnedPrayers {
       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
       .setContentIntent(contentIntent)
       .setDeleteIntent(refreshIntent(context, 2))
+      // Its own group, so Android doesn't bundle it with the prayer reminders
+      // (the bundle shows only the latest reminder when collapsed).
+      .setGroup("pinned_prayer_times")
 
     // Some phones (realme) show "x minutes ago" regardless, so show a
     // countdown to the next prayer there instead.
