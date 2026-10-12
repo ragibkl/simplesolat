@@ -60,12 +60,22 @@ export default function RootLayout() {
                     <View style={{ flexDirection: "row", gap: 12 }}>
                       {/* Padding + hitSlop: about 44 points to tap (Apple's minimum); the icon stays 20 points. */}
                       <Link href="/compass" asChild>
-                        <Pressable hitSlop={8} style={{ padding: 6 }}>
+                        <Pressable
+                          hitSlop={8}
+                          style={{ padding: 6 }}
+                          accessibilityLabel="Qibla"
+                          testID="header-qibla"
+                        >
                           <FontAwesome6 name="kaaba" size={20} color={color} />
                         </Pressable>
                       </Link>
                       <Link href="/settings" asChild>
-                        <Pressable hitSlop={8} style={{ padding: 6 }}>
+                        <Pressable
+                          hitSlop={8}
+                          style={{ padding: 6 }}
+                          accessibilityLabel="Settings"
+                          testID="header-settings"
+                        >
                           <FontAwesome6 name="gear" size={20} color={color} />
                         </Pressable>
                       </Link>

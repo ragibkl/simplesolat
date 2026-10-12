@@ -1,0 +1,7 @@
+# Home screen with the widget (added by widget.yaml).
+appId: com.apple.springboard
+---
+- pressKey: home
+- waitForAnimationToEnd:
+    timeout: 10000
+- takeScreenshot: ${MODE}-4-widget

@@ -1,0 +1,38 @@
+# App screens for the App Store, run on the iOS simulator by
+# .github/workflows/ios-screenshots.yml. Permissions are granted up front and
+# the location is Kuala Lumpur, so the app opens straight to its times.
+# MODE (light/dark) prefixes the file names.
+appId: com.simplesolat.app
+---
+- setLocation:
+    latitude: 3.1390
+    longitude: 101.6869
+- launchApp:
+    clearState: true
+    permissions:
+      location: always
+      notifications: allow
+# The zone line ("WLY01 - Source: ...") shows once location and times are in.
+- extendedWaitUntil:
+    visible: ".*Source.*"
+    timeout: 60000
+- assertVisible: "Fajr"
+- takeScreenshot: ${MODE}-1-home
+
+- tapOn:
+    id: "header-settings"
+- extendedWaitUntil:
+    visible: "Settings"
+    timeout: 10000
+- takeScreenshot: ${MODE}-2-settings
+
+- launchApp
+- extendedWaitUntil:
+    visible: ".*Source.*"
+    timeout: 30000
+- tapOn:
+    id: "header-qibla"
+- extendedWaitUntil:
+    visible: "Qibla"
+    timeout: 10000
+- takeScreenshot: ${MODE}-3-qibla

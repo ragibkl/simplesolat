@@ -1,0 +1,26 @@
+# Adds simplesolat's medium widget to the home screen (home.yaml takes the
+# screenshot).
+# Runs after screens.yaml (the app has to have run once to give the widget its
+# times). Drives the home screen itself, so each step saves a screenshot to
+# show where it got to if a later step fails.
+appId: com.apple.springboard
+---
+- pressKey: home
+# A long press on an empty part of the home screen starts editing.
+- longPressOn:
+    point: "50%,75%"
+- takeScreenshot: widget-step-1-editing
+- tapOn: "Edit"
+- tapOn: "Add Widget"
+- takeScreenshot: widget-step-2-gallery
+- tapOn: "Search Widgets"
+- inputText: "simplesolat"
+- tapOn:
+    text: "simplesolat"
+    index: 1
+- takeScreenshot: widget-step-3-sizes
+# Small comes first; swipe to medium.
+- swipe:
+    direction: LEFT
+- tapOn: "Add Widget"
+- tapOn: "Done"
