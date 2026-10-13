@@ -1,26 +1,52 @@
 # Adds simplesolat's medium widget to the home screen (home.yaml takes the
-# screenshot).
-# Runs after screens.yaml (the app has to have run once to give the widget its
-# times). Drives the home screen itself, so each step saves a screenshot to
-# show where it got to if a later step fails.
+# screenshot). Runs after screens.yaml (the app has to have run once to give
+# the widget its times). Drives the home screen itself, so each step saves a
+# screenshot to show where it got to if a later step fails.
+# No automatic re-tap: on the home screen a second tap closes what the first
+# one opened.
 appId: com.apple.springboard
 ---
+# Start from a plain home screen, also when retrying after a failed attempt.
+- pressKey: home
 - pressKey: home
 # A long press on an empty part of the home screen starts editing.
 - longPressOn:
     point: "50%,75%"
+- extendedWaitUntil:
+    visible: "Edit"
+    timeout: 10000
 - takeScreenshot: widget-step-1-editing
-- tapOn: "Edit"
-- tapOn: "Add Widget"
-- takeScreenshot: widget-step-2-gallery
+- tapOn:
+    text: "Edit"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Add Widget"
+    timeout: 10000
+- takeScreenshot: widget-step-2-menu
+- tapOn:
+    text: "Add Widget"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Search Widgets"
+    timeout: 10000
 - tapOn: "Search Widgets"
 - inputText: "simplesolat"
+- takeScreenshot: widget-step-3-search
 - tapOn:
     text: "simplesolat"
-    index: 1
-- takeScreenshot: widget-step-3-sizes
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Add Widget"
+    timeout: 10000
+- takeScreenshot: widget-step-4-sizes
 # Small comes first; swipe to medium.
 - swipe:
     direction: LEFT
-- tapOn: "Add Widget"
-- tapOn: "Done"
+- waitForAnimationToEnd
+- takeScreenshot: widget-step-5-medium
+- tapOn:
+    text: "Add Widget"
+    retryTapIfNoChange: false
+- tapOn:
+    text: "Done"
+    retryTapIfNoChange: false

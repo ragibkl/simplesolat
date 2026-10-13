@@ -123,8 +123,13 @@ jobs:
             return 1
           }
 
+          # The simulator uses the runner's time zone (UTC): use Malaysia's,
+          # so the times read as they do there.
+          sudo systemsetup -settimezone Asia/Kuala_Lumpur || sudo ln -sf /usr/share/zoneinfo/Asia/Kuala_Lumpur /etc/localtime
+          date
+
           mkdir -p screenshots
-          for spec in "iphone-6.9:iPhone [0-9]+ Pro Max" "ipad-13:iPad Pro 13-inch.*"; do
+          for spec in "iphone-6.9:iPhone 17 Pro Max" "ipad-13:iPad Pro 13-inch \\(M5\\).*"; do
             name=${spec%%:*}
             udid=$(xcrun simctl create "$name" "$(devtype "${spec#*:}")" "$runtime")
             mkdir -p "screenshots/$name"
