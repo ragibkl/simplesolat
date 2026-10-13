@@ -180,7 +180,8 @@ jobs:
           # Widgets: write a home screen layout with them already in place
           # (.maestro/home-screen.plist), then restart the simulator. The app
           # has run above, so the widgets have times to show; widgets.yaml
-          # opens it again so they're drawn, then takes the screenshots.
+          # opens it again so they're drawn; the screenshots are taken without
+          # Maestro's driver app installed, so its icon isn't on the home screen.
           sb=~/Library/Developer/CoreSimulator/Devices/$udid/data/Library/SpringBoard
           xcrun simctl shutdown "$udid"
           mkdir -p "$sb"
@@ -191,10 +192,13 @@ jobs:
             --dataNetwork wifi --wifiMode active --wifiBars 3 \
             --cellularMode active --cellularBars 4 \
             --batteryState charged --batteryLevel 100
-          xcrun simctl ui "$udid" appearance light
-          flow widgets.yaml light || true
-          xcrun simctl ui "$udid" appearance dark
-          flow widgets.yaml dark || true
+          for mode in light dark; do
+            xcrun simctl ui "$udid" appearance $mode
+            flow widgets.yaml $mode || true
+            xcrun simctl uninstall "$udid" dev.mobile.maestro-driver-iosUITests.xctrunner || true
+            sleep 5
+            xcrun simctl io "$udid" screenshot "$out/$mode-4-widgets.png"
+          done
 
           # Maestro saves takeScreenshot files in its output folder.
           find maestro-out -path '*takeScreenshot*' -name '*.png' -exec cp {} "$out/" \;
