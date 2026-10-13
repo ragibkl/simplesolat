@@ -21,8 +21,10 @@ appId: com.simplesolat.app
 
 - tapOn:
     id: "header-settings"
+# Text only on that screen: the header buttons are labelled "Settings" and
+# "Qibla" too, so their names show up on the home screen as well.
 - extendedWaitUntil:
-    visible: "Settings"
+    visible: "Permissions"
     timeout: 10000
 - takeScreenshot: ${MODE}-2-settings
 
@@ -32,7 +34,8 @@ appId: com.simplesolat.app
     timeout: 30000
 - tapOn:
     id: "header-qibla"
+# The simulator has no compass, so the screen waits for one.
 - extendedWaitUntil:
-    visible: "Qibla"
+    visible: "Waiting for compass.*"
     timeout: 10000
 - takeScreenshot: ${MODE}-3-qibla
