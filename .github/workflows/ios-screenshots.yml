@@ -190,18 +190,13 @@ jobs:
             --dataNetwork wifi --wifiMode active --wifiBars 3 \
             --cellularMode active --cellularBars 4 \
             --batteryState charged --batteryLevel 100
-          for mode in light dark; do
-            xcrun simctl ui "$udid" appearance $mode
-            sleep 20
-            xcrun simctl io "$udid" screenshot "$out/$mode-4-widgets.png"
-          done
-
-          # SpringBoard's files after the restart, to check it kept the layout.
-          mkdir -p "$out/springboard"
-          ls -la "$sb" || true
-          for f in "$sb"/*.plist; do
-            [ -f "$f" ] && plutil -convert xml1 -o "$out/springboard/$(basename "$f")" "$f"
-          done
+          # iOS draws the widgets a while after booting (blank before that).
+          xcrun simctl ui "$udid" appearance light
+          sleep 60
+          xcrun simctl io "$udid" screenshot "$out/light-4-widgets.png"
+          xcrun simctl ui "$udid" appearance dark
+          sleep 20
+          xcrun simctl io "$udid" screenshot "$out/dark-4-widgets.png"
 
           # Maestro saves takeScreenshot files in its output folder.
           find maestro-out -path '*takeScreenshot*' -name '*.png' -exec cp {} "$out/" \;
