@@ -5,6 +5,7 @@
 #
 #   gh workflow run ios-screenshots.yml
 #   gh workflow run ios-screenshots.yml -f build_run=<run id>   # reuse that run's build
+#   gh workflow run ios-screenshots.yml -f build_run=<run id> -f only=widget
 name: iOS screenshots
 
 on:
@@ -19,6 +20,10 @@ on:
         description: "Reuse the simulator build from this run ID (skips the 20+ minute build)"
         required: false
         default: ""
+      only:
+        description: "all, or widget (skips the dark app screens)"
+        required: false
+        default: "all"
 
 permissions:
   contents: read
@@ -75,7 +80,15 @@ jobs:
     needs: build
     if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped')
     runs-on: macos-26
-    timeout-minutes: 45
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: iphone-6.9
+            device: "iPhone 17 Pro Max"
+          - name: ipad-13
+            device: "iPad Pro 13-inch \\(M5\\).*"
     steps:
       - uses: actions/checkout@v4
 
@@ -92,74 +105,98 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
 
-      - name: Run on iPhone and iPad
+      - name: Run on ${{ matrix.name }}
         env:
+          NAME: ${{ matrix.name }}
+          DEVICE: ${{ matrix.device }}
+          ONLY: ${{ inputs.only || 'all' }}
           # Maestro's XCTest driver can be slow to start on shared runners.
           MAESTRO_DRIVER_STARTUP_TIMEOUT: "180000"
           MAESTRO_CLI_NO_ANALYTICS: "1"
         run: |
-          runtime=$(xcrun simctl list runtimes -j | python3 -c 'import json,sys; r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]]; print(r[-1]["identifier"])')
-          devtype() {
-            xcrun simctl list devicetypes -j | python3 -c 'import json,re,sys; t=[d["identifier"] for d in json.load(sys.stdin)["devicetypes"] if re.fullmatch(sys.argv[1], d["name"])]; print(t[-1])' "$1"
-          }
-          failed=0
-
-          # flow <device> <name> <flow file> <MODE>: one retry, since the
-          # driver's first start sometimes times out. On failure, save the
-          # screen's element tree to see what Maestro could find.
-          flow() {
-            local udid=$1 name=$2 file=$3 mode=$4 out=screenshots/$2
-            for try in 1 2; do
-              if maestro --device "$udid" test -e MODE="$mode" \
-                  --test-output-dir "maestro-out/$name" --debug-output "maestro-out/$name" \
-                  ".maestro/$file"; then
-                return 0
-              fi
-            done
-            echo "$name: $file ($mode) failed" >> screenshots/failures.txt
-            maestro --device "$udid" hierarchy > "$out/hierarchy-${file%.yaml}-$mode.json" 2>&1 || true
-            xcrun simctl io "$udid" screenshot "$out/failed-${file%.yaml}-$mode.png" || true
-            failed=1
-            return 1
-          }
-
           # The simulator uses the runner's time zone (UTC): use Malaysia's,
           # so the times read as they do there.
           sudo systemsetup -settimezone Asia/Kuala_Lumpur || sudo ln -sf /usr/share/zoneinfo/Asia/Kuala_Lumpur /etc/localtime
           date
 
-          mkdir -p screenshots
-          for spec in "iphone-6.9:iPhone 17 Pro Max" "ipad-13:iPad Pro 13-inch \\(M5\\).*"; do
-            name=${spec%%:*}
-            udid=$(xcrun simctl create "$name" "$(devtype "${spec#*:}")" "$runtime")
-            mkdir -p "screenshots/$name"
-            xcrun simctl boot "$udid"
-            xcrun simctl bootstatus "$udid" -b
-            xcrun simctl status_bar "$udid" override --time "9:41" \
-              --dataNetwork wifi --wifiMode active --wifiBars 3 \
-              --cellularMode active --cellularBars 4 \
-              --batteryState charged --batteryLevel 100
-            xcrun simctl location "$udid" set 3.1390,101.6869
-            xcrun simctl install "$udid" simplesolat.app
+          runtime=$(xcrun simctl list runtimes -j | python3 -c 'import json,sys; r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]]; print(r[-1]["identifier"])')
+          devtype=$(xcrun simctl list devicetypes -j | python3 -c 'import json,re,sys; t=[d["identifier"] for d in json.load(sys.stdin)["devicetypes"] if re.fullmatch(sys.argv[1], d["name"])]; print(t[-1])' "$DEVICE")
+          out=screenshots/$NAME
+          mkdir -p "$out"
+          failed=0
 
-            xcrun simctl ui "$udid" appearance light
-            flow "$udid" "$name" screens.yaml light || true
-            if flow "$udid" "$name" widget.yaml light; then
-              flow "$udid" "$name" home.yaml light || true
-            fi
+          maestro_test() {
+            maestro --device "$udid" test --test-output-dir maestro-out --debug-output maestro-out "$@"
+          }
+
+          # On failure, save the screen and its element tree to see what
+          # Maestro could find.
+          save_failure() {
+            echo "$NAME: $1 failed" >> screenshots/failures.txt
+            maestro --device "$udid" hierarchy > "$out/hierarchy-$2.json" 2>&1 || true
+            xcrun simctl io "$udid" screenshot "$out/failed-$2.png" || true
+            failed=1
+          }
+
+          # flow <file> <MODE>, with one retry: the driver's first start
+          # sometimes times out.
+          flow() {
+            maestro_test -e MODE="$2" ".maestro/$1" || maestro_test -e MODE="$2" ".maestro/$1" \
+              || { save_failure "$1 ($2)" "${1%.yaml}-$2"; return 1; }
+          }
+
+          # add_widget <small|medium>: search the gallery, then tap just
+          # below the search field (the result row isn't in the element tree).
+          add_widget() {
+            for try in 1 2; do
+              maestro_test -e SIZE="$1" .maestro/widget-search.yaml || continue
+              row=$(maestro --device "$udid" hierarchy | python3 -c '
+          import json, re, sys
+          s = sys.stdin.read(); tree = json.loads(s[s.index("{"):])
+          def find(n):
+              a = n.get("attributes", {})
+              if a.get("accessibilityText") == "Search Widgets" and a.get("bounds"):
+                  return a["bounds"]
+              for c in n.get("children", []):
+                  b = find(c)
+                  if b: return b
+          x1, y1, x2, y2 = map(int, re.findall(r"\d+", find(tree)))
+          print(f"{x1 + (x2 - x1) // 3},{y2 + (y2 - y1) * 3 // 2}")
+          ') || continue
+              echo "search result row at $row"
+              maestro_test -e SIZE="$1" -e ROW="$row" .maestro/widget-add.yaml && return 0
+            done
+            save_failure "widget $1" "widget-$1"
+            return 1
+          }
+
+          udid=$(xcrun simctl create "$NAME" "$devtype" "$runtime")
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl status_bar "$udid" override --time "9:41" \
+            --dataNetwork wifi --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4 \
+            --batteryState charged --batteryLevel 100
+          xcrun simctl location "$udid" set 3.1390,101.6869
+          xcrun simctl install "$udid" simplesolat.app
+
+          xcrun simctl ui "$udid" appearance light
+          # The app has to run once before its widget has times to show.
+          flow screens.yaml light || true
+          if [ "$ONLY" != widget ]; then
             xcrun simctl ui "$udid" appearance dark
-            flow "$udid" "$name" screens.yaml dark || true
-            flow "$udid" "$name" home.yaml dark || true
-
-            xcrun simctl shutdown "$udid"
-          done
+            flow screens.yaml dark || true
+            xcrun simctl ui "$udid" appearance light
+          fi
+          # Added in this order, medium ends up above small.
+          add_widget small && add_widget medium || true
+          flow home.yaml light || true
+          xcrun simctl ui "$udid" appearance dark
+          flow home.yaml dark || true
 
           # Maestro saves takeScreenshot files in its output folder.
-          for name in iphone-6.9 ipad-13; do
-            find "maestro-out/$name" -name '*.png' -exec cp {} "screenshots/$name/" \; 2>/dev/null || true
-          done
-          ls -R screenshots
-          for f in screenshots/*/*.png; do
+          find maestro-out -path '*takeScreenshot*' -name '*.png' -exec cp {} "$out/" \;
+          for f in "$out"/*.png; do
             echo "$f: $(sips -g pixelWidth -g pixelHeight "$f" | awk '/pixel/{printf "%s ", $2}')"
           done
           cat screenshots/failures.txt 2>/dev/null || true
@@ -168,7 +205,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ios-screenshots
+          name: ios-screenshots-${{ matrix.name }}
           path: |
             screenshots
             maestro-out

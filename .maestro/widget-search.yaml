@@ -1,0 +1,33 @@
+# Adding a widget, part 1: opens the widget gallery and searches for
+# simplesolat. The search result isn't in the accessibility tree, so the
+# workflow finds the search field's position and widget-add.yaml taps just
+# below it. Each step saves a screenshot to show where it got to on failure.
+# No automatic re-tap: on the home screen a second tap closes what the first
+# one opened.
+appId: com.apple.springboard
+---
+# Start from a plain home screen, also when retrying after a failed attempt.
+- pressKey: home
+- pressKey: home
+# A long press on an empty part of the home screen starts editing.
+- longPressOn:
+    point: "50%,75%"
+- extendedWaitUntil:
+    visible: "Edit"
+    timeout: 10000
+- tapOn:
+    text: "Edit"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Add Widget"
+    timeout: 10000
+- tapOn:
+    text: "Add Widget"
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Search Widgets"
+    timeout: 10000
+- tapOn: "Search Widgets"
+- inputText: "simplesolat"
+- waitForAnimationToEnd
+- takeScreenshot: widget-${SIZE}-1-search

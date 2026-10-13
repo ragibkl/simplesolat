@@ -1,0 +1,27 @@
+# Adding a widget, part 2: taps the search result at ROW ("x,y", from the
+# workflow), picks SIZE (small or medium) and adds it to the home screen.
+appId: com.apple.springboard
+---
+- tapOn:
+    point: ${ROW}
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: "Add Widget"
+    timeout: 10000
+- takeScreenshot: widget-${SIZE}-2-sizes
+# Small comes first; swipe once for medium.
+- runFlow:
+    when:
+      true: ${SIZE == 'medium'}
+    commands:
+      - swipe:
+          direction: LEFT
+      - waitForAnimationToEnd
+- takeScreenshot: widget-${SIZE}-3-chosen
+- tapOn:
+    text: "Add Widget"
+    retryTapIfNoChange: false
+- waitForAnimationToEnd
+- tapOn:
+    text: "Done"
+    retryTapIfNoChange: false
