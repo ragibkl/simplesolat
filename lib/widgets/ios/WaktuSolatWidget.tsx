@@ -5,6 +5,7 @@ import {
   frame,
   lineLimit,
   padding,
+  strokeBorder,
 } from "@expo/ui/swift-ui/modifiers";
 import { createWidget, type WidgetEnvironment } from "expo-widgets";
 
@@ -19,6 +20,10 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
   "widget";
   const mono = (size: number, bold: boolean) =>
     font({ design: "monospaced", size, weight: bold ? "bold" : "regular" });
+  const secondary = foregroundStyle({
+    type: "hierarchical",
+    style: "secondary",
+  });
 
   if (env.widgetFamily === "accessoryRectangular") {
     return (
@@ -48,47 +53,69 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
     );
   }
 
-  // systemMedium: like the Android Waktu Solat widget, centred vertically
+  // systemMedium: the current prayer in large type with a countdown to the
+  // next one, above the Android widget's row of times in a rounded box.
+  // Between prayers (after Syuruk, or after midnight) it leads with the next.
+  const now = props.nowLabel !== "";
   return (
-    <VStack spacing={10}>
-      <Spacer />
-      <HStack>
-        <Text modifiers={[mono(13, false), lineLimit(1)]}>
-          {props.dateText}
-        </Text>
+    <VStack spacing={8}>
+      <HStack alignment="top">
+        <VStack alignment="leading" spacing={0}>
+          <Text modifiers={[mono(11, false), lineLimit(1), secondary]}>
+            {now ? "Now" : "Next"}
+          </Text>
+          <Text modifiers={[mono(26, true), lineLimit(1)]}>
+            {now ? props.nowLabel : props.nextLabel}
+          </Text>
+        </VStack>
         <Spacer />
-        <Text modifiers={[mono(13, false), lineLimit(1)]}>{props.place}</Text>
+        <VStack alignment="trailing" spacing={4}>
+          <Text modifiers={[mono(11, false), lineLimit(1), secondary]}>
+            {props.place}
+          </Text>
+          {props.nextAt > 0 ? (
+            <HStack spacing={0}>
+              <Text modifiers={[mono(14, false), lineLimit(1)]}>
+                {now ? `${props.nextLabel} in ` : "in "}
+              </Text>
+              {/* Counts down by itself; iOS redraws it, not the app. */}
+              <Text
+                date={new Date(props.nextAt)}
+                dateStyle="timer"
+                modifiers={[mono(14, false), lineLimit(1)]}
+              />
+            </HStack>
+          ) : null}
+        </VStack>
       </HStack>
-      <HStack spacing={0}>
+      <HStack
+        spacing={0}
+        modifiers={[
+          padding({ vertical: 8 }),
+          strokeBorder({
+            shape: "roundedRectangle",
+            cornerRadius: 6,
+            style: { lineWidth: 1 },
+          }),
+        ]}
+      >
         {props.columns.map((c, i) => (
           // Equal-width columns: each may grow, so they share the row evenly
           // (a huge max width stands in for .infinity).
           <VStack
             key={c.label}
-            spacing={4}
+            spacing={6}
             modifiers={[frame({ maxWidth: 1000 })]}
           >
             <Text modifiers={[mono(11, i === props.active), lineLimit(1)]}>
               {c.label}
             </Text>
-            <Text
-              modifiers={[
-                mono(12, i === props.active),
-                lineLimit(1),
-                i === props.active
-                  ? foregroundStyle({ type: "hierarchical", style: "primary" })
-                  : foregroundStyle({
-                      type: "hierarchical",
-                      style: "secondary",
-                    }),
-              ]}
-            >
+            <Text modifiers={[mono(12, i === props.active), lineLimit(1)]}>
               {c.short ?? c.time}
             </Text>
           </VStack>
         ))}
       </HStack>
-      <Spacer />
     </VStack>
   );
 };
