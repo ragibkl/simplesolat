@@ -4,6 +4,7 @@ import {
   foregroundStyle,
   frame,
   lineLimit,
+  multilineTextAlignment,
   padding,
   strokeBorder,
 } from "@expo/ui/swift-ui/modifiers";
@@ -78,11 +79,18 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
               <Text modifiers={[mono(14, false), lineLimit(1)]}>
                 {now ? `${props.nextLabel} in ` : "in "}
               </Text>
-              {/* Counts down by itself; iOS redraws it, not the app. */}
+              {/* Counts down by itself; iOS redraws it, not the app. A
+                  timer takes all the width it's offered, so it gets a fixed
+                  one (room for "10:00:00"), right-aligned. */}
               <Text
                 date={new Date(props.nextAt)}
                 dateStyle="timer"
-                modifiers={[mono(14, false), lineLimit(1)]}
+                modifiers={[
+                  mono(14, false),
+                  lineLimit(1),
+                  multilineTextAlignment("trailing"),
+                  frame({ width: 70, alignment: "trailing" }),
+                ]}
               />
             </HStack>
           ) : null}
@@ -92,6 +100,8 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
         spacing={0}
         modifiers={[
           padding({ vertical: 8 }),
+          // The box fills the rest of the widget's height.
+          frame({ maxHeight: 1000 }),
           strokeBorder({
             shape: "roundedRectangle",
             cornerRadius: 6,
