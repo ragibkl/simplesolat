@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Home screen layout (SpringBoard's IconState.plist) with simplesolat's
+     medium and small widgets and its icon on the first page. The workflow
+     writes it into the simulator before booting it, so no one has to add
+     the widgets by hand. Apps not listed go to the App Library. Taken from a
+     simulator where the widget was added through the gallery. -->
+<plist version="1.0">
+<dict>
+	<key>buttonBar</key>
+	<array>
+		<string>com.apple.mobilesafari</string>
+		<string>com.apple.MobileSMS</string>
+	</array>
+	<key>iconLists</key>
+	<array>
+		<array>
+			<dict>
+				<key>allowsExternalSuggestions</key>
+				<true/>
+				<key>allowsSuggestions</key>
+				<true/>
+				<key>bundleIdentifier</key>
+				<string>com.simplesolat.app.widgets</string>
+				<key>containerBundleIdentifier</key>
+				<string>com.simplesolat.app</string>
+				<key>displayIdentifier</key>
+				<string>620EA996-95A3-4189-9766-722BFDEBEB57</string>
+				<key>elementType</key>
+				<string>widget</string>
+				<key>gridSize</key>
+				<string>medium</string>
+				<key>iconType</key>
+				<string>custom</string>
+				<key>uniqueIdentifier</key>
+				<string>3D2D874F-47FD-475A-8AA1-F968FBCBD75B</string>
+				<key>widgetIdentifier</key>
+				<string>WaktuSolat</string>
+			</dict>
+			<dict>
+				<key>allowsExternalSuggestions</key>
+				<true/>
+				<key>allowsSuggestions</key>
+				<true/>
+				<key>bundleIdentifier</key>
+				<string>com.simplesolat.app.widgets</string>
+				<key>containerBundleIdentifier</key>
+				<string>com.simplesolat.app</string>
+				<key>displayIdentifier</key>
+				<string>620EA996-95A3-4189-9766-722BFDEBEB56</string>
+				<key>elementType</key>
+				<string>widget</string>
+				<key>gridSize</key>
+				<string>small</string>
+				<key>iconType</key>
+				<string>custom</string>
+				<key>uniqueIdentifier</key>
+				<string>3D2D874F-47FD-475A-8AA1-F968FBCBD75A</string>
+				<key>widgetIdentifier</key>
+				<string>WaktuSolat</string>
+			</dict>
+			<string>com.simplesolat.app</string>
+		</array>
+	</array>
+	<key>listUniqueIdentifiers</key>
+	<array>
+		<string>9DD1A509-45BB-4578-807A-DFF5F8A93455</string>
+	</array>
+</dict>
+</plist>

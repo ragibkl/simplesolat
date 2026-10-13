@@ -1,0 +1,17 @@
+# Home screen with the widgets (placed there by the workflow's home screen
+# layout). Opening the app first makes it reload the widgets, so iOS draws
+# them now instead of whenever it gets round to it.
+appId: com.simplesolat.app
+---
+- launchApp
+- extendedWaitUntil:
+    visible: ".*Source.*"
+    timeout: 30000
+- pressKey: home
+# A fixed pause (an optional wait for text that never appears) while the
+# widgets are drawn.
+- extendedWaitUntil:
+    visible: "pause-never-shown"
+    timeout: 15000
+    optional: true
+- takeScreenshot: ${MODE}-4-widgets
