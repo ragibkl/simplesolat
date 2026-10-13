@@ -136,11 +136,7 @@
               "displayName": "Waktu Solat",
               "description": "Today's prayer times, with the current one highlighted",
               "ios": {
-                "supportedFamilies": [
-                  "systemSmall",
-                  "systemMedium",
-                  "accessoryRectangular"
-                ]
+                "supportedFamilies": ["systemMedium", "accessoryRectangular"]
               }
             }
           ]

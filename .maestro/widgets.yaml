@@ -1,6 +1,8 @@
-# Home screen with the widgets (placed there by the workflow's home screen
-# layout). Opening the app first makes it reload the widgets, so iOS draws
-# them now instead of whenever it gets round to it.
+# Gets the home screen ready for the widget screenshot (the widget is placed
+# there by the workflow's home screen layout). Opening the app first makes it
+# reload the widgets, so iOS draws them now instead of whenever it gets round
+# to it. The workflow takes the screenshot after removing Maestro's driver
+# app, whose icon would otherwise be on the iPad's home screen.
 appId: com.simplesolat.app
 ---
 - launchApp
@@ -14,4 +16,3 @@ appId: com.simplesolat.app
     visible: "pause-never-shown"
     timeout: 15000
     optional: true
-- takeScreenshot: ${MODE}-4-widgets
