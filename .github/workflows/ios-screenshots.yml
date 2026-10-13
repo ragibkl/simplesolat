@@ -179,7 +179,8 @@ jobs:
           fi
           # Widgets: write a home screen layout with them already in place
           # (.maestro/home-screen.plist), then restart the simulator. The app
-          # has run above, so the widgets have times to show.
+          # has run above, so the widgets have times to show; widgets.yaml
+          # opens it again so they're drawn, then takes the screenshots.
           sb=~/Library/Developer/CoreSimulator/Devices/$udid/data/Library/SpringBoard
           xcrun simctl shutdown "$udid"
           mkdir -p "$sb"
@@ -190,13 +191,10 @@ jobs:
             --dataNetwork wifi --wifiMode active --wifiBars 3 \
             --cellularMode active --cellularBars 4 \
             --batteryState charged --batteryLevel 100
-          # iOS draws the widgets a while after booting (blank before that).
           xcrun simctl ui "$udid" appearance light
-          sleep 60
-          xcrun simctl io "$udid" screenshot "$out/light-4-widgets.png"
+          flow widgets.yaml light || true
           xcrun simctl ui "$udid" appearance dark
-          sleep 20
-          xcrun simctl io "$udid" screenshot "$out/dark-4-widgets.png"
+          flow widgets.yaml dark || true
 
           # Maestro saves takeScreenshot files in its output folder.
           find maestro-out -path '*takeScreenshot*' -name '*.png' -exec cp {} "$out/" \;
