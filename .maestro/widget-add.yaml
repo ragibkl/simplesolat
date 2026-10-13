@@ -1,13 +1,17 @@
 # Adding a widget, part 2 (iPhone): taps the search result at ROW ("x,y", from
 # the workflow), picks SIZE (small or medium) and adds it to the home screen.
 # The gallery isn't in the accessibility tree either, so its swipe and its
-# Add Widget button (bottom of the sheet) go by position.
+# Add Widget button (bottom of the sheet) go by position, and the waits are
+# fixed pauses (an optional wait for text that never appears).
 appId: com.apple.springboard
 ---
 - tapOn:
     point: ${ROW}
     retryTapIfNoChange: false
-- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "pause-never-shown"
+    timeout: 3000
+    optional: true
 - takeScreenshot: widget-${SIZE}-2-sizes
 # Small comes first; swipe once for medium.
 - runFlow:
@@ -17,11 +21,23 @@ appId: com.apple.springboard
       - swipe:
           start: "80%,55%"
           end: "20%,55%"
-      - waitForAnimationToEnd
+      - extendedWaitUntil:
+          visible: "pause-never-shown"
+          timeout: 3000
+          optional: true
 - takeScreenshot: widget-${SIZE}-3-chosen
 - tapOn:
     point: "50%,91%"
     retryTapIfNoChange: false
-- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "pause-never-shown"
+    timeout: 3000
+    optional: true
+- takeScreenshot: widget-${SIZE}-4-added
 # Leaves editing.
+- tapOn:
+    text: "Done"
+    optional: true
+    retryTapIfNoChange: false
 - pressKey: home
+- takeScreenshot: widget-${SIZE}-5-home

@@ -213,6 +213,15 @@ jobs:
             flow home.yaml dark || true
           fi
 
+          # The home screen layout files, for pre-loading a layout with the
+          # widgets already in place.
+          sb=~/Library/Developer/CoreSimulator/Devices/$udid/data/Library/SpringBoard
+          mkdir -p "$out/springboard"
+          ls -la "$sb" || true
+          for f in "$sb"/*.plist; do
+            [ -f "$f" ] && plutil -convert xml1 -o "$out/springboard/$(basename "$f")" "$f"
+          done
+
           # Maestro saves takeScreenshot files in its output folder.
           find maestro-out -path '*takeScreenshot*' -name '*.png' -exec cp {} "$out/" \;
           for f in "$out"/*.png; do
