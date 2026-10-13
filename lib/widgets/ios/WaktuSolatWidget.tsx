@@ -75,20 +75,24 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
             {props.place}
           </Text>
           {props.nextAt > 0 ? (
-            // One text, so it stays right-aligned as the countdown changes
-            // length ("1:10:29", "29:34"). The timer counts down by itself:
-            // iOS redraws it, not the app.
-            <Text
-              modifiers={[
-                mono(14, false),
-                lineLimit(1),
-                multilineTextAlignment("trailing"),
-                frame({ maxWidth: 1000, alignment: "trailing" }),
-              ]}
-            >
-              <Text>{now ? `${props.nextLabel} in ` : "in "}</Text>
-              <Text date={new Date(props.nextAt)} dateStyle="timer" />
-            </Text>
+            // "29:34 to Isha". The timer counts down by itself (iOS redraws
+            // it, not the app) and takes all the width it's offered, so it
+            // goes first, right-aligned: the digits then sit next to the
+            // label whatever their length. (A label before it left a gap.)
+            <HStack spacing={0}>
+              <Text
+                date={new Date(props.nextAt)}
+                dateStyle="timer"
+                modifiers={[
+                  mono(14, false),
+                  lineLimit(1),
+                  multilineTextAlignment("trailing"),
+                ]}
+              />
+              <Text modifiers={[mono(14, false), lineLimit(1)]}>
+                {` to ${props.nextLabel}`}
+              </Text>
+            </HStack>
           ) : null}
         </VStack>
       </HStack>
