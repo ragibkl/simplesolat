@@ -1,5 +1,5 @@
-# Builds simplesolat for the iOS simulator, opens its screens and adds its
-# widget on an iPhone 6.9" and an iPad 13", and uploads the screenshots (App
+# Builds simplesolat for the iOS simulator, opens its screens on an iPhone
+# 6.9" and an iPad 13" and adds its widgets (small, medium) on the iPhone, and uploads the screenshots (App
 # Store sizes, 9:41 status bar, light and dark). Also a smoke test: it fails
 # if the app doesn't open to its prayer times.
 #
@@ -37,27 +37,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The built app, keyed on everything that goes into it: a change to
+      # the flows or this workflow alone reuses it.
+      - uses: actions/cache@v4
+        id: app
+        with:
+          path: simplesolat-app.zip
+          key: simulator-app-${{ hashFiles('app/**', 'lib/**', 'modules/**', 'plugins/**', 'patches/**', 'assets/**', 'index.ts', 'app.json', 'package-lock.json') }}
+
       - uses: actions/setup-node@v4
+        if: steps.app.outputs.cache-hit != 'true'
         with:
           node-version: lts/*
           cache: npm
 
       - run: npm ci
+        if: steps.app.outputs.cache-hit != 'true'
 
       - name: Generate the iOS project
+        if: steps.app.outputs.cache-hit != 'true'
         run: npx expo prebuild --platform ios --no-install
 
       - uses: actions/cache@v4
+        if: steps.app.outputs.cache-hit != 'true'
         with:
           path: ios/Pods
           key: pods-${{ runner.os }}-${{ hashFiles('package-lock.json', 'app.json') }}
 
       - run: cd ios && pod install
+        if: steps.app.outputs.cache-hit != 'true'
 
       # Release, so the JavaScript is bundled into the app. Signed ad hoc ("-")
       # rather than not at all, so the app and widget keep their app group
       # entitlement and share the prayer times.
       - name: Build for the simulator
+        if: steps.app.outputs.cache-hit != 'true'
         run: |
           set -o pipefail
           xcodebuild -workspace ios/simplesolat.xcworkspace -scheme simplesolat \
@@ -80,7 +94,7 @@ jobs:
     needs: build
     if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped')
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -89,6 +103,8 @@ jobs:
             device: "iPhone 17 Pro Max"
           - name: ipad-13
             device: "iPad Pro 13-inch \\(M5\\).*"
+            # On iPad, Maestro's driver hangs once the widget gallery opens.
+            no_widget: true
     steps:
       - uses: actions/checkout@v4
 
@@ -110,6 +126,7 @@ jobs:
           NAME: ${{ matrix.name }}
           DEVICE: ${{ matrix.device }}
           ONLY: ${{ inputs.only || 'all' }}
+          NO_WIDGET: ${{ matrix.no_widget }}
           # Maestro's XCTest driver can be slow to start on shared runners.
           MAESTRO_DRIVER_STARTUP_TIMEOUT: "180000"
           MAESTRO_CLI_NO_ANALYTICS: "1"
@@ -188,11 +205,13 @@ jobs:
             flow screens.yaml dark || true
             xcrun simctl ui "$udid" appearance light
           fi
-          # Added in this order, medium ends up above small.
-          add_widget small && add_widget medium || true
-          flow home.yaml light || true
-          xcrun simctl ui "$udid" appearance dark
-          flow home.yaml dark || true
+          if [ "$NO_WIDGET" != true ]; then
+            # Added in this order, medium ends up above small.
+            add_widget small && add_widget medium || true
+            flow home.yaml light || true
+            xcrun simctl ui "$udid" appearance dark
+            flow home.yaml dark || true
+          fi
 
           # Maestro saves takeScreenshot files in its output folder.
           find maestro-out -path '*takeScreenshot*' -name '*.png' -exec cp {} "$out/" \;
