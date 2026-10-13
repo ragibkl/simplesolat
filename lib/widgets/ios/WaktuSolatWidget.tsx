@@ -60,27 +60,29 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
   const now = props.nowLabel !== "";
   return (
     <VStack spacing={8}>
-      <HStack alignment="top">
-        <VStack alignment="leading" spacing={0}>
+      <VStack spacing={0}>
+        <HStack>
           <Text modifiers={[mono(11, false), lineLimit(1), secondary]}>
             {now ? "Now" : "Next"}
           </Text>
-          <Text modifiers={[mono(26, true), lineLimit(1)]}>
-            {now ? props.nowLabel : props.nextLabel}
-          </Text>
-        </VStack>
-        <Spacer />
-        <VStack alignment="trailing" spacing={4}>
+          <Spacer />
           <Text modifiers={[mono(11, false), lineLimit(1), secondary]}>
             {props.place}
           </Text>
+        </HStack>
+        {/* The prayer and the countdown share a baseline. */}
+        <HStack alignment="firstTextBaseline">
+          <Text modifiers={[mono(26, true), lineLimit(1)]}>
+            {now ? props.nowLabel : props.nextLabel}
+          </Text>
+          <Spacer />
           {props.nextAt > 0 ? (
             // "6 min, 48 sec to Isha", "1 hr, 10 min to Isha": iOS's words
             // (in the phone's language), counting down by itself, so the app
             // doesn't redraw it. It takes all the width it's offered, so it
             // goes first, right-aligned, and sits next to the label at any
             // length. (Label first left a gap; a joined text didn't render.)
-            <HStack spacing={0}>
+            <HStack alignment="firstTextBaseline" spacing={0}>
               <Text
                 date={new Date(props.nextAt)}
                 dateStyle="relative"
@@ -95,8 +97,8 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
               </Text>
             </HStack>
           ) : null}
-        </VStack>
-      </HStack>
+        </HStack>
+      </VStack>
       <HStack
         spacing={0}
         modifiers={[
