@@ -81,7 +81,8 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
               </Text>
               {/* Counts down by itself; iOS redraws it, not the app. A
                   timer takes all the width it's offered, so it gets a fixed
-                  one (room for "10:00:00"), right-aligned. */}
+                  one (room for "9:59:59": Isha to Fajr is under 10 hours in
+                  Malaysia), right-aligned. */}
               <Text
                 date={new Date(props.nextAt)}
                 dateStyle="timer"
@@ -89,7 +90,7 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
                   mono(14, false),
                   lineLimit(1),
                   multilineTextAlignment("trailing"),
-                  frame({ width: 70, alignment: "trailing" }),
+                  frame({ width: 62, alignment: "trailing" }),
                 ]}
               />
             </HStack>
