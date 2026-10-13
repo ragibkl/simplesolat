@@ -75,11 +75,11 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
             {props.place}
           </Text>
           {props.nextAt > 0 ? (
-            // "6 min, 48 sec to Isha" / "1 hr, 10 min to Isha" (iOS's words,
-            // in the phone's language). The timer counts down by itself (iOS redraws
-            // it, not the app) and takes all the width it's offered, so it
-            // goes first, right-aligned: the digits then sit next to the
-            // label whatever their length. (A label before it left a gap.)
+            // "6 min, 48 sec to Isha", "1 hr, 10 min to Isha": iOS's words
+            // (in the phone's language), counting down by itself, so the app
+            // doesn't redraw it. It takes all the width it's offered, so it
+            // goes first, right-aligned, and sits next to the label at any
+            // length. (Label first left a gap; a joined text didn't render.)
             <HStack spacing={0}>
               <Text
                 date={new Date(props.nextAt)}
