@@ -1,5 +1,5 @@
 # Builds simplesolat for the iOS simulator, opens its screens on an iPhone
-# 6.9" and an iPad 13" with its widgets (small, medium) on the home screen, and uploads the screenshots (App
+# 6.9" and an iPad 13" with its medium widget on the home screen, and uploads the screenshots (App
 # Store sizes, 9:41 status bar, light and dark). Also a smoke test: it fails
 # if the app doesn't open to its prayer times.
 #
