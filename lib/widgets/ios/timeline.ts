@@ -14,6 +14,11 @@ export type IosWidgetProps = {
   active: number;
   // The next prayer, for the Lock Screen widget.
   next: string;
+  // For the medium widget's header: the current prayer ("" between prayers),
+  // and the next one's name and start (epoch ms) for a live countdown.
+  nowLabel: string;
+  nextLabel: string;
+  nextAt: number;
 };
 
 export type IosWidgetEntry = { date: Date; props: IosWidgetProps };
@@ -71,16 +76,23 @@ export function buildTimeline(
       const active = cols.findIndex(
         (c) => c.start * 1000 <= t && (c.end === undefined || t < c.end * 1000),
       );
-      const upcoming = cols.find((c) => c.start * 1000 > t);
+      const upcoming = cols.find((c) => c.start * 1000 > t) ?? firstTomorrow;
       const next = upcoming
         ? `${upcoming.label} ${timeText(upcoming.start)}`
-        : firstTomorrow
-          ? `${firstTomorrow.label} ${timeText(firstTomorrow.start)}`
-          : "";
+        : "";
 
       entries.push({
         date: new Date(Math.max(t, Math.min(now, nextMoment))),
-        props: { dateText, place, columns, active, next },
+        props: {
+          dateText,
+          place,
+          columns,
+          active,
+          next,
+          nowLabel: active >= 0 ? cols[active].label : "",
+          nextLabel: upcoming?.label ?? "",
+          nextAt: upcoming ? upcoming.start * 1000 : 0,
+        },
       });
     });
   });
