@@ -94,6 +94,10 @@ function PermissionRow(props: { check: PermissionCheck; onFix: () => void }) {
 export default function SettingsScreen() {
   const { color, backgroundColor, colorScheme } = useMonoStyle();
   const offTrackColor = colorScheme === "dark" ? "#555555" : "#BDBDBD";
+  // iOS 26 ignores thumbColor and always draws a white knob, which vanished
+  // on the white "on" track in dark mode: use light grey there instead.
+  const onTrackColor =
+    Platform.OS === "ios" && colorScheme === "dark" ? "#A0A0A0" : color;
   const { settings } = useSettings();
   const [checks, setChecks] = useState<PermissionCheck[]>([]);
   const [testSent, setTestSent] = useState(false);
@@ -168,7 +172,7 @@ export default function SettingsScreen() {
             <Switch
               value={settings.notifications[prayer.key]}
               onValueChange={(value) => toggleNotification(prayer.key, value)}
-              trackColor={{ true: color, false: offTrackColor }}
+              trackColor={{ true: onTrackColor, false: offTrackColor }}
               thumbColor={backgroundColor}
             />
           </View>
@@ -230,7 +234,7 @@ export default function SettingsScreen() {
                 onValueChange={(value) =>
                   update({ ...settings, pinnedNotification: value })
                 }
-                trackColor={{ true: color, false: offTrackColor }}
+                trackColor={{ true: onTrackColor, false: offTrackColor }}
                 thumbColor={backgroundColor}
               />
             </View>
