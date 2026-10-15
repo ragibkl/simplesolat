@@ -177,7 +177,15 @@ object PinnedPrayers {
     val intent = refreshIntent(context, 1)
     val exact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms.canScheduleExactAlarms()
     if (exact) {
-      alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next, intent)
+      // An alarm clock, like the prayer reminders (notifee SET_ALARM_CLOCK):
+      // Android fires those on time even when the phone is idle. An exact
+      // "allow while idle" alarm is rate-limited then, and the reminder
+      // firing at the same moment used up the allowance, so the redraw came
+      // minutes late (bold stuck on the last prayer, countdown below zero).
+      val show = context.packageManager.getLaunchIntentForPackage(context.packageName)?.let {
+        PendingIntent.getActivity(context, 3, it, PendingIntent.FLAG_IMMUTABLE)
+      }
+      alarms.setAlarmClock(AlarmManager.AlarmClockInfo(next, show), intent)
     } else {
       alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next, intent)
     }
