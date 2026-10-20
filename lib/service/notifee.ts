@@ -4,6 +4,7 @@ import notifee, {
   AuthorizationStatus,
   TriggerType,
 } from "@notifee/react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 
 import { loadSettings } from "@/lib/data/settingsStore";
@@ -153,6 +154,18 @@ async function scheduleNudge(epochMs: number) {
   );
 }
 
+const TRIGGERS_RESET_KEY = "NOTIFEE_TRIGGERS_RESET_V1";
+
+async function resetStoredTriggersOnce() {
+  try {
+    if (await AsyncStorage.getItem(TRIGGERS_RESET_KEY)) return;
+    await notifee.cancelTriggerNotifications();
+    await AsyncStorage.setItem(TRIGGERS_RESET_KEY, "1");
+  } catch {
+    // Try again next time.
+  }
+}
+
 // Schedules reminders for the given days (Android: today, rescheduled by the
 // background task; iOS: up to about 12 days, since background runs are rare)
 // and cancels any others.
@@ -207,14 +220,18 @@ export async function scheduleAllWaktuSolatNotifications(
       : null;
   const wantedNudge = nudgeAt === null ? null : nudgeId(nudgeAt);
 
+  // Once per install, cancel every stored reminder and schedule afresh:
+  // notifee crashed reading one stored by an older version
+  // (BadParcelableException in NotificationModel when it fired).
+  await resetStoredTriggersOnce();
+
   // Only read the ids. getTriggerNotifications() unparcels every stored
   // notification, which crashes the app when one can't be read back.
   const ids = await notifee.getTriggerNotificationIds();
   const existing = new Set<string>();
   for (const id of ids) {
-    if (!id.startsWith(`${WAKTU_SOLAT_CHANNEL}::`)) {
-      continue;
-    }
+    // Anything not wanted goes, including ids in an older format: the app
+    // schedules nothing else.
     if (wanted.has(id) || id === wantedNudge) {
       existing.add(id);
     } else {

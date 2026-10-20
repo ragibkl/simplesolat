@@ -1,0 +1,40 @@
+diff --git a/node_modules/react-native-android-widget/android/src/main/java/com/reactnativeandroidwidget/oss/HeadlessJsTaskWorker.java b/node_modules/react-native-android-widget/android/src/main/java/com/reactnativeandroidwidget/oss/HeadlessJsTaskWorker.java
+index 867f716..fb8fae6 100644
+--- a/node_modules/react-native-android-widget/android/src/main/java/com/reactnativeandroidwidget/oss/HeadlessJsTaskWorker.java
++++ b/node_modules/react-native-android-widget/android/src/main/java/com/reactnativeandroidwidget/oss/HeadlessJsTaskWorker.java
+@@ -56,13 +56,29 @@ public abstract class HeadlessJsTaskWorker extends ListenableWorker implements H
+     @Override
+     public ListenableFuture<Result> startWork() {
+         return CallbackToFutureAdapter.getFuture(completer -> {
+-            HeadlessJsTaskConfig taskConfig = this.getTaskConfig(this.getInputData());
+             mCompleter = completer;
+-            if (taskConfig != null) {
+-                this.startTask(taskConfig);
+-            } else {
+-                mCompleter.set(Result.failure());
+-            }
++            // startWork runs on the main thread. Building the task config
++            // creates React Native maps, and the first one loads React
++            // Native's native libraries, which took long enough on slow phones
++            // for Android to report the app as not responding. Build it on the
++            // worker's background executor, then start the task on the main
++            // thread as before.
++            getBackgroundExecutor().execute(() -> {
++                HeadlessJsTaskConfig taskConfig;
++                try {
++                    taskConfig = this.getTaskConfig(this.getInputData());
++                } catch (Exception e) {
++                    taskConfig = null;
++                }
++                final HeadlessJsTaskConfig config = taskConfig;
++                UiThreadUtil.runOnUiThread(() -> {
++                    if (config != null) {
++                        this.startTask(config);
++                    } else {
++                        mCompleter.set(Result.failure());
++                    }
++                });
++            });
+             return "";
+         });
+     }

@@ -1,8 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { startOfMinute } from "date-fns";
-import { Platform } from "react-native";
+import { Appearance, Platform } from "react-native";
+
+import { loadSettings } from "@/lib/data/settingsStore";
 
 import { WaktuSolat } from "@/lib/domain/prayerTime";
-import { Zone } from "@/lib/domain/zone";
+import { getZoneCode, Zone } from "@/lib/domain/zone";
 import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
 import { requestWaktuSolatCompactUpdate } from "@/lib/widgets/WaktuSolatCompact";
 import { requestWaktuSolatImsakWidgetUpdate } from "@/lib/widgets/WaktuSolatImsak";
@@ -15,11 +18,44 @@ import { updatePinnedNotification } from "./pinnedNotification";
 import { getPrayerData } from "./prayerData";
 import { getUpcomingWaktuSolat } from "./waktuSolat";
 
+const LAST_WIDGETS_KEY = "ANDROID_WIDGETS_LAST_REQUEST";
+
+// What the Android widgets show: the day, the zone, its times, which of the
+// day's times have passed (so the bold moves), the widget settings and light
+// or dark. Each widget update starts a background job that loads React
+// Native, which made slow phones report "not responding"; the app and the
+// background task asked every few minutes although this changes only a few
+// times a day. Android's own periodic update (updatePeriodMillis) still
+// redraws them regardless, as a fallback.
+async function widgetsKey(date: Date, zone: Zone, waktuSolat: WaktuSolat) {
+  const now = date.getTime() / 1000;
+  const times = Object.values(waktuSolat.prayerTime).filter(
+    (t): t is number => typeof t === "number",
+  );
+  const { widgetExtraTime, widgetExtraTimeChosen } = await loadSettings();
+  return JSON.stringify([
+    date.toDateString(),
+    getZoneCode(zone),
+    waktuSolat.prayerTime,
+    times.filter((t) => t <= now).length,
+    widgetExtraTime,
+    widgetExtraTimeChosen ?? null,
+    Appearance.getColorScheme() ?? null,
+  ]);
+}
+
 export async function requestUpdateWaktuSolatWidgets(
   date: Date,
   zone: Zone,
   waktuSolat: WaktuSolat,
+  force = false,
 ) {
+  if (Platform.OS !== "android") return;
+  const key = await widgetsKey(date, zone, waktuSolat);
+  if (!force && (await AsyncStorage.getItem(LAST_WIDGETS_KEY)) === key) {
+    return;
+  }
+  await AsyncStorage.setItem(LAST_WIDGETS_KEY, key);
   await Promise.all([
     requestWaktuSolatWidgetUpdate(date, zone, waktuSolat.prayerTime),
     requestWaktuSolatCompactUpdate(date, zone, waktuSolat.prayerTime),
