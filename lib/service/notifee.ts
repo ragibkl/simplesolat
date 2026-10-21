@@ -166,13 +166,39 @@ async function resetStoredTriggersOnce() {
   }
 }
 
+function isToday(waktuSolat: WaktuSolat): boolean {
+  const now = new Date();
+  return (
+    waktuSolat.year === now.getFullYear() &&
+    waktuSolat.month === now.getMonth() + 1 &&
+    waktuSolat.date === now.getDate()
+  );
+}
+
+// Runs one at a time: the app, the background task and the widgets can all
+// ask at once (around midnight especially), and overlapping runs cancelled
+// each other's reminders.
+let scheduling: Promise<void> = Promise.resolve();
+
 // Schedules reminders for the given days (Android: today, rescheduled by the
 // background task; iOS: up to about 12 days, since background runs are rare)
 // and cancels any others.
-export async function scheduleAllWaktuSolatNotifications(
+export function scheduleAllWaktuSolatNotifications(
   days: WaktuSolat[],
   zone: Zone,
-) {
+): Promise<void> {
+  const run = scheduling.then(() => scheduleAll(days, zone));
+  scheduling = run.catch(() => {});
+  return run;
+}
+
+async function scheduleAll(days: WaktuSolat[], zone: Zone) {
+  // Times for another day (state not yet updated after midnight) would make
+  // today's reminders look unwanted. The next run has the right day.
+  if (days.length === 0 || !isToday(days[0])) {
+    return;
+  }
+
   const settings = await notifee.getNotificationSettings();
   if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
     return;
@@ -228,17 +254,10 @@ export async function scheduleAllWaktuSolatNotifications(
   // Only read the ids. getTriggerNotifications() unparcels every stored
   // notification, which crashes the app when one can't be read back.
   const ids = await notifee.getTriggerNotificationIds();
-  const existing = new Set<string>();
-  for (const id of ids) {
-    // Anything not wanted goes, including ids in an older format: the app
-    // schedules nothing else.
-    if (wanted.has(id) || id === wantedNudge) {
-      existing.add(id);
-    } else {
-      await notifee.cancelTriggerNotification(id);
-    }
-  }
+  const existing = new Set(ids);
 
+  // Schedule first, cancel after: a run cut short (background time limit)
+  // then leaves extra reminders rather than missing ones.
   for (const [id, { waktuSolat, waktu }] of wanted) {
     if (!existing.has(id)) {
       await scheduleWaktuSolatNotification(waktuSolat, zone, waktu);
@@ -246,5 +265,13 @@ export async function scheduleAllWaktuSolatNotifications(
   }
   if (nudgeAt !== null && wantedNudge && !existing.has(wantedNudge)) {
     await scheduleNudge(nudgeAt);
+  }
+
+  // Anything not wanted goes, including ids in an older format: the app
+  // schedules nothing else.
+  for (const id of ids) {
+    if (!wanted.has(id) && id !== wantedNudge) {
+      await notifee.cancelTriggerNotification(id);
+    }
   }
 }
