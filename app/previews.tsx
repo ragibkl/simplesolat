@@ -1,3 +1,4 @@
+import { Redirect } from "expo-router";
 import { View } from "react-native";
 import { WidgetPreview } from "react-native-android-widget";
 
@@ -14,6 +15,13 @@ import { WaktuSolatCompact } from "@/lib/widgets/WaktuSolatCompact";
 import { WaktuSolatTransparent } from "@/lib/widgets/WaktuSolatTransparent";
 
 export default function Index() {
+  // A developer screen (linked from the home screen in development builds
+  // only). In release builds it isn't a feature, so it goes back home.
+  if (!__DEV__) return <Redirect href="/" />;
+  return <Previews />;
+}
+
+function Previews() {
   useWaktuSolatWidgetUpdate();
 
   const { date } = useCurrentDate();
