@@ -1,9 +1,17 @@
+import { useEffect, useRef } from "react";
 import { View } from "react-native";
+import Animated, {
+  Easing,
+  type SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
 import { useMonoStyle } from "@/lib/components/monoui";
-import { useCompass } from "@/lib/hooks/compass";
+import { FINE_HEADING, useCompass } from "@/lib/hooks/compass";
 
 function CompassArrow(props: { rotation: number }) {
   const { color } = useMonoStyle();
@@ -61,13 +69,45 @@ function CompassRing(props: { children: React.ReactNode }) {
   );
 }
 
+// Android reports the heading only a few times a second, in steps of about
+// 2 degrees (expo-location), so setting the rotation directly looked jerky.
+// Each new heading starts a short glide on the UI thread instead, taking the
+// short way round (359 -> 1 turns 2 degrees, not 358).
+// Shorter when headings come often in small steps (iOS, our Android module).
+const GLIDE_MS = FINE_HEADING ? 80 : 180;
+
+function useSmoothHeading(heading: number | null): SharedValue<number> {
+  // Unwrapped (can go past 360) so the glide never spins the long way.
+  const target = useRef<number | null>(null);
+  const smooth = useSharedValue(0);
+  useEffect(() => {
+    if (heading == null) return;
+    if (target.current == null) {
+      // First reading: start there, no glide from 0.
+      target.current = heading;
+      smooth.value = heading;
+      return;
+    }
+    const delta = ((heading - target.current + 540) % 360) - 180;
+    target.current += delta;
+    smooth.value = withTiming(target.current, {
+      duration: GLIDE_MS,
+      easing: Easing.out(Easing.quad),
+    });
+  }, [heading, smooth]);
+  return smooth;
+}
+
 function CardinalLabel(props: {
   label: string;
   rotation: number;
-  heading: number;
+  heading: SharedValue<number>;
 }) {
   const { color } = useMonoStyle();
-  const textRotation = props.heading - props.rotation;
+  // Counter-rotate so the letter stays upright as the dial turns.
+  const upright = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${props.heading.value - props.rotation}deg` }],
+  }));
   return (
     <View
       style={{
@@ -79,22 +119,19 @@ function CardinalLabel(props: {
         transform: [{ rotate: `${props.rotation}deg` }],
       }}
     >
-      <MonoText
-        style={{
-          fontSize: 22,
-          color,
-          marginTop: 2,
-          transform: [{ rotate: `${textRotation}deg` }],
-        }}
-      >
-        {props.label}
-      </MonoText>
+      <Animated.View style={[{ marginTop: 2 }, upright]}>
+        <MonoText style={{ fontSize: 22, color }}>{props.label}</MonoText>
+      </Animated.View>
     </View>
   );
 }
 
 export default function Compass() {
   const compass = useCompass();
+  const smoothHeading = useSmoothHeading(compass.heading);
+  const dial = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${-smoothHeading.value}deg` }],
+  }));
 
   if (!compass.ready) {
     const { noCompass, qiblaBearing } = compass;
@@ -149,21 +186,15 @@ export default function Compass() {
           </MonoText>
         </View>
 
-        <View
-          style={{
-            position: "relative",
-            marginTop: 20,
-            transform: [{ rotate: `${-heading}deg` }],
-          }}
-        >
+        <Animated.View style={[{ position: "relative", marginTop: 20 }, dial]}>
           <CompassRing>
             <CompassArrow rotation={qiblaBearing} />
           </CompassRing>
-          <CardinalLabel label="N" rotation={0} heading={heading} />
-          <CardinalLabel label="E" rotation={90} heading={heading} />
-          <CardinalLabel label="S" rotation={180} heading={heading} />
-          <CardinalLabel label="W" rotation={270} heading={heading} />
-        </View>
+          <CardinalLabel label="N" rotation={0} heading={smoothHeading} />
+          <CardinalLabel label="E" rotation={90} heading={smoothHeading} />
+          <CardinalLabel label="S" rotation={180} heading={smoothHeading} />
+          <CardinalLabel label="W" rotation={270} heading={smoothHeading} />
+        </Animated.View>
       </View>
     </MonoScrollPage>
   );
