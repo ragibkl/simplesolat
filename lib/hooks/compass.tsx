@@ -1,5 +1,8 @@
 import * as Location from "expo-location";
 import { useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
+
+import CompassHeading from "@/modules/compass-heading";
 
 import { useLocation } from "@/lib/hooks/location";
 
@@ -50,10 +53,25 @@ type HeadingData = {
   accuracy: Accuracy;
 };
 
+// Android: our own module reads the fused rotation vector sensor (smooth, about
+// 30 updates a second). expo-location's Android heading comes a few times a
+// second in 2-degree steps; it stays as the fallback and on iOS, where it's
+// already smooth.
+const nativeCompass =
+  Platform.OS === "android" && CompassHeading?.isAvailable()
+    ? CompassHeading
+    : null;
+
+// Whether headings arrive often and in small steps (the dial can glide quickly).
+export const FINE_HEADING = Platform.OS === "ios" || nativeCompass != null;
+
 // Many tablets have no compass sensor: no heading ever arrives.
 const NO_COMPASS_AFTER_MS = 6000;
 
-function useHeading(): { data: HeadingData | null; noCompass: boolean } {
+function useHeading(location: Location.LocationObject | null): {
+  data: HeadingData | null;
+  noCompass: boolean;
+} {
   const [data, setData] = useState<HeadingData | null>(null);
   const [noCompass, setNoCompass] = useState(false);
   const smoothed = useRef<number | null>(null);
@@ -63,6 +81,23 @@ function useHeading(): { data: HeadingData | null; noCompass: boolean } {
     const timer = setTimeout(() => {
       if (smoothed.current == null) setNoCompass(true);
     }, NO_COMPASS_AFTER_MS);
+
+    if (nativeCompass) {
+      const sub = nativeCompass.addListener("onHeading", (update) => {
+        smoothed.current = update.heading;
+        setNoCompass(false);
+        setData({
+          heading: update.heading,
+          accuracy: getAccuracyLabel(update.accuracy),
+        });
+      });
+      nativeCompass.start();
+      return () => {
+        clearTimeout(timer);
+        nativeCompass.stop();
+        sub.remove();
+      };
+    }
 
     async function start() {
       subscription = await Location.watchHeadingAsync((update) => {
@@ -91,6 +126,15 @@ function useHeading(): { data: HeadingData | null; noCompass: boolean } {
     };
   }, []);
 
+  // True north needs the declination where the phone is.
+  const latitude = location?.coords.latitude;
+  const longitude = location?.coords.longitude;
+  useEffect(() => {
+    if (nativeCompass && latitude != null && longitude != null) {
+      nativeCompass.setLocation(latitude, longitude);
+    }
+  }, [latitude, longitude]);
+
   return { data, noCompass };
 }
 
@@ -114,7 +158,7 @@ export type CompassData =
 
 export function useCompass(): CompassData {
   const { location } = useLocation();
-  const { data: headingData, noCompass } = useHeading();
+  const { data: headingData, noCompass } = useHeading(location);
   const qiblaBearing =
     location == null
       ? null

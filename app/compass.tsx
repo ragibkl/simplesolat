@@ -11,7 +11,7 @@ import Animated, {
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
 import { useMonoStyle } from "@/lib/components/monoui";
-import { useCompass } from "@/lib/hooks/compass";
+import { FINE_HEADING, useCompass } from "@/lib/hooks/compass";
 
 function CompassArrow(props: { rotation: number }) {
   const { color } = useMonoStyle();
@@ -73,7 +73,8 @@ function CompassRing(props: { children: React.ReactNode }) {
 // 2 degrees (expo-location), so setting the rotation directly looked jerky.
 // Each new heading starts a short glide on the UI thread instead, taking the
 // short way round (359 -> 1 turns 2 degrees, not 358).
-const GLIDE_MS = 180;
+// Shorter when headings come often in small steps (iOS, our Android module).
+const GLIDE_MS = FINE_HEADING ? 80 : 180;
 
 function useSmoothHeading(heading: number | null): SharedValue<number> {
   // Unwrapped (can go past 360) so the glide never spins the long way.
