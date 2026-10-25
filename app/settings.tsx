@@ -22,7 +22,7 @@ const PRAYERS: { key: keyof PrayerTime; label: string; note?: string }[] = [
   { key: "imsak", label: "Imsak" },
   { key: "fajr", label: "Fajr" },
   { key: "syuruk", label: "Syuruk" },
-  { key: "dhuha", label: "Dhuha", note: "Malaysia and Brunei only" },
+  { key: "dhuha", label: "Dhuha", note: "Malaysia, Brunei and Indonesia only" },
   { key: "dhuhr", label: "Dhuhr" },
   { key: "asr", label: "Asr" },
   { key: "maghrib", label: "Maghrib" },
@@ -182,8 +182,9 @@ export default function SettingsScreen() {
           <SectionTitle>Widget</SectionTitle>
           <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
             Extra time shown on the Waktu Solat widgets, next to the five
-            prayers. None shows only the five prayers. Dhuha is for Malaysia and
-            Brunei only; elsewhere the widget shows the five prayers.
+            prayers. None shows only the five prayers. Dhuha is for Malaysia,
+            Brunei and Indonesia only; elsewhere the widget shows the five
+            prayers.
           </MonoText>
           {WIDGET_EXTRA_TIMES.map((option) => (
             <Pressable

@@ -1,5 +1,5 @@
 import { WidgetExtraTime } from "@/lib/data/settingsStore";
-import { PrayerTime } from "@/lib/domain/prayerTime";
+import { getSyurukEnd, PrayerTime } from "@/lib/domain/prayerTime";
 
 export type WidgetColumn = { label: string; start: number; end?: number };
 
@@ -29,7 +29,7 @@ export function getWidgetColumns(
   } else {
     head = [
       { label: "Fajr", start: fajr, end: syuruk },
-      { label: "Syuruk", start: syuruk, end: dhuhr },
+      { label: "Syuruk", start: syuruk, end: getSyurukEnd(prayerTime) },
     ];
   }
 

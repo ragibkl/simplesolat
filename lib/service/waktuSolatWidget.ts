@@ -4,13 +4,14 @@ import { Appearance, Platform } from "react-native";
 
 import { loadSettings } from "@/lib/data/settingsStore";
 
-import { WaktuSolat } from "@/lib/domain/prayerTime";
+import { getSyurukEnd, PrayerTime, WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, Zone } from "@/lib/domain/zone";
 import { requestWaktuSolatWidgetUpdate } from "@/lib/widgets/WaktuSolat";
 import { requestWaktuSolatCompactUpdate } from "@/lib/widgets/WaktuSolatCompact";
 import { requestWaktuSolatImsakWidgetUpdate } from "@/lib/widgets/WaktuSolatImsak";
 import { requestWaktuSolatTransparentUpdate } from "@/lib/widgets/WaktuSolatTransparent";
 import { updateIosWidgets } from "@/lib/widgets/ios/updateIosWidgets";
+import WidgetRefresh from "@/modules/widget-refresh";
 
 import { scheduleAllWaktuSolatNotifications } from "./notifee";
 import { GetLocationOptions } from "./location";
@@ -19,6 +20,14 @@ import { getPrayerData } from "./prayerData";
 import { getUpcomingWaktuSolat } from "./waktuSolat";
 
 const LAST_WIDGETS_KEY = "ANDROID_WIDGETS_LAST_REQUEST";
+
+// Every moment a widget's bold can change: each time, and the end of Syuruk.
+function widgetMoments(prayerTime: PrayerTime): number[] {
+  const times = Object.values(prayerTime).filter(
+    (t): t is number => typeof t === "number",
+  );
+  return [...times, getSyurukEnd(prayerTime)];
+}
 
 // What the Android widgets show: the day, the zone, its times, which of the
 // day's times have passed (so the bold moves), the widget settings and light
@@ -29,9 +38,7 @@ const LAST_WIDGETS_KEY = "ANDROID_WIDGETS_LAST_REQUEST";
 // redraws them regardless, as a fallback.
 async function widgetsKey(date: Date, zone: Zone, waktuSolat: WaktuSolat) {
   const now = date.getTime() / 1000;
-  const times = Object.values(waktuSolat.prayerTime).filter(
-    (t): t is number => typeof t === "number",
-  );
+  const times = widgetMoments(waktuSolat.prayerTime);
   const { widgetExtraTime, widgetExtraTimeChosen } = await loadSettings();
   return JSON.stringify([
     date.toDateString(),
@@ -62,6 +69,23 @@ export async function requestUpdateWaktuSolatWidgets(
     requestWaktuSolatImsakWidgetUpdate(date, zone, waktuSolat.prayerTime),
     requestWaktuSolatTransparentUpdate(date, zone, waktuSolat.prayerTime),
   ]);
+  await scheduleWidgetRefresh(date);
+}
+
+// Android redraws the widgets at those moments (and midnight) by itself, so
+// the bold moves on time even when no reminder fires (modules/widget-refresh).
+async function scheduleWidgetRefresh(date: Date) {
+  if (!WidgetRefresh) return;
+  try {
+    const days = await getUpcomingWaktuSolat(date, 2);
+    const times = days.flatMap((ws) => [
+      ...widgetMoments(ws.prayerTime).map((t) => t * 1000),
+      new Date(ws.year, ws.month - 1, ws.date + 1).getTime(),
+    ]);
+    await WidgetRefresh.schedule(times);
+  } catch (error) {
+    console.error("Failed to schedule widget refresh:", error);
+  }
 }
 
 // The days to schedule reminders for. Android reschedules from its frequent
