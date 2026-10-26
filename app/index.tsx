@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { View } from "react-native";
 
-import { getTimeText, WaktuSolat } from "@/lib/domain/prayerTime";
+import { getSyurukEnd, getTimeText, WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneInfoText, getZoneLocationText } from "@/lib/domain/zone";
 
 import { MonoPager } from "@/lib/components/MonoPager";
@@ -110,7 +110,7 @@ function PrayerTimePage(props: {
           date={currentDate}
           label="Syuruk"
           start={syuruk}
-          end={dhuha ?? dhuhr}
+          end={waktuSolat ? getSyurukEnd(waktuSolat.prayerTime) : dhuhr}
         />
         {dhuha !== undefined && (
           <PrayerTimeRow
