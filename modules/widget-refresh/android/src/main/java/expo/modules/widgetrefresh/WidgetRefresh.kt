@@ -66,12 +66,15 @@ object WidgetRefresh {
     }
     if (next == Long.MAX_VALUE) return
 
-    // Not an alarm clock (that shows an alarm icon in the status bar): an
-    // exact "allow while idle" alarm, rate-limited only to about one per
-    // 10 minutes when the phone is idle, which is plenty for these.
     val exact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms.canScheduleExactAlarms()
     if (exact) {
-      alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next, intent)
+      // An alarm clock, like the prayer reminders and the pinned notification:
+      // a realme phone turned an exact "allow while idle" alarm into one with
+      // a one-hour window, but fires alarm clocks on time.
+      val show = context.packageManager.getLaunchIntentForPackage(context.packageName)?.let {
+        PendingIntent.getActivity(context, 4, it, PendingIntent.FLAG_IMMUTABLE)
+      }
+      alarms.setAlarmClock(AlarmManager.AlarmClockInfo(next, show), intent)
     } else {
       alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next, intent)
     }
