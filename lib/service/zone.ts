@@ -93,61 +93,154 @@ function buildCalculatedZone(
   };
 }
 
+// The bundled country map is coarse (Natural Earth: Singapore is 5 points,
+// Brunei 21), so coasts and islands such as Colombo, George Town, Muara or
+// Changi fall outside every country. So it only suggests candidates: the
+// country it finds, then every country whose outline box, widened by this
+// margin, holds the point. Each candidate's detailed zone map decides.
+const COUNTRY_MARGIN_DEG = 0.5;
+// About 1, 2 and 4 km, in eight directions.
+const NEARBY_STEPS_DEG = [0.01, 0.02, 0.04];
+const DIRECTIONS = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+  [1, 1],
+  [1, -1],
+  [-1, 1],
+  [-1, -1],
+];
+
+type BBox = { minLng: number; minLat: number; maxLng: number; maxLat: number };
+
+function boxesByCountry(): Map<string, BBox> {
+  const boxes = new Map<string, BBox>();
+  for (const feature of (countriesGeoData as any).features) {
+    const iso: string | undefined = feature.properties?.ISO_A2;
+    const geometry = feature.geometry;
+    if (!iso || !geometry) continue;
+    const polygons: number[][][][] =
+      geometry.type === "Polygon"
+        ? [geometry.coordinates]
+        : geometry.coordinates;
+    const box = boxes.get(iso) ?? {
+      minLng: Infinity,
+      minLat: Infinity,
+      maxLng: -Infinity,
+      maxLat: -Infinity,
+    };
+    for (const [lng, lat] of polygons.flat(2)) {
+      box.minLng = Math.min(box.minLng, lng);
+      box.minLat = Math.min(box.minLat, lat);
+      box.maxLng = Math.max(box.maxLng, lng);
+      box.maxLat = Math.max(box.maxLat, lat);
+    }
+    boxes.set(iso, box);
+  }
+  return boxes;
+}
+
+const countryBoxes = boxesByCountry();
+
+function nearbyCountries(lat: number, lng: number): string[] {
+  const m = COUNTRY_MARGIN_DEG;
+  return [...countryBoxes.entries()]
+    .filter(
+      ([, b]) =>
+        lng >= b.minLng - m &&
+        lng <= b.maxLng + m &&
+        lat >= b.minLat - m &&
+        lat <= b.maxLat + m,
+    )
+    .map(([iso]) => iso);
+}
+
+// The official zone containing the point in this country's detailed map.
+async function lookupOfficialZone(
+  countryConfig: CountryConfig,
+  lat: number,
+  lng: number,
+): Promise<Zone | null> {
+  const lookup = await getPolygonLookup(countryConfig);
+  const result = lookup.search(lng, lat);
+  if (!result || !result.properties) return null;
+
+  const lookupKey = result.properties[countryConfig.shape_property];
+  const district = result.properties.shapeName;
+  if (!lookupKey) return null;
+
+  const mapping = await getMapping(countryConfig);
+  const zoneEntry = mapping[lookupKey];
+  if (!zoneEntry) return null;
+
+  const zones = await getZonesForCountry(countryConfig.code);
+  const zoneConfig = zones.find((z) => z.code === zoneEntry.zone);
+  if (!zoneConfig) return null;
+
+  return {
+    type: "official",
+    zone: zoneEntry.zone,
+    country: countryConfig.code,
+    state: zoneEntry.state,
+    district,
+    timezone: zoneConfig.timezone,
+    source: countryConfig.source,
+  };
+}
+
 export async function lookupZoneByGps(lat: number, lng: number): Promise<Zone> {
   const country = lookupCountry(lat, lng);
+  const candidates = [
+    ...new Set([
+      ...(country ? [country.iso] : []),
+      ...nearbyCountries(lat, lng),
+    ]),
+  ];
 
-  if (!country) {
-    return buildCalculatedZone(lat, lng, null, null);
-  }
-
-  const countries = await getCountries();
-  const countryConfig = countries.find((c) => c.code === country.iso);
-
-  if (!countryConfig) {
-    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  let countries: CountryConfig[];
+  try {
+    countries = await getCountries();
+  } catch (error) {
+    // Offline with nothing cached: an ocean point used to skip this fetch.
+    if (!country) return buildCalculatedZone(lat, lng, null, null);
+    throw error;
   }
 
   // Clean up stale geojson/mapping files
   const allUrls = countries.flatMap((c) => [c.geojson, c.mapping]);
   clearStaleFiles(allUrls).catch(() => {});
 
-  // Resolve zone via polygon lookup
-  const lookup = await getPolygonLookup(countryConfig);
-  const result = lookup.search(lng, lat);
+  const configs = candidates
+    .map((iso) => countries.find((c) => c.code === iso))
+    .filter((c): c is CountryConfig => c !== undefined);
 
-  if (!result || !result.properties) {
-    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  for (const countryConfig of configs) {
+    const zone = await lookupOfficialZone(countryConfig, lat, lng);
+    if (zone) return zone;
   }
 
-  const lookupKey = result.properties[countryConfig.shape_property];
-  const district = result.properties.shapeName;
-  if (!lookupKey) {
-    return buildCalculatedZone(lat, lng, country.iso, country.name);
+  // On a beach or a pier the point can sit just outside the district maps
+  // (Port Dickson): take the nearest district within about 4 km.
+  for (const step of NEARBY_STEPS_DEG) {
+    for (const [dLat, dLng] of DIRECTIONS) {
+      for (const countryConfig of configs) {
+        const zone = await lookupOfficialZone(
+          countryConfig,
+          lat + dLat * step,
+          lng + dLng * step,
+        );
+        if (zone) return zone;
+      }
+    }
   }
 
-  const mapping = await getMapping(countryConfig);
-  const zoneEntry = mapping[lookupKey];
-
-  if (!zoneEntry) {
-    return buildCalculatedZone(lat, lng, country.iso, country.name);
-  }
-
-  const zones = await getZonesForCountry(country.iso);
-  const zoneConfig = zones.find((z) => z.code === zoneEntry.zone);
-
-  if (!zoneConfig) {
-    return buildCalculatedZone(lat, lng, country.iso, country.name);
-  }
-
-  return {
-    type: "official",
-    zone: zoneEntry.zone,
-    country: country.iso,
-    state: zoneEntry.state,
-    district,
-    timezone: zoneConfig.timezone,
-    source: countryConfig.source,
-  };
+  return buildCalculatedZone(
+    lat,
+    lng,
+    country?.iso ?? null,
+    country?.name ?? null,
+  );
 }
 
 export async function updateZoneViaGps(
