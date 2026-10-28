@@ -22,7 +22,8 @@ import { getLocation, GetLocationOptions } from "./location";
 
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 
-// Bundled ADM0 for fast country detection
+// Bundled ADM0 for fast country detection: Natural Earth 1:10m countries,
+// simplified to 20% with coordinates rounded to ~10 m (2.2 MB)
 const countriesLookup = new PolygonLookup(countriesGeoData as any);
 
 // In-memory cache for PolygonLookup instances (per country)
@@ -35,12 +36,30 @@ function lookupCountry(
   lat: number,
   lng: number,
 ): { iso: string; name: string } | null {
-  const result = countriesLookup.search(lng, lat);
+  const result = countriesLookup.search(lng, lat) ?? nearbyCountry(lat, lng);
   if (!result || !result.properties) return null;
   return {
     iso: result.properties.ISO_A2,
     name: result.properties.NAME,
   };
+}
+
+// Even a detailed world map leaves small islands and some shores in the
+// sea (Manama, Malé): take the nearest country within about 20 km. Its
+// name and calculation method then apply; open sea stays unknown.
+const COUNTRY_NEARBY_STEPS_DEG = [0.02, 0.05, 0.1, 0.2];
+
+function nearbyCountry(lat: number, lng: number) {
+  for (const step of COUNTRY_NEARBY_STEPS_DEG) {
+    for (const [dLat, dLng] of DIRECTIONS) {
+      const result = countriesLookup.search(
+        lng + dLng * step,
+        lat + dLat * step,
+      );
+      if (result) return result;
+    }
+  }
+  return undefined;
 }
 
 async function getCountries(): Promise<CountryConfig[]> {
