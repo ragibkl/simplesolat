@@ -143,3 +143,20 @@ export function removeOthers(folder: string, keep: string[]) {
     if (!names.has(base)) item.delete();
   }
 }
+
+// Deletes month files (…/YYYY-MM.json) before `month` anywhere under a
+// mirror folder (e.g. "prayer-times"), with their metadata.
+export function removeMonthsBefore(folder: string, month: string) {
+  const walk = (dir: Directory) => {
+    for (const item of dir.list()) {
+      if (item instanceof Directory) {
+        walk(item);
+        continue;
+      }
+      const m = item.name.match(/^(\d{4}-\d{2})\.json/)?.[1];
+      if (m && m < month) item.delete();
+    }
+  };
+  const dir = new Directory(root, ...folder.split("/"));
+  if (dir.exists) walk(dir);
+}

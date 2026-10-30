@@ -1,117 +1,102 @@
-import { addDays, addMonths, compareAsc, startOfYesterday } from "date-fns";
+import { addDays, addMonths, subMonths } from "date-fns";
 
-import { WaktuSolatStore, waktuSolatStore } from "@/lib/data/waktuSolatStore";
+import { readLegacyTimes, removeLegacyTimes } from "@/lib/data/legacyCache";
+import { getText, removeMonthsBefore, WEEKLY } from "@/lib/data/mirror";
 import { zoneStore } from "@/lib/data/zoneStore";
+import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 import { localTimeToEpoch } from "@/lib/domain/datetime";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
-import {
-  fetchPrayerTimesMonth,
-  PrayerTimeEntry,
-} from "@/lib/remote/simplesolat";
-import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
+import { PrayerTimeEntry } from "@/lib/remote/simplesolat";
 
-function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
-  return [
-    waktuSolat.year,
-    waktuSolat.month,
-    waktuSolat.date,
-    waktuSolat.zone,
-  ].join("::");
+// Official prayer times are the CDN's month files, kept in the mirror on the
+// phone (cdn/prayer-times/MY/SGR01/2026-11.json) and checked weekly, so
+// corrections arrive. Calculated zones are worked out on the phone.
+
+const monthKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+const monthPath = (zone: OfficialZone, month: string) =>
+  `prayer-times/${zone.country}/${zone.zone}/${month}.json`;
+
+// The last converted month per file, so widget updates every minute don't
+// redo the work: reused while the file's text is unchanged.
+const converted = new Map<string, { text: string; days: WaktuSolat[] }>();
+
+function toWaktuSolat(
+  zone: OfficialZone,
+  entries: PrayerTimeEntry[],
+): WaktuSolat[] {
+  const { timezone } = zone;
+  return entries.map((entry) => {
+    const [y, m, d] = entry.date.split("-").map(Number);
+    return {
+      year: y,
+      month: m,
+      date: d,
+      zone: zone.zone,
+      prayerTime: {
+        imsak: localTimeToEpoch(entry.date, entry.imsak, timezone),
+        fajr: localTimeToEpoch(entry.date, entry.fajr, timezone),
+        syuruk: localTimeToEpoch(entry.date, entry.syuruk, timezone),
+        ...(entry.dhuha && {
+          dhuha: localTimeToEpoch(entry.date, entry.dhuha, timezone),
+        }),
+        dhuhr: localTimeToEpoch(entry.date, entry.dhuhr, timezone),
+        asr: localTimeToEpoch(entry.date, entry.asr, timezone),
+        maghrib: localTimeToEpoch(entry.date, entry.maghrib, timezone),
+        isha: localTimeToEpoch(entry.date, entry.isha, timezone),
+      },
+    };
+  });
 }
 
-function getWaktuSolatKeyFromDate(date: Date, zone: string): string {
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-
-  return [y, m, d, zone].join("::");
+// A zone's month, converted. Throws MirrorError (with the reason) if it isn't
+// on the phone and can't be downloaded.
+export async function getMonth(
+  zone: OfficialZone,
+  month: string,
+): Promise<WaktuSolat[]> {
+  const path = monthPath(zone, month);
+  const text = await getText(path, WEEKLY);
+  const memo = converted.get(path);
+  if (memo && memo.text === text) return memo.days;
+  const days = toWaktuSolat(zone, JSON.parse(text) as PrayerTimeEntry[]);
+  converted.set(path, { text, days });
+  return days;
 }
 
-export function getWaktuSolatFromStore(
-  store: WaktuSolatStore,
-  zone: string,
-  date: Date,
-): WaktuSolat | null {
-  const key = getWaktuSolatKeyFromDate(date, zone);
-  return store[key] || null;
+let tidied = false;
+
+// Once per run: drop months before last month, and the pre-mirror store once
+// today's times come from the mirror.
+function tidyUp(date: Date) {
+  if (tidied) return;
+  tidied = true;
+  try {
+    removeMonthsBefore("prayer-times", monthKey(subMonths(date, 1)));
+  } catch {}
+  removeLegacyTimes().catch(() => {});
 }
 
-function trimWaktuSolatStore(store: WaktuSolatStore): WaktuSolatStore {
-  const cutoff = startOfYesterday();
-  const newStore: WaktuSolatStore = {};
-
-  for (const key in store) {
-    const waktuSolat = store[key];
-    const dt = new Date(waktuSolat.year, waktuSolat.month - 1, waktuSolat.date);
-
-    if (compareAsc(dt, cutoff) >= 0) {
-      newStore[key] = waktuSolat;
-    }
-  }
-
-  return newStore;
-}
-
-export async function fetchAndMergePrayerTimes(
-  store: WaktuSolatStore,
+export async function getOfficialWaktuSolat(
   zone: OfficialZone,
   date: Date,
-): Promise<WaktuSolatStore> {
-  const { timezone } = zone;
-  const trimmedStore = trimWaktuSolatStore(store);
-  const newStore: WaktuSolatStore = {};
-
-  const months = [
-    { year: date.getFullYear(), month: date.getMonth() + 1 },
-    {
-      year: addMonths(date, 1).getFullYear(),
-      month: addMonths(date, 1).getMonth() + 1,
-    },
-  ];
-
-  for (const [i, { year, month }] of months.entries()) {
-    let entries: PrayerTimeEntry[];
-    try {
-      entries = await fetchPrayerTimesMonth(
-        zone.country,
-        zone.zone,
-        year,
-        month,
-      );
-    } catch (error) {
-      // This month is needed; next month is a bonus (it may not be
-      // published yet, e.g. the new year in December).
-      if (i === 0) throw error;
-      console.log("Next month's prayer times not loaded:", error);
-      continue;
-    }
-
-    for (const entry of entries) {
-      const [y, m, d] = entry.date.split("-").map(Number);
-      const ws: WaktuSolat = {
-        year: y,
-        month: m,
-        date: d,
-        zone: zone.zone,
-        prayerTime: {
-          imsak: localTimeToEpoch(entry.date, entry.imsak, timezone),
-          fajr: localTimeToEpoch(entry.date, entry.fajr, timezone),
-          syuruk: localTimeToEpoch(entry.date, entry.syuruk, timezone),
-          ...(entry.dhuha && {
-            dhuha: localTimeToEpoch(entry.date, entry.dhuha, timezone),
-          }),
-          dhuhr: localTimeToEpoch(entry.date, entry.dhuhr, timezone),
-          asr: localTimeToEpoch(entry.date, entry.asr, timezone),
-          maghrib: localTimeToEpoch(entry.date, entry.maghrib, timezone),
-          isha: localTimeToEpoch(entry.date, entry.isha, timezone),
-        },
-      };
-      newStore[getWaktuSolatKey(ws)] = ws;
-    }
+): Promise<WaktuSolat | null> {
+  let days: WaktuSolat[];
+  try {
+    days = await getMonth(zone, monthKey(date));
+  } catch (error) {
+    // Updated the app while offline: the old store still has the times.
+    const old = await readLegacyTimes(zone.zone, date);
+    if (old) return old;
+    throw error;
   }
-
-  return { ...trimmedStore, ...newStore };
+  // Keep next month on the phone too, for offline use at the end of the
+  // month. It may not be published yet (e.g. next year in December).
+  getMonth(zone, monthKey(addMonths(date, 1))).catch(() => {});
+  tidyUp(date);
+  return days.find((d) => d.date === date.getDate()) ?? null;
 }
 
 export async function getOrRetrieveWaktuSolat(date: Date) {
@@ -128,29 +113,27 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
     );
   }
 
-  const store = await waktuSolatStore.load();
-  const waktuSolat = getWaktuSolatFromStore(store, zone.zone, date);
-  if (waktuSolat) {
-    return waktuSolat;
-  }
-
-  const newStore = await fetchAndMergePrayerTimes(store, zone, date);
-  await waktuSolatStore.save(newStore);
-
-  return getWaktuSolatFromStore(newStore, zone.zone, date);
+  return getOfficialWaktuSolat(zone, date);
 }
 
-// Today and the following days, for scheduling reminders ahead (iOS).
+// Today and the following days, for reminders, widgets and the pinned
+// notification. Stops at the first day it can't get (e.g. next month not
+// published yet), keeping the days before it.
 export async function getUpcomingWaktuSolat(
   date: Date,
   days: number,
 ): Promise<WaktuSolat[]> {
   const result: WaktuSolat[] = [];
   for (let i = 0; i < days; i++) {
-    const waktuSolat = await getOrRetrieveWaktuSolat(addDays(date, i));
-    if (waktuSolat) {
-      result.push(waktuSolat);
+    let waktuSolat: WaktuSolat | null;
+    try {
+      waktuSolat = await getOrRetrieveWaktuSolat(addDays(date, i));
+    } catch (error) {
+      if (i === 0) throw error;
+      break;
     }
+    if (!waktuSolat) break;
+    result.push(waktuSolat);
   }
   return result;
 }

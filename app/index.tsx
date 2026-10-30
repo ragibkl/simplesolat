@@ -3,7 +3,7 @@ import { Pressable, View } from "react-native";
 
 import { getSyurukEnd, getTimeText, WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneInfoText, getZoneLocationText } from "@/lib/domain/zone";
-import { LoadFailure } from "@/lib/remote/simplesolat";
+import { LoadFailure } from "@/lib/data/mirror";
 
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";

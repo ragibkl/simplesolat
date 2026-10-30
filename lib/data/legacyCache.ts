@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Directory, File, Paths } from "expo-file-system";
 
+import { WaktuSolat } from "@/lib/domain/prayerTime";
+
 // Read-only access to the caches used before the CDN mirror (app 1.3.6 and
 // older): AsyncStorage "CACHE:<key>" entries and files in file-cache/. Only
 // a fallback for a phone that updates the app while offline, so it can still
@@ -41,4 +43,31 @@ export async function withLegacy<T>(
     if (old !== null) return old;
     throw error;
   }
+}
+
+// The pre-mirror prayer-times store: converted days keyed "y::m::d::zone".
+const LEGACY_TIMES_KEY = "WAKTU_SOLAT_STORE_V4_KEY";
+
+export async function readLegacyTimes(
+  zone: string,
+  date: Date,
+): Promise<WaktuSolat | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LEGACY_TIMES_KEY);
+    if (!raw) return null;
+    const key = [
+      date.getFullYear(),
+      date.getMonth() + 1,
+      date.getDate(),
+      zone,
+    ].join("::");
+    return (JSON.parse(raw) as Record<string, WaktuSolat>)[key] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// Called once today's times come from the mirror.
+export async function removeLegacyTimes() {
+  await AsyncStorage.removeItem(LEGACY_TIMES_KEY);
 }
