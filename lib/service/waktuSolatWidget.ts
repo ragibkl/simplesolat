@@ -17,6 +17,7 @@ import { scheduleAllWaktuSolatNotifications } from "./notifee";
 import { GetLocationOptions } from "./location";
 import { updatePinnedNotification } from "./pinnedNotification";
 import { getPrayerData } from "./prayerData";
+import { ensureTravelData } from "./travelData";
 import { getUpcomingWaktuSolat } from "./waktuSolat";
 
 const LAST_WIDGETS_KEY = "ANDROID_WIDGETS_LAST_REQUEST";
@@ -122,5 +123,10 @@ export async function updateWaktuSolatAndWidgets(
       await getReminderDays(date, waktuSolat),
       zone,
     );
+  }
+  // Last, so it never delays the widgets: keep the country (and neighbours)
+  // on the phone for travelling without a connection.
+  if (zone.type === "official") {
+    await ensureTravelData(zone.country, date);
   }
 }

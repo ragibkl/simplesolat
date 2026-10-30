@@ -208,6 +208,22 @@ async function lookupOfficialZone(
   };
 }
 
+// Downloads (once) what's needed to find a zone in this country without a
+// connection: the zone list, district map and mapping. Returns the zones, or
+// null if the country has no official timetable.
+export async function cacheCountryForTravel(
+  countryCode: string,
+): Promise<ZoneConfig[] | null> {
+  const country = (await getCountries()).find((c) => c.code === countryCode);
+  if (!country) return null;
+  const zones = await getZonesForCountry(countryCode);
+  await getCachedFileOrFetch(country.geojson, () =>
+    fetchGeoJson(country.geojson),
+  );
+  await getMapping(country);
+  return zones;
+}
+
 export async function lookupZoneByGps(lat: number, lng: number): Promise<Zone> {
   const country = lookupCountry(lat, lng);
   const candidates = [
