@@ -1,5 +1,3 @@
-import yaml from "js-yaml";
-
 const BASE_URL = "https://simplesolat-data.netlify.app";
 
 export type CountryConfig = {
@@ -31,36 +29,6 @@ export type PrayerTimeEntry = {
   maghrib: string;
   isha: string;
 };
-
-export async function fetchCountries(): Promise<CountryConfig[]> {
-  const response = await fetch(`${BASE_URL}/countries.yaml`);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const text = await response.text();
-  const parsed = yaml.load(text) as { countries: CountryConfig[] };
-  return parsed.countries;
-}
-
-export async function fetchZones(countryCode: string): Promise<ZoneConfig[]> {
-  const response = await fetch(`${BASE_URL}/zones/${countryCode}.yaml`);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const text = await response.text();
-  const parsed = yaml.load(text) as { zones: ZoneConfig[] };
-  return parsed.zones;
-}
-
-export async function fetchGeoJson(url: string): Promise<any> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return await response.json();
-}
-
-export async function fetchMapping(
-  url: string,
-): Promise<Record<string, { zone: string; state: string }>> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return await response.json();
-}
 
 // Why a month's times couldn't be loaded: no connection, not published yet,
 // or the servers failed. Shown to the user, so they know what to do.

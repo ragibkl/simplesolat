@@ -1,26 +1,24 @@
 import PolygonLookup from "polygon-lookup";
 
-import { getCachedOrFetch } from "@/lib/data/asyncCacheStore";
 import {
-  getCachedFileOrFetch,
-  clearStaleFiles,
-} from "@/lib/data/fileCacheStore";
+  readLegacyEntry,
+  readLegacyFile,
+  withLegacy,
+} from "@/lib/data/legacyCache";
+import {
+  getJson,
+  getYaml,
+  NEVER,
+  removeOthers,
+  WEEKLY,
+} from "@/lib/data/mirror";
 import { zoneStore } from "@/lib/data/zoneStore";
 import { CalculatedZone, Zone } from "@/lib/domain/zone";
-import {
-  fetchCountries,
-  fetchZones,
-  fetchGeoJson,
-  fetchMapping,
-  CountryConfig,
-  ZoneConfig,
-} from "@/lib/remote/simplesolat";
+import { CountryConfig, ZoneConfig } from "@/lib/remote/simplesolat";
 
 import countriesGeoData from "@/assets/geodata/countries-adm0.json";
 
 import { getLocation, GetLocationOptions } from "./location";
-
-const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 
 // Bundled ADM0 for fast country detection: Natural Earth 1:10m countries,
 // simplified to 20% with coordinates rounded to ~10 m (2.2 MB)
@@ -62,13 +60,27 @@ function nearbyCountry(lat: number, lng: number) {
   return undefined;
 }
 
+// Country and zone lists, district maps and mappings come from the CDN
+// mirror on the phone (lib/data/mirror.ts).
 async function getCountries(): Promise<CountryConfig[]> {
-  return getCachedOrFetch("countries", ONE_MONTH_MS, fetchCountries);
+  return withLegacy(
+    async () =>
+      (await getYaml<{ countries: CountryConfig[] }>("countries.yaml", WEEKLY))
+        .countries,
+    () => readLegacyEntry<CountryConfig[]>("countries"),
+  );
 }
 
 async function getZonesForCountry(countryCode: string): Promise<ZoneConfig[]> {
-  return getCachedOrFetch(`zones:${countryCode}`, ONE_MONTH_MS, () =>
-    fetchZones(countryCode),
+  return withLegacy(
+    async () =>
+      (
+        await getYaml<{ zones: ZoneConfig[] }>(
+          `zones/${countryCode}.yaml`,
+          WEEKLY,
+        )
+      ).zones,
+    () => readLegacyEntry<ZoneConfig[]>(`zones:${countryCode}`),
   );
 }
 
@@ -80,8 +92,10 @@ async function getPolygonLookup(
     return cached.lookup;
   }
 
-  const geojson = await getCachedFileOrFetch(country.geojson, () =>
-    fetchGeoJson(country.geojson),
+  // Maps have dated names: a new map is a new file, so never re-checked.
+  const geojson = await withLegacy(
+    () => getJson<unknown>(country.geojson, NEVER),
+    () => readLegacyFile<unknown>(country.geojson),
   );
 
   const lookup = new PolygonLookup(geojson as any);
@@ -92,8 +106,16 @@ async function getPolygonLookup(
 async function getMapping(
   country: CountryConfig,
 ): Promise<Record<string, { zone: string; state: string }>> {
-  return getCachedFileOrFetch(country.mapping, () =>
-    fetchMapping(country.mapping),
+  return withLegacy(
+    () =>
+      getJson<Record<string, { zone: string; state: string }>>(
+        country.mapping,
+        NEVER,
+      ),
+    () =>
+      readLegacyFile<Record<string, { zone: string; state: string }>>(
+        country.mapping,
+      ),
   );
 }
 
@@ -226,9 +248,17 @@ export async function lookupZoneByGps(lat: number, lng: number): Promise<Zone> {
     throw error;
   }
 
-  // Clean up stale geojson/mapping files
-  const allUrls = countries.flatMap((c) => [c.geojson, c.mapping]);
-  clearStaleFiles(allUrls).catch(() => {});
+  // Remove maps the country list no longer points to (replaced by newer ones).
+  try {
+    removeOthers(
+      "geojson",
+      countries.map((c) => c.geojson),
+    );
+    removeOthers(
+      "mappings",
+      countries.map((c) => c.mapping),
+    );
+  } catch {}
 
   const configs = candidates
     .map((iso) => countries.find((c) => c.code === iso))
