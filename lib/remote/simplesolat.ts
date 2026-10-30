@@ -1,7 +1,6 @@
 import yaml from "js-yaml";
 
 const BASE_URL = "https://simplesolat-data.netlify.app";
-const API_URL = "https://api.simplesolat.com";
 
 export type CountryConfig = {
   code: string;
@@ -94,8 +93,7 @@ async function tryFetchJson(
   }
 }
 
-// A month of times from the data CDN, or from api.simplesolat.com (same
-// data) if the CDN can't be reached, e.g. a network that blocks it.
+// A month of times from the data CDN.
 export async function fetchPrayerTimesMonth(
   country: string,
   zone: string,
@@ -103,20 +101,9 @@ export async function fetchPrayerTimesMonth(
   month: number,
 ): Promise<PrayerTimeEntry[]> {
   const monthStr = `${year}-${month.toString().padStart(2, "0")}`;
-  const cdn = await tryFetchJson(
+  const result = await tryFetchJson(
     `${BASE_URL}/prayer-times/${country}/${zone}/${monthStr}.json`,
   );
-  if ("data" in cdn) return cdn.data as PrayerTimeEntry[];
-
-  const api = await tryFetchJson(
-    `${API_URL}/v2/zones/${zone}/prayer-times/month/${monthStr}`,
-  );
-  if ("data" in api) return (api.data as { data: PrayerTimeEntry[] }).data;
-
-  // Not published is the more useful answer if either server says so.
-  const failures = [cdn.failure, api.failure];
-  if (failures.includes("notFound")) throw new PrayerTimesError("notFound");
-  if (failures.every((f) => f === "offline"))
-    throw new PrayerTimesError("offline");
-  throw new PrayerTimesError("server");
+  if ("data" in result) return result.data as PrayerTimeEntry[];
+  throw new PrayerTimesError(result.failure);
 }
