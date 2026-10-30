@@ -1,10 +1,12 @@
 import { addDays } from "date-fns";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AppState } from "react-native";
 
 import { waktuSolatStore } from "@/lib/data/waktuSolatStore";
 import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
+import { LoadFailure, PrayerTimesError } from "@/lib/remote/simplesolat";
 import {
   fetchAndMergePrayerTimes,
   getWaktuSolatFromStore,
@@ -69,8 +71,15 @@ function useWaktuSolatForDate(date: Date) {
   const { zone } = useZone();
 
   const [waktuSolat, setWaktuSolat] = useState<WaktuSolat | null>(null);
+  // Why the times couldn't be loaded, shown instead of empty times.
+  const [failure, setFailure] = useState<LoadFailure | null>(null);
+  // Bumped to try again: the Retry button, or the app coming back.
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function effect() {
       if (!zone) {
         setWaktuSolat(null);
@@ -86,19 +95,39 @@ function useWaktuSolatForDate(date: Date) {
           zone.country,
         );
         setWaktuSolat(w);
+        setFailure(null);
         return;
       }
 
-      const w = await fetchWaktuSolat(zone, date);
-      if (w) {
+      try {
+        const w = await fetchWaktuSolat(zone, date);
+        if (cancelled) return;
         setWaktuSolat(w);
+        setFailure(w ? null : "notFound");
+      } catch (error) {
+        if (cancelled) return;
+        // Don't keep showing another zone's or day's times.
+        setWaktuSolat(null);
+        setFailure(error instanceof PrayerTimesError ? error.reason : "server");
       }
     }
 
     effect();
-  }, [zone, fetchWaktuSolat, date]);
+    return () => {
+      cancelled = true;
+    };
+  }, [zone, fetchWaktuSolat, date, attempt]);
 
-  return { waktuSolat };
+  // Try again when the app comes back to the front, if it failed.
+  useEffect(() => {
+    if (!failure) return;
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") retry();
+    });
+    return () => sub.remove();
+  }, [failure, retry]);
+
+  return { waktuSolat, failure, retry };
 }
 
 export function useWaktuSolatCurrent() {
@@ -109,6 +138,11 @@ export function useWaktuSolatCurrent() {
 export function useWaktuSolatTomorrow() {
   const { date } = useCurrentDate();
   const tomorrow = useMemo(() => addDays(date, 1), [date]);
-  const { waktuSolat } = useWaktuSolatForDate(tomorrow);
-  return { waktuSolatTomorrow: waktuSolat, tomorrow };
+  const { waktuSolat, failure, retry } = useWaktuSolatForDate(tomorrow);
+  return {
+    waktuSolatTomorrow: waktuSolat,
+    tomorrowFailure: failure,
+    retryTomorrow: retry,
+    tomorrow,
+  };
 }

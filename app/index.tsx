@@ -1,8 +1,9 @@
 import { Link } from "expo-router";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { getSyurukEnd, getTimeText, WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneInfoText, getZoneLocationText } from "@/lib/domain/zone";
+import { LoadFailure } from "@/lib/remote/simplesolat";
 
 import { MonoPager } from "@/lib/components/MonoPager";
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
@@ -63,13 +64,42 @@ function PrayerTimeRow(props: {
   );
 }
 
+const FAILURE_TEXT: Record<LoadFailure, string> = {
+  offline: "Couldn't load the prayer times: no internet connection.",
+  notFound: "This zone's timetable for this day isn't published yet.",
+  server: "Couldn't load the prayer times: the server didn't answer.",
+};
+
+// Instead of empty times: loading, or why the times couldn't be loaded and a
+// way to try again.
+function NoTimes(props: { failure: LoadFailure | null; onRetry: () => void }) {
+  const { failure, onRetry } = props;
+  return (
+    <View style={{ padding: 25, alignItems: "center", gap: 16 }}>
+      <MonoText style={{ fontSize: 16, textAlign: "center" }}>
+        {failure ? FAILURE_TEXT[failure] : "Loading prayer times…"}
+      </MonoText>
+      {failure && (
+        <Pressable onPress={onRetry} accessibilityRole="button">
+          <MonoView style={{ borderWidth: 1, borderRadius: 8, padding: 10 }}>
+            <MonoText style={{ fontSize: 16 }}>Retry</MonoText>
+          </MonoView>
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
 function PrayerTimePage(props: {
   currentDate: Date;
   displayDate: Date;
   subtitle: string;
   waktuSolat: WaktuSolat | null;
+  failure: LoadFailure | null;
+  onRetry: () => void;
 }) {
-  const { currentDate, displayDate, subtitle, waktuSolat } = props;
+  const { currentDate, displayDate, subtitle, waktuSolat, failure, onRetry } =
+    props;
 
   const {
     imsak = 0,
@@ -93,53 +123,57 @@ function PrayerTimePage(props: {
         </MonoText>
       </View>
 
-      <View>
-        <PrayerTimeRow
-          date={currentDate}
-          label="Imsak"
-          start={imsak}
-          end={fajr}
-        />
-        <PrayerTimeRow
-          date={currentDate}
-          label="Fajr"
-          start={fajr}
-          end={syuruk}
-        />
-        <PrayerTimeRow
-          date={currentDate}
-          label="Syuruk"
-          start={syuruk}
-          end={waktuSolat ? getSyurukEnd(waktuSolat.prayerTime) : dhuhr}
-        />
-        {dhuha !== undefined && (
+      {!waktuSolat ? (
+        <NoTimes failure={failure} onRetry={onRetry} />
+      ) : (
+        <View>
           <PrayerTimeRow
             date={currentDate}
-            label="Dhuha"
-            start={dhuha}
-            end={dhuhr}
+            label="Imsak"
+            start={imsak}
+            end={fajr}
           />
-        )}
-        <PrayerTimeRow
-          date={currentDate}
-          label="Dhuhr"
-          start={dhuhr}
-          end={asr}
-        />
-        <PrayerTimeRow
-          date={currentDate}
-          label="Asr"
-          start={asr}
-          end={maghrib}
-        />
-        <PrayerTimeRow
-          date={currentDate}
-          label="Maghrib"
-          start={maghrib}
-          end={isha}
-        />
-        <PrayerTimeRow date={currentDate} label="Isha" start={isha} />
-      </View>
+          <PrayerTimeRow
+            date={currentDate}
+            label="Fajr"
+            start={fajr}
+            end={syuruk}
+          />
+          <PrayerTimeRow
+            date={currentDate}
+            label="Syuruk"
+            start={syuruk}
+            end={waktuSolat ? getSyurukEnd(waktuSolat.prayerTime) : dhuhr}
+          />
+          {dhuha !== undefined && (
+            <PrayerTimeRow
+              date={currentDate}
+              label="Dhuha"
+              start={dhuha}
+              end={dhuhr}
+            />
+          )}
+          <PrayerTimeRow
+            date={currentDate}
+            label="Dhuhr"
+            start={dhuhr}
+            end={asr}
+          />
+          <PrayerTimeRow
+            date={currentDate}
+            label="Asr"
+            start={asr}
+            end={maghrib}
+          />
+          <PrayerTimeRow
+            date={currentDate}
+            label="Maghrib"
+            start={maghrib}
+            end={isha}
+          />
+          <PrayerTimeRow date={currentDate} label="Isha" start={isha} />
+        </View>
+      )}
     </View>
   );
 }
@@ -147,8 +181,9 @@ function PrayerTimePage(props: {
 export default function Index() {
   const { date } = useCurrentDate();
   const { zone } = useUpdatedZone();
-  const { waktuSolat } = useWaktuSolatCurrent();
-  const { waktuSolatTomorrow, tomorrow } = useWaktuSolatTomorrow();
+  const { waktuSolat, failure, retry } = useWaktuSolatCurrent();
+  const { waktuSolatTomorrow, tomorrowFailure, retryTomorrow, tomorrow } =
+    useWaktuSolatTomorrow();
   useWaktuSolatWidgetUpdate();
 
   const locationText = zone ? getZoneLocationText(zone) : "Location not set";
@@ -167,12 +202,16 @@ export default function Index() {
           displayDate={date}
           subtitle="Today"
           waktuSolat={waktuSolat}
+          failure={failure}
+          onRetry={retry}
         />
         <PrayerTimePage
           currentDate={date}
           displayDate={tomorrow}
           subtitle="Tomorrow"
           waktuSolat={waktuSolatTomorrow}
+          failure={tomorrowFailure}
+          onRetry={retryTomorrow}
         />
       </MonoPager>
 

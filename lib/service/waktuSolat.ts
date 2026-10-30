@@ -5,7 +5,10 @@ import { zoneStore } from "@/lib/data/zoneStore";
 import { localTimeToEpoch } from "@/lib/domain/datetime";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
-import { fetchPrayerTimesMonth } from "@/lib/remote/simplesolat";
+import {
+  fetchPrayerTimesMonth,
+  PrayerTimeEntry,
+} from "@/lib/remote/simplesolat";
 import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 
 function getWaktuSolatKey(waktuSolat: WaktuSolat): string {
@@ -67,13 +70,22 @@ export async function fetchAndMergePrayerTimes(
     },
   ];
 
-  for (const { year, month } of months) {
-    const entries = await fetchPrayerTimesMonth(
-      zone.country,
-      zone.zone,
-      year,
-      month,
-    );
+  for (const [i, { year, month }] of months.entries()) {
+    let entries: PrayerTimeEntry[];
+    try {
+      entries = await fetchPrayerTimesMonth(
+        zone.country,
+        zone.zone,
+        year,
+        month,
+      );
+    } catch (error) {
+      // This month is needed; next month is a bonus (it may not be
+      // published yet, e.g. the new year in December).
+      if (i === 0) throw error;
+      console.log("Next month's prayer times not loaded:", error);
+      continue;
+    }
 
     for (const entry of entries) {
       const [y, m, d] = entry.date.split("-").map(Number);
