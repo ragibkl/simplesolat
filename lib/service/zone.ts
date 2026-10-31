@@ -1,13 +1,6 @@
 import PolygonLookup from "polygon-lookup";
 
 import {
-  readLegacyEntry,
-  readLegacyFile,
-  removeLegacyEntry,
-  removeLegacyFile,
-  withLegacy,
-} from "@/lib/data/legacyCache";
-import {
   getJson,
   getText,
   getYaml,
@@ -67,27 +60,15 @@ function nearbyCountry(lat: number, lng: number) {
 // mirror on the phone (lib/data/mirror.ts).
 // The countries with official timetables (also listed in Settings → Offline data).
 export async function getCountries(): Promise<CountryConfig[]> {
-  return withLegacy(
-    async () =>
-      (await getYaml<{ countries: CountryConfig[] }>("countries.yaml", WEEKLY))
-        .countries,
-    () => readLegacyEntry<CountryConfig[]>("countries"),
-    () => removeLegacyEntry("countries"),
-  );
+  return (
+    await getYaml<{ countries: CountryConfig[] }>("countries.yaml", WEEKLY)
+  ).countries;
 }
 
 async function getZonesForCountry(countryCode: string): Promise<ZoneConfig[]> {
-  return withLegacy(
-    async () =>
-      (
-        await getYaml<{ zones: ZoneConfig[] }>(
-          `zones/${countryCode}.yaml`,
-          WEEKLY,
-        )
-      ).zones,
-    () => readLegacyEntry<ZoneConfig[]>(`zones:${countryCode}`),
-    () => removeLegacyEntry(`zones:${countryCode}`),
-  );
+  return (
+    await getYaml<{ zones: ZoneConfig[] }>(`zones/${countryCode}.yaml`, WEEKLY)
+  ).zones;
 }
 
 // The files a country's zone lookup reads: zone list, district map and
@@ -118,11 +99,7 @@ async function getPolygonLookup(
   }
 
   // Maps have dated names: a new map is a new file, so never re-checked.
-  const geojson = await withLegacy(
-    () => getJson<unknown>(country.geojson, NEVER),
-    () => readLegacyFile<unknown>(country.geojson),
-    () => removeLegacyFile(country.geojson),
-  );
+  const geojson = await getJson<unknown>(country.geojson, NEVER);
 
   const lookup = new PolygonLookup(geojson as any);
   lookupCache.set(country.code, { lookup, geojsonUrl: country.geojson });
@@ -132,17 +109,9 @@ async function getPolygonLookup(
 async function getMapping(
   country: CountryConfig,
 ): Promise<Record<string, { zone: string; state: string }>> {
-  return withLegacy(
-    () =>
-      getJson<Record<string, { zone: string; state: string }>>(
-        country.mapping,
-        NEVER,
-      ),
-    () =>
-      readLegacyFile<Record<string, { zone: string; state: string }>>(
-        country.mapping,
-      ),
-    () => removeLegacyFile(country.mapping),
+  return getJson<Record<string, { zone: string; state: string }>>(
+    country.mapping,
+    NEVER,
   );
 }
 
