@@ -6,6 +6,7 @@ import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode } from "@/lib/domain/zone";
 import { LoadFailure, MirrorError } from "@/lib/data/mirror";
+import { loadMethods } from "@/lib/service/methods";
 import { getOfficialWaktuSolat } from "@/lib/service/waktuSolat";
 import { useCurrentDate } from "./date";
 import { useZone } from "./zone";
@@ -30,6 +31,8 @@ function useWaktuSolatForDate(date: Date) {
       }
 
       if (zone.type === "calculated") {
+        await loadMethods();
+        if (cancelled) return;
         const w = calculateWaktuSolat(
           date,
           getZoneCode(zone),

@@ -8,6 +8,7 @@ import { localTimeToEpoch } from "@/lib/domain/datetime";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
 import { PrayerTimeEntry } from "@/lib/remote/simplesolat";
+import { loadMethods } from "./methods";
 
 // Official prayer times are the CDN's month files, kept in the mirror on the
 // phone (cdn/prayer-times/MY/SGR01/2026-11.json) and checked weekly, so
@@ -104,6 +105,7 @@ export async function getOrRetrieveWaktuSolat(date: Date) {
   if (!zone) return null;
 
   if (zone.type === "calculated") {
+    await loadMethods();
     return calculateWaktuSolat(
       date,
       getZoneCode(zone),
