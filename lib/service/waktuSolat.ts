@@ -1,6 +1,6 @@
 import { addDays, addMonths, subMonths } from "date-fns";
 
-import { readLegacyTimes, removeLegacyTimes } from "@/lib/data/legacyCache";
+import { removeLegacyCaches } from "@/lib/data/legacyCache";
 import { readZoneFromCountry } from "@/lib/data/countryStore";
 import {
   getText,
@@ -91,30 +91,22 @@ export async function getMonth(
 
 let tidied = false;
 
-// Once per run: drop months before last month, and the pre-mirror store once
-// today's times come from the mirror.
+// Once per run, after today's times came from the mirror: drop months before
+// last month, and the caches from before the mirror.
 function tidyUp(date: Date) {
   if (tidied) return;
   tidied = true;
   try {
     removeMonthsBefore("prayer-times", monthKey(subMonths(date, 1)));
   } catch {}
-  removeLegacyTimes().catch(() => {});
+  removeLegacyCaches().catch(() => {});
 }
 
 export async function getOfficialWaktuSolat(
   zone: OfficialZone,
   date: Date,
 ): Promise<WaktuSolat | null> {
-  let days: WaktuSolat[];
-  try {
-    days = await getMonth(zone, monthKey(date));
-  } catch (error) {
-    // Updated the app while offline: the old store still has the times.
-    const old = await readLegacyTimes(zone.zone, date);
-    if (old) return old;
-    throw error;
-  }
+  const days = await getMonth(zone, monthKey(date));
   // Keep next month on the phone too, for offline use at the end of the
   // month. It may not be published yet (e.g. next year in December).
   getMonth(zone, monthKey(addMonths(date, 1))).catch(() => {});
