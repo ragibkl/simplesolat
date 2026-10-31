@@ -160,3 +160,14 @@ export function removeMonthsBefore(folder: string, month: string) {
   const dir = new Directory(root, ...folder.split("/"));
   if (dir.exists) walk(dir);
 }
+
+// Whether the mirror has a copy of this file (fresh or not).
+export function hasFile(pathOrUrl: string): boolean {
+  return fileAt(toPath(pathOrUrl)).exists;
+}
+
+// Size in bytes of the copy on the phone (0 if there's none).
+export function fileSize(pathOrUrl: string): number {
+  const file = fileAt(toPath(pathOrUrl));
+  return file.exists ? (file.size ?? 0) : 0;
+}

@@ -17,6 +17,7 @@ import { scheduleAllWaktuSolatNotifications } from "./notifee";
 import { GetLocationOptions } from "./location";
 import { updatePinnedNotification } from "./pinnedNotification";
 import { getPrayerData } from "./prayerData";
+import { syncOfflineCountries } from "./offlineCountries";
 import { getUpcomingWaktuSolat } from "./waktuSolat";
 
 const LAST_WIDGETS_KEY = "ANDROID_WIDGETS_LAST_REQUEST";
@@ -123,4 +124,6 @@ export async function updateWaktuSolatAndWidgets(
       zone,
     );
   }
+  // Last, so it never delays the widgets: keep the countries for offline use.
+  await syncOfflineCountries(date, zone);
 }

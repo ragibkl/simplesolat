@@ -6,6 +6,7 @@ import {
   requestUpdateWaktuSolatWidgets,
 } from "@/lib/service/waktuSolatWidget";
 import { updatePinnedNotification } from "@/lib/service/pinnedNotification";
+import { syncOfflineCountries } from "@/lib/service/offlineCountries";
 import { refreshTravelGeofence } from "@/lib/service/travelGeofence";
 import { registerBackgroundTasks } from "@/lib/tasks/backgroundTasks";
 import { updateIosWidgets } from "@/lib/widgets/ios/updateIosWidgets";
@@ -31,6 +32,12 @@ export function useWaktuSolatWidgetUpdate() {
   const zoneKey = zone ? JSON.stringify(zone) : null;
   useEffect(() => {
     if (zoneKey) refreshTravelGeofence();
+  }, [zoneKey]);
+
+  // Keep the countries for offline use (adds the one you're in).
+  useEffect(() => {
+    if (zone) syncOfflineCountries(new Date(), zone);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoneKey]);
 
   // iOS widget timeline (40 days): rebuild when the zone or the day changes.

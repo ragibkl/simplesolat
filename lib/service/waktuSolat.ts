@@ -1,7 +1,13 @@
 import { addDays, addMonths, subMonths } from "date-fns";
 
 import { readLegacyTimes, removeLegacyTimes } from "@/lib/data/legacyCache";
-import { getText, removeMonthsBefore, WEEKLY } from "@/lib/data/mirror";
+import { readZoneFromCountry } from "@/lib/data/countryStore";
+import {
+  getText,
+  hasFile,
+  removeMonthsBefore,
+  WEEKLY,
+} from "@/lib/data/mirror";
 import { zoneStore } from "@/lib/data/zoneStore";
 import { calculateWaktuSolat } from "@/lib/domain/adhanCalculator";
 import { localTimeToEpoch } from "@/lib/domain/datetime";
@@ -9,10 +15,13 @@ import { WaktuSolat } from "@/lib/domain/prayerTime";
 import { getZoneCode, OfficialZone } from "@/lib/domain/zone";
 import { PrayerTimeEntry } from "@/lib/remote/simplesolat";
 import { loadMethods } from "./methods";
+import { syncCountryInBackground } from "./offlineCountries";
 
 // Official prayer times are the CDN's month files, kept in the mirror on the
 // phone (cdn/prayer-times/MY/SGR01/2026-11.json) and checked weekly, so
-// corrections arrive. Calculated zones are worked out on the phone.
+// corrections arrive. A zone with no file of its own is read from a whole
+// country kept for offline use (lib/data/countryStore.ts). Calculated zones
+// are worked out on the phone.
 
 const monthKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -52,6 +61,19 @@ function toWaktuSolat(
   });
 }
 
+// The zone's own file if the mirror has it; else the zone from a whole
+// country on the phone; else download the zone's file (quick) and fetch the
+// whole country afterwards, in the background, for offline use.
+async function monthText(zone: OfficialZone, month: string): Promise<string> {
+  const path = monthPath(zone, month);
+  if (hasFile(path)) return getText(path, WEEKLY);
+  const fromCountry = await readZoneFromCountry(zone.country, zone.zone, month);
+  if (fromCountry) return fromCountry;
+  const text = await getText(path, WEEKLY);
+  syncCountryInBackground(zone.country);
+  return text;
+}
+
 // A zone's month, converted. Throws MirrorError (with the reason) if it isn't
 // on the phone and can't be downloaded.
 export async function getMonth(
@@ -59,7 +81,7 @@ export async function getMonth(
   month: string,
 ): Promise<WaktuSolat[]> {
   const path = monthPath(zone, month);
-  const text = await getText(path, WEEKLY);
+  const text = await monthText(zone, month);
   const memo = converted.get(path);
   if (memo && memo.text === text) return memo.days;
   const days = toWaktuSolat(zone, JSON.parse(text) as PrayerTimeEntry[]);

@@ -3,6 +3,7 @@ import { AppState, Platform, Pressable, Switch, View } from "react-native";
 
 import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
+import { OfflineData } from "@/lib/components/OfflineData";
 import { useMonoStyle } from "@/lib/components/monoui";
 import {
   saveSettings,
@@ -209,6 +210,9 @@ export default function SettingsScreen() {
             </Pressable>
           ))}
         </>
+
+        <SectionTitle>Offline data</SectionTitle>
+        <OfflineData />
 
         {Platform.OS === "android" && (
           <>
