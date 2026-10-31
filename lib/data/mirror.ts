@@ -31,6 +31,10 @@ export class MirrorError extends Error {
 // name changes when their content does, like the dated maps).
 export type Policy = { checkEveryMs: number | null };
 
+// The small lists (countries, zones, methods) are checked daily, so data
+// fixes such as a new zone map reach phones within a day; an unchanged file
+// costs a 304. Prayer-time months are checked weekly.
+export const DAILY: Policy = { checkEveryMs: 24 * 60 * 60 * 1000 };
 export const WEEKLY: Policy = { checkEveryMs: 7 * 24 * 60 * 60 * 1000 };
 export const NEVER: Policy = { checkEveryMs: null };
 

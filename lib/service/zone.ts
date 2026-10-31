@@ -1,12 +1,12 @@
 import PolygonLookup from "polygon-lookup";
 
 import {
+  DAILY,
   getJson,
   getText,
   getYaml,
   NEVER,
   removeOthers,
-  WEEKLY,
 } from "@/lib/data/mirror";
 import { zoneStore } from "@/lib/data/zoneStore";
 import { CalculatedZone, Zone } from "@/lib/domain/zone";
@@ -61,13 +61,13 @@ function nearbyCountry(lat: number, lng: number) {
 // The countries with official timetables (also listed in Settings → Offline data).
 export async function getCountries(): Promise<CountryConfig[]> {
   return (
-    await getYaml<{ countries: CountryConfig[] }>("countries.yaml", WEEKLY)
+    await getYaml<{ countries: CountryConfig[] }>("countries.yaml", DAILY)
   ).countries;
 }
 
 async function getZonesForCountry(countryCode: string): Promise<ZoneConfig[]> {
   return (
-    await getYaml<{ zones: ZoneConfig[] }>(`zones/${countryCode}.yaml`, WEEKLY)
+    await getYaml<{ zones: ZoneConfig[] }>(`zones/${countryCode}.yaml`, DAILY)
   ).zones;
 }
 
@@ -84,7 +84,7 @@ export async function syncCountryMaps(cc: string) {
   const country = (await getCountries()).find((c) => c.code === cc);
   if (!country) return;
   const [zones, geojson, mapping] = countryMapFiles(country);
-  await getText(zones, WEEKLY);
+  await getText(zones, DAILY);
   // Read as text: the maps are only parsed when a lookup needs them.
   await getText(geojson, NEVER);
   await getText(mapping, NEVER);
