@@ -8,6 +8,7 @@ import {
 } from "@/lib/data/countryStore";
 import { loadSettings, saveSettings } from "@/lib/data/settingsStore";
 import { Zone } from "@/lib/domain/zone";
+import { syncCountryMaps } from "@/lib/service/zone";
 
 // Which countries are kept on the phone for offline use, and keeping them up
 // to date (this month and next). The country you're in is added when you
@@ -18,7 +19,10 @@ const monthKey = (date: Date) =>
 
 const months = (date: Date) => [monthKey(date), monthKey(addMonths(date, 1))];
 
+// The country's map files first (so its zones can be found offline), then
+// the prayer times.
 async function syncCountry(cc: string, date: Date, force = false) {
+  await syncCountryMaps(cc);
   const results: SyncResult[] = [];
   for (const month of months(date)) {
     results.push(await syncCountryMonth(cc, month, force));
@@ -76,8 +80,9 @@ export async function downloadCountryNow(cc: string) {
   if (results[0] === "missing") throw new Error("not published");
 }
 
-// Settings → Remove: stop keeping the country and delete it from the phone.
-// Zone files for places you've been stay in the mirror.
+// Settings → Remove: stop keeping the country and delete its prayer times
+// from the phone. Its maps and zone files for places you've been stay in the
+// mirror.
 export async function removeOfflineCountry(cc: string) {
   const settings = await loadSettings();
   await saveSettings({

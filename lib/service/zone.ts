@@ -9,6 +9,7 @@ import {
 } from "@/lib/data/legacyCache";
 import {
   getJson,
+  getText,
   getYaml,
   NEVER,
   removeOthers,
@@ -87,6 +88,25 @@ async function getZonesForCountry(countryCode: string): Promise<ZoneConfig[]> {
     () => readLegacyEntry<ZoneConfig[]>(`zones:${countryCode}`),
     () => removeLegacyEntry(`zones:${countryCode}`),
   );
+}
+
+// The files a country's zone lookup reads: zone list, district map and
+// mapping (all in the mirror).
+export function countryMapFiles(country: CountryConfig): string[] {
+  return [`zones/${country.code}.yaml`, country.geojson, country.mapping];
+}
+
+// Brings a country's map files onto the phone, so its zones can be found
+// offline (Settings → Offline data, and the country you're in). Throws when
+// they can't be downloaded.
+export async function syncCountryMaps(cc: string) {
+  const country = (await getCountries()).find((c) => c.code === cc);
+  if (!country) return;
+  const [zones, geojson, mapping] = countryMapFiles(country);
+  await getText(zones, WEEKLY);
+  // Read as text: the maps are only parsed when a lookup needs them.
+  await getText(geojson, NEVER);
+  await getText(mapping, NEVER);
 }
 
 async function getPolygonLookup(

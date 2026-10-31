@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Platform, Switch, View } from "react-native";
 
 import { countryOffline, CountryOffline } from "@/lib/data/countryStore";
+import { fileSize } from "@/lib/data/mirror";
 import { useSettings } from "@/lib/data/settingsStore";
 import { CountryConfig } from "@/lib/remote/simplesolat";
 import {
   downloadCountryNow,
   removeOfflineCountry,
 } from "@/lib/service/offlineCountries";
-import { getCountries } from "@/lib/service/zone";
+import { countryMapFiles, getCountries } from "@/lib/service/zone";
 
 import { MonoText } from "./MonoText";
 import { useMonoStyle } from "./monoui";
@@ -43,7 +44,16 @@ export function OfflineData() {
 
   const refresh = useCallback((list: CountryConfig[]) => {
     setInfo(
-      Object.fromEntries(list.map((c) => [c.code, countryOffline(c.code)])),
+      Object.fromEntries(
+        list.map((c) => {
+          const times = countryOffline(c.code);
+          // Count the maps too while the times are here: they come with them.
+          const maps = times.months.length
+            ? countryMapFiles(c).reduce((sum, f) => sum + fileSize(f), 0)
+            : 0;
+          return [c.code, { ...times, bytes: times.bytes + maps }];
+        }),
+      ),
     );
   }, []);
 
