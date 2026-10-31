@@ -3,6 +3,8 @@ import PolygonLookup from "polygon-lookup";
 import {
   readLegacyEntry,
   readLegacyFile,
+  removeLegacyEntry,
+  removeLegacyFile,
   withLegacy,
 } from "@/lib/data/legacyCache";
 import {
@@ -68,6 +70,7 @@ async function getCountries(): Promise<CountryConfig[]> {
       (await getYaml<{ countries: CountryConfig[] }>("countries.yaml", WEEKLY))
         .countries,
     () => readLegacyEntry<CountryConfig[]>("countries"),
+    () => removeLegacyEntry("countries"),
   );
 }
 
@@ -81,6 +84,7 @@ async function getZonesForCountry(countryCode: string): Promise<ZoneConfig[]> {
         )
       ).zones,
     () => readLegacyEntry<ZoneConfig[]>(`zones:${countryCode}`),
+    () => removeLegacyEntry(`zones:${countryCode}`),
   );
 }
 
@@ -96,6 +100,7 @@ async function getPolygonLookup(
   const geojson = await withLegacy(
     () => getJson<unknown>(country.geojson, NEVER),
     () => readLegacyFile<unknown>(country.geojson),
+    () => removeLegacyFile(country.geojson),
   );
 
   const lookup = new PolygonLookup(geojson as any);
@@ -116,6 +121,7 @@ async function getMapping(
       readLegacyFile<Record<string, { zone: string; state: string }>>(
         country.mapping,
       ),
+    () => removeLegacyFile(country.mapping),
   );
 }
 

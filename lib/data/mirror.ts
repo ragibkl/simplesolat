@@ -1,5 +1,5 @@
 import { Directory, File, Paths } from "expo-file-system";
-import yaml from "js-yaml";
+import { load as parseYaml } from "js-yaml";
 
 import { coalesce } from "./coalesce";
 
@@ -128,7 +128,7 @@ export async function getJson<T>(pathOrUrl: string, policy: Policy) {
 }
 
 export async function getYaml<T>(pathOrUrl: string, policy: Policy) {
-  return yaml.load(await getText(pathOrUrl, policy)) as T;
+  return parseYaml(await getText(pathOrUrl, policy)) as T;
 }
 
 // Deletes files in a mirror folder (e.g. "geojson") that aren't in `keep`
