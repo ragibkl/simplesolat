@@ -64,7 +64,8 @@ function nearbyCountry(lat: number, lng: number) {
 
 // Country and zone lists, district maps and mappings come from the CDN
 // mirror on the phone (lib/data/mirror.ts).
-async function getCountries(): Promise<CountryConfig[]> {
+// The countries with official timetables (also listed in Settings → Offline data).
+export async function getCountries(): Promise<CountryConfig[]> {
   return withLegacy(
     async () =>
       (await getYaml<{ countries: CountryConfig[] }>("countries.yaml", WEEKLY))

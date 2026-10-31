@@ -14,6 +14,12 @@ export type Settings = {
   widgetExtraTimeChosen?: boolean;
   // Android: today's five prayer times pinned at the top of the notifications.
   pinnedNotification?: boolean;
+  // Countries kept on the phone for offline use (country codes), synced in the
+  // background. The country you're in is added when you arrive.
+  offlineCountries?: string[];
+  // The last country added automatically, so a country removed by hand isn't
+  // added straight back while you're still there.
+  offlineAutoCountry?: string;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
