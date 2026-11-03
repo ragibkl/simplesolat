@@ -1,3 +1,5 @@
+import { Language, t } from "@/lib/i18n/translate";
+
 import { getCalculationMethod } from "./adhanCalculator";
 
 export type OfficialZone = {
@@ -35,9 +37,11 @@ export function getZoneLocationText(zone: Zone): string {
   return zone.countryName;
 }
 
-export function getZoneInfoText(zone: Zone): string {
+export function getZoneInfoText(zone: Zone, lang: Language = "en"): string {
   if (zone.type === "official") {
-    return `${zone.zone} - Source: ${zone.source}`;
+    return t(lang, "zone.source", { zone: zone.zone, source: zone.source });
   }
-  return `Calculated (${getCalculationMethod(zone.country).label})`;
+  return t(lang, "zone.calculated", {
+    method: getCalculationMethod(zone.country).label,
+  });
 }

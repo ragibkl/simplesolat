@@ -12,6 +12,7 @@ import { PrayerTime } from "@/lib/domain/prayerTime";
 import { getZoneDisplayName, Zone } from "@/lib/domain/zone";
 import { loadSettings, WidgetExtraTime } from "@/lib/data/settingsStore";
 import { getPrayerData } from "@/lib/service/prayerData";
+import { dateText, Language, resolveLanguage } from "@/lib/i18n/translate";
 
 import { Empty } from "./Empty";
 import { WaktuColumn } from "./WaktuColumn";
@@ -23,11 +24,12 @@ export type WaktuSolatWidgetProps = {
   zone: Zone;
   prayerTime: PrayerTime;
   extraTime?: WidgetExtraTime;
+  lang?: Language;
 };
 
 export function WaktuSolat(props: WaktuSolatWidgetProps) {
-  const { date, prayerTime, zone, extraTime } = props;
-  const columns = getWidgetColumns(prayerTime, extraTime);
+  const { date, prayerTime, zone, extraTime, lang = "en" } = props;
+  const columns = getWidgetColumns(prayerTime, extraTime, lang);
 
   const { borderColor } = getMonoStyle();
 
@@ -41,7 +43,7 @@ export function WaktuSolat(props: WaktuSolatWidgetProps) {
           alignItems: "center",
         }}
       >
-        <MonoTextWidget>{date.toDateString()}</MonoTextWidget>
+        <MonoTextWidget>{dateText(lang, date)}</MonoTextWidget>
         <MonoTextWidget>{getZoneDisplayName(zone)}</MonoTextWidget>
       </FlexWidget>
 
@@ -76,7 +78,7 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
   if (!data) {
     return;
   }
-  const { widgetExtraTime } = await loadSettings();
+  const { widgetExtraTime, language } = await loadSettings();
 
   props.renderWidget(
     <WaktuSolat
@@ -84,6 +86,7 @@ async function updateWaktuSolatAndRender(props: WidgetTaskHandlerProps) {
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
       extraTime={widgetExtraTime}
+      lang={resolveLanguage(language)}
     />,
   );
 }
@@ -119,7 +122,7 @@ export async function requestWaktuSolatWidgetUpdate(
   zone: Zone,
   prayerTime: PrayerTime,
 ) {
-  const { widgetExtraTime } = await loadSettings();
+  const { widgetExtraTime, language } = await loadSettings();
   await requestWidgetUpdate({
     widgetName: "WaktuSolat",
     renderWidget: () => (
@@ -128,6 +131,7 @@ export async function requestWaktuSolatWidgetUpdate(
         zone={zone}
         prayerTime={prayerTime}
         extraTime={widgetExtraTime}
+        lang={resolveLanguage(language)}
       />
     ),
     widgetNotFound: () => {},

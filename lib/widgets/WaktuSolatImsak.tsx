@@ -6,6 +6,7 @@ import {
 } from "react-native-android-widget";
 
 import { imsakWidgetExtraTime, loadSettings } from "@/lib/data/settingsStore";
+import { resolveLanguage } from "@/lib/i18n/translate";
 import { PrayerTime } from "@/lib/domain/prayerTime";
 import { Zone } from "@/lib/domain/zone";
 import { getPrayerData } from "@/lib/service/prayerData";
@@ -24,7 +25,8 @@ async function updateWaktuSolatImsakAndRender(props: WidgetTaskHandlerProps) {
   if (!data) {
     return;
   }
-  const extraTime = imsakWidgetExtraTime(await loadSettings());
+  const settings = await loadSettings();
+  const extraTime = imsakWidgetExtraTime(settings);
 
   props.renderWidget(
     <WaktuSolat
@@ -32,6 +34,7 @@ async function updateWaktuSolatImsakAndRender(props: WidgetTaskHandlerProps) {
       zone={data.zone}
       prayerTime={data.waktuSolat.prayerTime}
       extraTime={extraTime}
+      lang={resolveLanguage(settings.language)}
     />,
   );
 }
@@ -67,7 +70,8 @@ export async function requestWaktuSolatImsakWidgetUpdate(
   zone: Zone,
   prayerTime: PrayerTime,
 ) {
-  const extraTime = imsakWidgetExtraTime(await loadSettings());
+  const settings = await loadSettings();
+  const extraTime = imsakWidgetExtraTime(settings);
   await requestWidgetUpdate({
     widgetName: "WaktuSolatImsak",
     renderWidget: () => (
@@ -76,6 +80,7 @@ export async function requestWaktuSolatImsakWidgetUpdate(
         zone={zone}
         prayerTime={prayerTime}
         extraTime={extraTime}
+        lang={resolveLanguage(settings.language)}
       />
     ),
     widgetNotFound: () => {},

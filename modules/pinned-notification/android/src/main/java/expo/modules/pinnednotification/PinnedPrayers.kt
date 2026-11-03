@@ -80,7 +80,7 @@ object PinnedPrayers {
   private fun show(context: Context, data: JSONObject, day: JSONObject?, next: JSONObject?, now: Long) {
     val manager = NotificationManagerCompat.from(context)
     if (!manager.areNotificationsEnabled()) return
-    createChannel(context)
+    createChannel(context, data)
 
     val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
     val contentIntent = launch?.let {
@@ -108,15 +108,15 @@ object PinnedPrayers {
     if (next != null) {
       builder.setShowWhen(true).setWhen(next.getLong("start"))
         .setUsesChronometer(true).setChronometerCountDown(true)
-        .setSubText("$zone · ${next.getString("label")} in")
+        .setSubText("$zone · " + text(data, "nextIn", "{prayer} in").replace("{prayer}", next.getString("label")))
     } else {
       builder.setShowWhen(false).setSubText(zone)
     }
 
     if (day == null) {
       builder
-        .setContentTitle("Prayer times")
-        .setContentText("Open simplesolat to update today's times")
+        .setContentTitle(text(data, "title", "Prayer times"))
+        .setContentText(text(data, "openToUpdate", "Open simplesolat to update today's times"))
     } else {
       val views = columnsView(context, day, now)
       builder
@@ -191,16 +191,23 @@ object PinnedPrayers {
     }
   }
 
-  private fun createChannel(context: Context) {
+  // The app's texts in its language (sent with the times), or English.
+  private fun text(data: JSONObject, key: String, fallback: String): String =
+    data.optJSONObject("texts")?.optString(key)?.takeIf { it.isNotEmpty() } ?: fallback
+
+  private fun createChannel(context: Context, data: JSONObject) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
     val manager = context.getSystemService(NotificationManager::class.java)
-    if (manager.getNotificationChannel(CHANNEL_ID) != null) return
+    // Created once with these settings; calling again on an existing channel
+    // only updates its name and description (when the language changes).
     // Default importance keeps it out of the "Silent" section; no sound or
     // vibration, since the prayer reminders do the alerting.
     val channel = NotificationChannel(
-      CHANNEL_ID, "Pinned prayer times", NotificationManager.IMPORTANCE_DEFAULT
+      CHANNEL_ID,
+      text(data, "channel", "Pinned prayer times"),
+      NotificationManager.IMPORTANCE_DEFAULT
     ).apply {
-      description = "Today's five prayer times, pinned in the notifications"
+      description = text(data, "channelDescription", "Today's five prayer times, pinned in the notifications")
       setSound(null, null)
       enableVibration(false)
       setShowBadge(false)

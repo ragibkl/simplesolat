@@ -10,6 +10,7 @@ import { Platform } from "react-native";
 import { loadSettings } from "@/lib/data/settingsStore";
 import { PrayerTime, WaktuSolat } from "@/lib/domain/prayerTime";
 import { Zone, getZoneLocationText } from "@/lib/domain/zone";
+import { Language, loadLanguage, prayerName, t } from "@/lib/i18n";
 
 export const WAKTU_SOLAT_CHANNEL = "waktu_solat";
 
@@ -17,10 +18,13 @@ export const WAKTU_SOLAT_CHANNEL = "waktu_solat";
 // with an older version are cancelled and rescheduled.
 const NOTIFICATION_VERSION = "v2";
 
-function notificationIdPrefix(waktuSolat: WaktuSolat): string {
+// The language is part of the id, so changing it replaces the scheduled
+// reminders (existing ids are otherwise left alone).
+function notificationIdPrefix(waktuSolat: WaktuSolat, lang: Language): string {
   return [
     WAKTU_SOLAT_CHANNEL,
     NOTIFICATION_VERSION,
+    lang,
     waktuSolat.year,
     waktuSolat.month,
     waktuSolat.date,
@@ -28,20 +32,13 @@ function notificationIdPrefix(waktuSolat: WaktuSolat): string {
   ].join("::");
 }
 
-function notificationId(waktuSolat: WaktuSolat, waktu: keyof PrayerTime) {
-  return `${notificationIdPrefix(waktuSolat)}::${waktu}`;
+function notificationId(
+  waktuSolat: WaktuSolat,
+  waktu: keyof PrayerTime,
+  lang: Language,
+) {
+  return `${notificationIdPrefix(waktuSolat, lang)}::${waktu}`;
 }
-
-const PRAYER_NAMES: Record<keyof PrayerTime, string> = {
-  imsak: "Imsak",
-  fajr: "Fajr",
-  syuruk: "Syuruk",
-  dhuha: "Dhuha",
-  dhuhr: "Dhuhr",
-  asr: "Asr",
-  maghrib: "Maghrib",
-  isha: "Isha",
-};
 
 export function getEpochDate(epochSeconds: number): Date {
   const date = new Date(0);
@@ -53,6 +50,7 @@ async function scheduleWaktuSolatNotification(
   waktuSolat: WaktuSolat,
   zone: Zone,
   waktu: keyof PrayerTime,
+  lang: Language,
 ) {
   const epochSeconds = waktuSolat.prayerTime[waktu];
   if (epochSeconds === undefined) {
@@ -73,7 +71,7 @@ async function scheduleWaktuSolatNotification(
   // Create a channel (required for Android)
   const channelId = await notifee.createChannel({
     id: WAKTU_SOLAT_CHANNEL,
-    name: "Prayer Times",
+    name: t(lang, "notification.channel"),
     sound: "default",
     importance: AndroidImportance.HIGH,
   });
@@ -81,9 +79,15 @@ async function scheduleWaktuSolatNotification(
   // Trigger a notification
   await notifee.createTriggerNotification(
     {
-      id: notificationId(waktuSolat, waktu),
-      title: `Waktu Solat - ${PRAYER_NAMES[waktu]} at ${dateText}`,
-      body: `It is now ${PRAYER_NAMES[waktu]} in ${getZoneLocationText(zone)}`,
+      id: notificationId(waktuSolat, waktu, lang),
+      title: t(lang, "notification.title", {
+        prayer: prayerName(lang, waktu),
+        time: dateText,
+      }),
+      body: t(lang, "notification.body", {
+        prayer: prayerName(lang, waktu),
+        place: getZoneLocationText(zone),
+      }),
       android: {
         channelId,
         importance: AndroidImportance.HIGH,
@@ -109,15 +113,16 @@ async function scheduleWaktuSolatNotification(
 }
 
 export async function sendTestNotification() {
+  const lang = await loadLanguage();
   const channelId = await notifee.createChannel({
     id: WAKTU_SOLAT_CHANNEL,
-    name: "Prayer Times",
+    name: t(lang, "notification.channel"),
     sound: "default",
     importance: AndroidImportance.HIGH,
   });
   await notifee.displayNotification({
-    title: "simplesolat test",
-    body: "Prayer time notifications are working.",
+    title: t(lang, "notification.testTitle"),
+    body: t(lang, "notification.testBody"),
     android: { channelId, importance: AndroidImportance.HIGH },
   });
 }
@@ -137,18 +142,18 @@ const FIVE_PRAYERS: (keyof PrayerTime)[] = [
   "isha",
 ];
 
-function nudgeId(epochMs: number): string {
-  return `${WAKTU_SOLAT_CHANNEL}::${NOTIFICATION_VERSION}::nudge::${epochMs}`;
+function nudgeId(epochMs: number, lang: Language): string {
+  return `${WAKTU_SOLAT_CHANNEL}::${NOTIFICATION_VERSION}::${lang}::nudge::${epochMs}`;
 }
 
 // After the last scheduled reminder, ask the user to open the app, so
 // reminders don't stop silently if iOS never gave us background time.
-async function scheduleNudge(epochMs: number) {
+async function scheduleNudge(epochMs: number, lang: Language) {
   await notifee.createTriggerNotification(
     {
-      id: nudgeId(epochMs),
+      id: nudgeId(epochMs, lang),
       title: "simplesolat",
-      body: "Open simplesolat to keep your prayer time reminders coming.",
+      body: t(lang, "notification.stale"),
     },
     { type: TriggerType.TIMESTAMP, timestamp: epochMs },
   );
@@ -206,6 +211,7 @@ async function scheduleAll(days: WaktuSolat[], zone: Zone) {
 
   const isIos = Platform.OS === "ios";
   const { notifications: enabled } = await loadSettings();
+  const lang = await loadLanguage();
   const now = Date.now();
   let candidates: {
     id: string;
@@ -224,7 +230,7 @@ async function scheduleAll(days: WaktuSolat[], zone: Zone) {
       if (isIos && dayIndex >= IOS_EXTRAS_DAYS && !FIVE_PRAYERS.includes(waktu))
         continue;
       candidates.push({
-        id: notificationId(waktuSolat, waktu),
+        id: notificationId(waktuSolat, waktu, lang),
         at: epochSeconds * 1000,
         waktuSolat,
         waktu,
@@ -244,7 +250,7 @@ async function scheduleAll(days: WaktuSolat[], zone: Zone) {
     isIos && days.length > IOS_EXTRAS_DAYS && last
       ? last.at + 10 * 60 * 1000
       : null;
-  const wantedNudge = nudgeAt === null ? null : nudgeId(nudgeAt);
+  const wantedNudge = nudgeAt === null ? null : nudgeId(nudgeAt, lang);
 
   // Once per install, cancel every stored reminder and schedule afresh:
   // notifee crashed reading one stored by an older version
@@ -260,11 +266,11 @@ async function scheduleAll(days: WaktuSolat[], zone: Zone) {
   // then leaves extra reminders rather than missing ones.
   for (const [id, { waktuSolat, waktu }] of wanted) {
     if (!existing.has(id)) {
-      await scheduleWaktuSolatNotification(waktuSolat, zone, waktu);
+      await scheduleWaktuSolatNotification(waktuSolat, zone, waktu, lang);
     }
   }
   if (nudgeAt !== null && wantedNudge && !existing.has(wantedNudge)) {
-    await scheduleNudge(nudgeAt);
+    await scheduleNudge(nudgeAt, lang);
   }
 
   // Anything not wanted goes, including ids in an older format: the app

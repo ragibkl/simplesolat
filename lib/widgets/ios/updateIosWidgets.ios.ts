@@ -1,5 +1,6 @@
 import { loadSettings } from "@/lib/data/settingsStore";
 import { getZoneDisplayName, Zone } from "@/lib/domain/zone";
+import { resolveLanguage } from "@/lib/i18n/translate";
 import { getUpcomingWaktuSolat } from "@/lib/service/waktuSolat";
 
 import { buildTimeline } from "./timeline";
@@ -15,11 +16,12 @@ const WIDGET_DAYS = 3;
 export async function updateIosWidgets(date: Date, zone: Zone): Promise<void> {
   const days = await getUpcomingWaktuSolat(date, WIDGET_DAYS);
   if (!days.length) return;
-  const { widgetExtraTime } = await loadSettings();
+  const { widgetExtraTime, language } = await loadSettings();
   const entries = buildTimeline(
     days,
     getZoneDisplayName(zone),
     widgetExtraTime,
+    resolveLanguage(language),
   );
   if (entries.length) {
     WaktuSolatWidget.updateTimeline(entries);

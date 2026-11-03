@@ -20,6 +20,8 @@ export type Settings = {
   // The last country added automatically, so a country removed by hand isn't
   // added straight back while you're still there.
   offlineAutoCountry?: string;
+  // App language; missing = follow the phone.
+  language?: "system" | "en" | "ms";
 };
 
 export const DEFAULT_SETTINGS: Settings = {

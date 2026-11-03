@@ -12,6 +12,7 @@ import { MonoScrollPage } from "@/lib/components/MonoScrollPage";
 import { MonoText } from "@/lib/components/MonoText";
 import { useMonoStyle } from "@/lib/components/monoui";
 import { FINE_HEADING, useCompass } from "@/lib/hooks/compass";
+import { useI18n } from "@/lib/i18n";
 
 function CompassArrow(props: { rotation: number }) {
   const { color } = useMonoStyle();
@@ -128,6 +129,7 @@ function CardinalLabel(props: {
 
 export default function Compass() {
   const compass = useCompass();
+  const { t } = useI18n();
   const smoothHeading = useSmoothHeading(compass.heading);
   const dial = useAnimatedStyle(() => ({
     transform: [{ rotate: `${-smoothHeading.value}deg` }],
@@ -141,22 +143,22 @@ export default function Compass() {
           {noCompass && qiblaBearing == null ? (
             // iOS only reports the heading once location is allowed.
             <MonoText style={{ fontSize: 16 }}>
-              Allow location access (Settings) to use the Qibla compass.
+              {t("qibla.allowLocation")}
             </MonoText>
           ) : noCompass ? (
             <>
               <MonoText style={{ fontSize: 16 }}>
-                This device has no compass, so it can't point the way.
+                {t("qibla.noCompass")}
               </MonoText>
               {qiblaBearing != null && (
                 <MonoText style={{ fontSize: 16, marginTop: 10 }}>
-                  {`From where you are, the Kaaba is ${qiblaBearing.toFixed(0)}° clockwise from north.`}
+                  {t("qibla.bearingOnly", { bearing: qiblaBearing.toFixed(0) })}
                 </MonoText>
               )}
             </>
           ) : (
             <MonoText style={{ fontSize: 16, textAlign: "center" }}>
-              Waiting for compass...
+              {t("qibla.waiting")}
             </MonoText>
           )}
         </View>
@@ -174,15 +176,16 @@ export default function Compass() {
       <View style={{ flex: 1, paddingBottom: 40, alignItems: "center" }}>
         <View style={{ padding: 20, alignSelf: "stretch" }}>
           <MonoText style={{ fontSize: 18 }}>
-            {`Kaaba direction: ${qiblaBearing.toFixed(0)}°`}
+            {t("qibla.direction", { bearing: qiblaBearing.toFixed(0) })}
           </MonoText>
           <MonoText style={{ fontSize: 18, marginTop: 5 }}>
-            {`You're facing: ${heading.toFixed(0)}°${aligned ? " \u2713" : ""}`}
+            {t("qibla.facing", { heading: heading.toFixed(0) }) +
+              (aligned ? " \u2713" : "")}
           </MonoText>
           <MonoText style={{ fontSize: 18, marginTop: 5 }}>
-            Accuracy: {accuracy}{" "}
+            {t("qibla.accuracy", { accuracy: t(`qibla.accuracy.${accuracy}`) })}{" "}
             {(accuracy === "low" || accuracy === "none") &&
-              "Low accuracy - wave phone in figure-8"}
+              t("qibla.calibrate")}
           </MonoText>
         </View>
 
@@ -190,10 +193,26 @@ export default function Compass() {
           <CompassRing>
             <CompassArrow rotation={qiblaBearing} />
           </CompassRing>
-          <CardinalLabel label="N" rotation={0} heading={smoothHeading} />
-          <CardinalLabel label="E" rotation={90} heading={smoothHeading} />
-          <CardinalLabel label="S" rotation={180} heading={smoothHeading} />
-          <CardinalLabel label="W" rotation={270} heading={smoothHeading} />
+          <CardinalLabel
+            label={t("compass.n")}
+            rotation={0}
+            heading={smoothHeading}
+          />
+          <CardinalLabel
+            label={t("compass.e")}
+            rotation={90}
+            heading={smoothHeading}
+          />
+          <CardinalLabel
+            label={t("compass.s")}
+            rotation={180}
+            heading={smoothHeading}
+          />
+          <CardinalLabel
+            label={t("compass.w")}
+            rotation={270}
+            heading={smoothHeading}
+          />
         </Animated.View>
       </View>
     </MonoScrollPage>
