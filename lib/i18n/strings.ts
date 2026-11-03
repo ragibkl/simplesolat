@@ -205,21 +205,21 @@ export const ms: Record<StringKey, string> = {
   "settings.permissions": "Kebenaran",
   "settings.permissions.allGood": "Semua kebenaran sudah dihidupkan.",
   "settings.fix": "Betulkan",
-  "settings.testNotification": "Hantar pemberitahuan ujian",
-  "settings.testNotificationSent": "Pemberitahuan ujian dihantar",
-  "settings.notifications": "Pemberitahuan",
+  "settings.testNotification": "Hantar notifikasi ujian",
+  "settings.testNotificationSent": "Notifikasi ujian dihantar",
+  "settings.notifications": "Notifikasi",
   "settings.dhuhaNote": "Malaysia, Brunei dan Indonesia sahaja",
   "settings.widget": "Widget",
   "settings.widget.help":
     "Waktu tambahan pada widget Waktu Solat, di sebelah lima waktu solat. Tiada bermaksud lima waktu solat sahaja. Dhuha untuk Malaysia, Brunei dan Indonesia sahaja; di tempat lain widget menunjukkan lima waktu solat.",
   "settings.widget.none": "Tiada",
   "settings.offlineData": "Data luar talian",
-  "settings.pinned": "Pemberitahuan tetap",
-  "settings.pinned.label": "Waktu solat dalam pemberitahuan",
+  "settings.pinned": "Notifikasi tetap",
+  "settings.pinned.label": "Waktu solat dalam notifikasi",
   "settings.pinned.help":
-    "Lima waktu solat hari ini, sentiasa di atas senarai pemberitahuan anda. Senyap.",
+    "Lima waktu solat hari ini, sentiasa di atas senarai notifikasi anda. Senyap.",
 
-  "permission.notifications": "Pemberitahuan",
+  "permission.notifications": "Notifikasi",
   "permission.notifications.help": "Diperlukan untuk peringatan waktu solat.",
   "permission.exactAlarms": "Penggera tepat",
   "permission.exactAlarms.help":
@@ -251,27 +251,27 @@ export const ms: Record<StringKey, string> = {
   "prompt.backgroundError.title": "Ralat Lokasi Latar Belakang",
   "prompt.backgroundError.body":
     "Kebenaran lokasi latar belakang tidak dapat diminta. Widget mungkin tidak dikemas kini secara automatik.",
-  "prompt.notificationError.title": "Ralat Pemberitahuan",
+  "prompt.notificationError.title": "Ralat Notifikasi",
   "prompt.notificationError.body":
-    "Pemberitahuan tidak dapat dimulakan. Peringatan waktu solat mungkin tidak berfungsi. Sila mulakan semula app atau pasang semula jika masalah berterusan.",
+    "Notifikasi tidak dapat dimulakan. Peringatan waktu solat mungkin tidak berfungsi. Sila mulakan semula app atau pasang semula jika masalah berterusan.",
   "prompt.exactAlarm.title": "Kebenaran Penggera Tepat",
   "prompt.exactAlarm.body":
     "App ini memerlukan kebenaran penggera tepat untuk memberitahu anda tepat pada setiap waktu solat.",
   "prompt.battery.title": "Pengoptimuman Bateri",
   "prompt.battery.body":
-    'Supaya pemberitahuan waktu solat sampai tepat pada masanya, cari "simplesolat" dalam senarai, ketik, dan pilih "Tanpa had" (Unrestricted).',
+    'Supaya notifikasi waktu solat sampai tepat pada masanya, cari "simplesolat" dalam senarai, ketik, dan pilih "Tanpa had" (Unrestricted).',
 
   "notification.channel": "Waktu Solat",
   "notification.title": "Waktu Solat - {prayer} pada {time}",
   "notification.body": "Telah masuk waktu {prayer} di {place}",
   "notification.testTitle": "Ujian simplesolat",
-  "notification.testBody": "Pemberitahuan waktu solat berfungsi.",
+  "notification.testBody": "Notifikasi waktu solat berfungsi.",
   "notification.stale":
     "Buka simplesolat supaya peringatan waktu solat anda diteruskan.",
 
   "pinned.channel": "Waktu solat tetap",
   "pinned.channelDescription":
-    "Lima waktu solat hari ini, tetap dalam senarai pemberitahuan",
+    "Lima waktu solat hari ini, tetap dalam senarai notifikasi",
   "pinned.title": "Waktu solat",
   "pinned.openToUpdate": "Buka simplesolat untuk mengemas kini waktu hari ini",
   "pinned.nextIn": "{prayer} dalam",
