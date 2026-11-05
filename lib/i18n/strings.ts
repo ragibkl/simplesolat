@@ -172,7 +172,7 @@ export const ms: Record<StringKey, string> = {
   "home.failure.offline":
     "Waktu solat tidak dapat dimuatkan: tiada sambungan internet.",
   "home.failure.notFound":
-    "Jadual waktu solat zon ini untuk hari ini belum diterbitkan.",
+    "Jadual waktu solat zon ini bagi tarikh ini belum diterbitkan.",
   "home.failure.server":
     "Waktu solat tidak dapat dimuatkan: pelayan tidak menjawab.",
   "home.noLocation": "Lokasi belum ditetapkan",
@@ -188,7 +188,7 @@ export const ms: Record<StringKey, string> = {
     "Dari tempat anda, Kaabah berada {bearing}° ikut arah jam dari utara.",
   "qibla.waiting": "Menunggu kompas...",
   "qibla.direction": "Arah Kaabah: {bearing}°",
-  "qibla.facing": "Arah anda: {heading}°",
+  "qibla.facing": "Anda menghadap: {heading}°",
   "qibla.accuracy": "Ketepatan: {accuracy}",
   "qibla.accuracy.high": "tinggi",
   "qibla.accuracy.medium": "sederhana",
@@ -211,13 +211,13 @@ export const ms: Record<StringKey, string> = {
   "settings.dhuhaNote": "Malaysia, Brunei dan Indonesia sahaja",
   "settings.widget": "Widget",
   "settings.widget.help":
-    "Waktu tambahan pada widget Waktu Solat, di sebelah lima waktu solat. Tiada bermaksud lima waktu solat sahaja. Dhuha untuk Malaysia, Brunei dan Indonesia sahaja; di tempat lain widget menunjukkan lima waktu solat.",
+    "Waktu tambahan pada widget Waktu Solat, di sebelah lima waktu solat. "Tiada" bermaksud lima waktu solat sahaja. Dhuha untuk Malaysia, Brunei dan Indonesia sahaja; di tempat lain widget menunjukkan lima waktu solat.",
   "settings.widget.none": "Tiada",
   "settings.offlineData": "Data luar talian",
-  "settings.pinned": "Notifikasi tetap",
+  "settings.pinned": "Notifikasi disemat",
   "settings.pinned.label": "Waktu solat dalam notifikasi",
   "settings.pinned.help":
-    "Lima waktu solat hari ini, sentiasa di atas senarai notifikasi anda. Senyap.",
+    "Lima waktu solat hari ini, sentiasa di bahagian atas notifikasi anda. Tanpa bunyi.",
 
   "permission.notifications": "Notifikasi",
   "permission.notifications.help": "Diperlukan untuk peringatan waktu solat.",
@@ -239,24 +239,24 @@ export const ms: Record<StringKey, string> = {
   "prompt.skip": "Langkau",
   "prompt.location.title": "Kebenaran Lokasi",
   "prompt.location.body":
-    "App ini memerlukan lokasi anda untuk mengenal pasti zon waktu solat dan memaparkan waktu solat yang tepat untuk kawasan anda.",
+    "Aplikasi ini memerlukan lokasi anda untuk mengenal pasti zon waktu solat dan memaparkan waktu solat yang tepat untuk kawasan anda.",
   "prompt.locationError.title": "Ralat Lokasi",
   "prompt.locationError.body":
     "Kebenaran lokasi tidak dapat diminta. Zon waktu solat mungkin tidak dapat dikenal pasti.",
   "prompt.background.title": "Kebenaran Lokasi Latar Belakang",
   "prompt.background.body.ios":
-    'Supaya waktu solat, peringatan dan widget kekal betul semasa anda bermusafir, pilih "Change to Always Allow" selepas ini. Lokasi anda kekal dalam peranti anda.',
+    'Supaya waktu solat, peringatan dan widget kekal betul semasa anda bermusafir, pilih "Tukar kepada Sentiasa Benarkan" (Change to Always Allow) selepas ini. Lokasi anda kekal dalam peranti anda.',
   "prompt.background.body.android":
-    "App ini memerlukan akses lokasi latar belakang supaya waktu solat dan widget dikemas kini semasa anda bermusafir, walaupun app tidak dibuka.",
+    "Aplikasi ini memerlukan akses lokasi latar belakang supaya waktu solat dan widget dikemas kini semasa anda bermusafir, walaupun aplikasi tidak dibuka.",
   "prompt.backgroundError.title": "Ralat Lokasi Latar Belakang",
   "prompt.backgroundError.body":
     "Kebenaran lokasi latar belakang tidak dapat diminta. Widget mungkin tidak dikemas kini secara automatik.",
   "prompt.notificationError.title": "Ralat Notifikasi",
   "prompt.notificationError.body":
-    "Notifikasi tidak dapat dimulakan. Peringatan waktu solat mungkin tidak berfungsi. Sila mulakan semula app atau pasang semula jika masalah berterusan.",
+    "Notifikasi tidak dapat dimulakan. Peringatan waktu solat mungkin tidak berfungsi. Sila mulakan semula aplikasi atau pasang semula jika masalah berterusan.",
   "prompt.exactAlarm.title": "Kebenaran Penggera Tepat",
   "prompt.exactAlarm.body":
-    "App ini memerlukan kebenaran penggera tepat untuk memberitahu anda tepat pada setiap waktu solat.",
+    "Aplikasi ini memerlukan kebenaran penggera tepat untuk memberitahu anda tepat pada setiap waktu solat.",
   "prompt.battery.title": "Pengoptimuman Bateri",
   "prompt.battery.body":
     'Supaya notifikasi waktu solat sampai tepat pada masanya, cari "simplesolat" dalam senarai, ketik, dan pilih "Tanpa had" (Unrestricted).',
@@ -269,9 +269,9 @@ export const ms: Record<StringKey, string> = {
   "notification.stale":
     "Buka simplesolat supaya peringatan waktu solat anda diteruskan.",
 
-  "pinned.channel": "Waktu solat tetap",
+  "pinned.channel": "Waktu solat disemat",
   "pinned.channelDescription":
-    "Lima waktu solat hari ini, tetap dalam senarai notifikasi",
+    "Lima waktu solat hari ini, disemat dalam notifikasi",
   "pinned.title": "Waktu solat",
   "pinned.openToUpdate": "Buka simplesolat untuk mengemas kini waktu hari ini",
   "pinned.nextIn": "{prayer} dalam",
@@ -287,5 +287,5 @@ export const ms: Record<StringKey, string> = {
   "offline.waiting": "Menunggu internet",
   "offline.notHere": "Tiada dalam telefon ini",
   "offline.updated": "{size} · dikemas kini {date}",
-  "offline.keep": "Simpan {country} untuk luar talian",
+  "offline.keep": "Simpan data {country} untuk luar talian",
 };
