@@ -211,7 +211,7 @@ export const ms: Record<StringKey, string> = {
   "settings.dhuhaNote": "Malaysia, Brunei dan Indonesia sahaja",
   "settings.widget": "Widget",
   "settings.widget.help":
-    "Waktu tambahan pada widget Waktu Solat, di sebelah lima waktu solat. "Tiada" bermaksud lima waktu solat sahaja. Dhuha untuk Malaysia, Brunei dan Indonesia sahaja; di tempat lain widget menunjukkan lima waktu solat.",
+    "Waktu tambahan pada widget Waktu Solat, di sebelah lima waktu solat. \"Tiada\" bermaksud lima waktu solat sahaja. Dhuha untuk Malaysia, Brunei dan Indonesia sahaja; di tempat lain widget menunjukkan lima waktu solat.",
   "settings.widget.none": "Tiada",
   "settings.offlineData": "Data luar talian",
   "settings.pinned": "Notifikasi disemat",
