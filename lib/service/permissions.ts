@@ -3,6 +3,8 @@ import * as Location from "expo-location";
 import notifee, { AndroidNotificationSetting } from "@notifee/react-native";
 import { Alert, Platform } from "react-native";
 
+import { loadLanguage, t } from "@/lib/i18n";
+
 const PROMPTED_KEY = "PERMISSIONS_PROMPTED_V1";
 
 // Ask once, on first launch. After that, the settings page shows what's
@@ -16,17 +18,18 @@ export async function requestPermissionsOnFirstLaunch(): Promise<void> {
 }
 
 export async function requestAllPermissions(): Promise<void> {
+  const lang = await loadLanguage();
   // Foreground location
   try {
     const fgStatus = await Location.getForegroundPermissionsAsync();
     if (fgStatus.status !== "granted") {
       await new Promise<void>((resolve) => {
         Alert.alert(
-          "Location Permission",
-          "This app needs your location to determine your prayer zone and display accurate prayer times for your area.",
+          t(lang, "prompt.location.title"),
+          t(lang, "prompt.location.body"),
           [
             {
-              text: "Ok",
+              text: t(lang, "prompt.ok"),
               style: "default",
               onPress: async () => {
                 await Location.requestForegroundPermissionsAsync();
@@ -39,8 +42,8 @@ export async function requestAllPermissions(): Promise<void> {
     }
   } catch {
     Alert.alert(
-      "Location Error",
-      "Failed to request location permission. Prayer zone detection may not work.",
+      t(lang, "prompt.locationError.title"),
+      t(lang, "prompt.locationError.body"),
     );
   }
 
@@ -51,13 +54,13 @@ export async function requestAllPermissions(): Promise<void> {
     if (bgStatus.status !== "granted") {
       await new Promise<void>((resolve) => {
         Alert.alert(
-          "Background Location Permission",
+          t(lang, "prompt.background.title"),
           Platform.OS === "ios"
-            ? 'To keep your prayer times, reminders and widget right when you travel, choose "Change to Always Allow" next. Your location stays on your device.'
-            : "This app needs background location access to keep your prayer times and widgets updated as you travel, even when the app is not open.",
+            ? t(lang, "prompt.background.body.ios")
+            : t(lang, "prompt.background.body.android"),
           [
             {
-              text: "Ok",
+              text: t(lang, "prompt.ok"),
               style: "default",
               onPress: async () => {
                 await Location.requestBackgroundPermissionsAsync();
@@ -70,8 +73,8 @@ export async function requestAllPermissions(): Promise<void> {
     }
   } catch {
     Alert.alert(
-      "Background Location Error",
-      "Failed to request background location permission. Widgets may not update automatically.",
+      t(lang, "prompt.backgroundError.title"),
+      t(lang, "prompt.backgroundError.body"),
     );
   }
 
@@ -80,8 +83,8 @@ export async function requestAllPermissions(): Promise<void> {
     await notifee.requestPermission();
   } catch {
     Alert.alert(
-      "Notification Error",
-      "Failed to initialize notifications. Prayer time alerts may not work. Please restart the app or reinstall if the issue persists.",
+      t(lang, "prompt.notificationError.title"),
+      t(lang, "prompt.notificationError.body"),
     );
   }
 
@@ -92,16 +95,16 @@ export async function requestAllPermissions(): Promise<void> {
       if (settings.android.alarm !== AndroidNotificationSetting.ENABLED) {
         await new Promise<void>((resolve) => {
           Alert.alert(
-            "Exact Alarm Permission",
-            "This app needs exact alarm permission to notify you precisely when each prayer time begins.",
+            t(lang, "prompt.exactAlarm.title"),
+            t(lang, "prompt.exactAlarm.body"),
             [
               {
-                text: "Skip",
+                text: t(lang, "prompt.skip"),
                 style: "cancel",
                 onPress: () => resolve(),
               },
               {
-                text: "Ok",
+                text: t(lang, "prompt.ok"),
                 style: "default",
                 onPress: async () => {
                   await notifee.openAlarmPermissionSettings();
@@ -122,16 +125,16 @@ export async function requestAllPermissions(): Promise<void> {
       if (batteryOptimized) {
         await new Promise<void>((resolve) => {
           Alert.alert(
-            "Battery Optimization",
-            'To ensure prayer time notifications arrive on time, please find "simplesolat" in the list, tap on it, and select "Unrestricted".',
+            t(lang, "prompt.battery.title"),
+            t(lang, "prompt.battery.body"),
             [
               {
-                text: "Skip",
+                text: t(lang, "prompt.skip"),
                 style: "cancel",
                 onPress: () => resolve(),
               },
               {
-                text: "Ok",
+                text: t(lang, "prompt.ok"),
                 style: "default",
                 onPress: async () => {
                   await notifee.openBatteryOptimizationSettings();

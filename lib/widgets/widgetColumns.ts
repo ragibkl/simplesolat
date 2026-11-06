@@ -1,5 +1,6 @@
 import { WidgetExtraTime } from "@/lib/data/settingsStore";
 import { getSyurukEnd, PrayerTime } from "@/lib/domain/prayerTime";
+import { Language, prayerName } from "@/lib/i18n/translate";
 
 export type WidgetColumn = { label: string; start: number; end?: number };
 
@@ -10,34 +11,36 @@ export type WidgetColumn = { label: string; start: number; end?: number };
 export function getWidgetColumns(
   prayerTime: PrayerTime,
   extraTime: WidgetExtraTime = "syuruk",
+  lang: Language = "en",
 ): WidgetColumn[] {
   const { imsak, fajr, syuruk, dhuha, dhuhr, asr, maghrib, isha } = prayerTime;
+  const name = (prayer: keyof PrayerTime) => prayerName(lang, prayer);
 
   let head: WidgetColumn[];
   if (extraTime === "none" || (extraTime === "dhuha" && dhuha === undefined)) {
-    head = [{ label: "Fajr", start: fajr, end: syuruk }];
+    head = [{ label: name("fajr"), start: fajr, end: syuruk }];
   } else if (extraTime === "imsak") {
     head = [
-      { label: "Imsak", start: imsak, end: fajr },
-      { label: "Fajr", start: fajr, end: syuruk },
+      { label: name("imsak"), start: imsak, end: fajr },
+      { label: name("fajr"), start: fajr, end: syuruk },
     ];
   } else if (extraTime === "dhuha" && dhuha !== undefined) {
     head = [
-      { label: "Fajr", start: fajr, end: syuruk },
-      { label: "Dhuha", start: dhuha, end: dhuhr },
+      { label: name("fajr"), start: fajr, end: syuruk },
+      { label: name("dhuha"), start: dhuha, end: dhuhr },
     ];
   } else {
     head = [
-      { label: "Fajr", start: fajr, end: syuruk },
-      { label: "Syuruk", start: syuruk, end: getSyurukEnd(prayerTime) },
+      { label: name("fajr"), start: fajr, end: syuruk },
+      { label: name("syuruk"), start: syuruk, end: getSyurukEnd(prayerTime) },
     ];
   }
 
   return [
     ...head,
-    { label: "Dhuhr", start: dhuhr, end: asr },
-    { label: "Asr", start: asr, end: maghrib },
-    { label: "Maghrib", start: maghrib, end: isha },
-    { label: "Isha", start: isha },
+    { label: name("dhuhr"), start: dhuhr, end: asr },
+    { label: name("asr"), start: asr, end: maghrib },
+    { label: name("maghrib"), start: maghrib, end: isha },
+    { label: name("isha"), start: isha },
   ];
 }

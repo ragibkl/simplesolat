@@ -17,6 +17,8 @@ import { scheduleAllWaktuSolatNotifications } from "./notifee";
 import { GetLocationOptions } from "./location";
 import { updatePinnedNotification } from "./pinnedNotification";
 import { getPrayerData } from "./prayerData";
+import { resolveLanguage } from "@/lib/i18n/translate";
+
 import { syncOfflineCountries } from "./offlineCountries";
 import { getUpcomingWaktuSolat } from "./waktuSolat";
 
@@ -30,7 +32,7 @@ function widgetMoments(prayerTime: PrayerTime): number[] {
   return [...times, getSyurukEnd(prayerTime)];
 }
 
-// What the Android widgets show: the day, the zone, its times, which of the
+// What the Android widgets show: the language, the day, the zone, its times, which of the
 // day's times have passed (so the bold moves), the widget settings and light
 // or dark. Each widget update starts a background job that loads React
 // Native, which made slow phones report "not responding"; the app and the
@@ -40,8 +42,10 @@ function widgetMoments(prayerTime: PrayerTime): number[] {
 async function widgetsKey(date: Date, zone: Zone, waktuSolat: WaktuSolat) {
   const now = date.getTime() / 1000;
   const times = widgetMoments(waktuSolat.prayerTime);
-  const { widgetExtraTime, widgetExtraTimeChosen } = await loadSettings();
+  const { widgetExtraTime, widgetExtraTimeChosen, language } =
+    await loadSettings();
   return JSON.stringify([
+    resolveLanguage(language),
     date.toDateString(),
     getZoneCode(zone),
     waktuSolat.prayerTime,

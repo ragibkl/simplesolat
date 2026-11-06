@@ -12,12 +12,13 @@ import { Pressable, useColorScheme, View } from "react-native";
 import * as SystemUI from "expo-system-ui";
 
 import { useMonoStyle } from "@/lib/components/monoui";
+import { useI18n } from "@/lib/i18n";
 import { settingsStore } from "@/lib/data/settingsStore";
 import { zoneStore } from "@/lib/data/zoneStore";
 import { requestPermissionsOnFirstLaunch } from "@/lib/service/permissions";
 
 export default function RootLayout() {
-  const { backgroundColor, color, getFontFamily } = useMonoStyle();
+  const { backgroundColor, color } = useMonoStyle();
   const scheme = useColorScheme();
   const navTheme = scheme === "dark" ? DarkTheme : DefaultTheme;
 
@@ -43,53 +44,60 @@ export default function RootLayout() {
         <settingsStore.Provider>
           {/* Dark icons on the light header, light icons in dark mode. */}
           <StatusBar style="auto" />
-          <Stack
-            screenOptions={{
-              headerTintColor: color,
-              headerStyle: { backgroundColor },
-              headerTitleStyle: { fontFamily: getFontFamily() },
-            }}
-          >
-            <Stack.Screen
-              name="index"
-              options={{
-                title: "simplesolat",
-                headerRight: () => (
-                  <View style={{ flexDirection: "row", gap: 12 }}>
-                    {/* Padding + hitSlop: about 44 points to tap (Apple's minimum); the icon stays 20 points. */}
-                    <Link href="/compass" asChild>
-                      <Pressable
-                        hitSlop={8}
-                        style={{ padding: 6 }}
-                        accessibilityLabel="Qibla"
-                        testID="header-qibla"
-                      >
-                        <FontAwesome6 name="kaaba" size={20} color={color} />
-                      </Pressable>
-                    </Link>
-                    <Link href="/settings" asChild>
-                      <Pressable
-                        hitSlop={8}
-                        style={{ padding: 6 }}
-                        accessibilityLabel="Settings"
-                        testID="header-settings"
-                      >
-                        <FontAwesome6 name="gear" size={20} color={color} />
-                      </Pressable>
-                    </Link>
-                  </View>
-                ),
-              }}
-            />
-            <Stack.Screen name="compass" options={{ title: "Qibla" }} />
-            <Stack.Screen name="settings" options={{ title: "Settings" }} />
-            <Stack.Screen
-              name="previews"
-              options={{ title: "Widget Previews" }}
-            />
-          </Stack>
+          <AppStack color={color} backgroundColor={backgroundColor} />
         </settingsStore.Provider>
       </zoneStore.Provider>
     </ThemeProvider>
+  );
+}
+
+// Inside the settings provider, so the titles follow the app language.
+function AppStack(props: { color: string; backgroundColor: string }) {
+  const { color, backgroundColor } = props;
+  const { getFontFamily } = useMonoStyle();
+  const { t } = useI18n();
+  return (
+    <Stack
+      screenOptions={{
+        headerTintColor: color,
+        headerStyle: { backgroundColor },
+        headerTitleStyle: { fontFamily: getFontFamily() },
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "simplesolat",
+          headerRight: () => (
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              {/* Padding + hitSlop: about 44 points to tap (Apple's minimum); the icon stays 20 points. */}
+              <Link href="/compass" asChild>
+                <Pressable
+                  hitSlop={8}
+                  style={{ padding: 6 }}
+                  accessibilityLabel={t("title.qibla")}
+                  testID="header-qibla"
+                >
+                  <FontAwesome6 name="kaaba" size={20} color={color} />
+                </Pressable>
+              </Link>
+              <Link href="/settings" asChild>
+                <Pressable
+                  hitSlop={8}
+                  style={{ padding: 6 }}
+                  accessibilityLabel={t("title.settings")}
+                  testID="header-settings"
+                >
+                  <FontAwesome6 name="gear" size={20} color={color} />
+                </Pressable>
+              </Link>
+            </View>
+          ),
+        }}
+      />
+      <Stack.Screen name="compass" options={{ title: t("title.qibla") }} />
+      <Stack.Screen name="settings" options={{ title: t("title.settings") }} />
+      <Stack.Screen name="previews" options={{ title: "Widget Previews" }} />
+    </Stack>
   );
 }

@@ -5,6 +5,8 @@ import notifee, {
 import * as Location from "expo-location";
 import { Linking, Platform } from "react-native";
 
+import { Language, t } from "@/lib/i18n/translate";
+
 export type PermissionCheck = {
   key: string;
   label: string;
@@ -13,7 +15,9 @@ export type PermissionCheck = {
   fix: () => Promise<unknown>;
 };
 
-export async function getPermissionChecks(): Promise<PermissionCheck[]> {
+export async function getPermissionChecks(
+  lang: Language,
+): Promise<PermissionCheck[]> {
   const settings = await notifee.getNotificationSettings();
   const isAndroid = Platform.OS === "android";
   const batteryOptimized =
@@ -24,8 +28,8 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
   const checks: (PermissionCheck & { androidOnly?: boolean })[] = [
     {
       key: "notifications",
-      label: "Notifications",
-      help: "Needed for prayer time reminders.",
+      label: t(lang, "permission.notifications"),
+      help: t(lang, "permission.notifications.help"),
       ok:
         settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
         settings.authorizationStatus === AuthorizationStatus.PROVISIONAL,
@@ -42,23 +46,23 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
     {
       key: "alarms",
       androidOnly: true,
-      label: "Exact alarms",
-      help: "Lets reminders arrive right at the prayer time.",
+      label: t(lang, "permission.exactAlarms"),
+      help: t(lang, "permission.exactAlarms.help"),
       ok: settings.android.alarm === AndroidNotificationSetting.ENABLED,
       fix: () => notifee.openAlarmPermissionSettings(),
     },
     {
       key: "battery",
       androidOnly: true,
-      label: "Battery unrestricted",
-      help: 'Find "simplesolat" and choose "Unrestricted", so Android doesn\'t delay reminders and widget updates.',
+      label: t(lang, "permission.battery"),
+      help: t(lang, "permission.battery.help"),
       ok: !batteryOptimized,
       fix: () => notifee.openBatteryOptimizationSettings(),
     },
     {
       key: "location",
-      label: "Location",
-      help: "Used on your phone to find your prayer zone. It never leaves your phone.",
+      label: t(lang, "permission.location"),
+      help: t(lang, "permission.location.help"),
       ok: fg.granted,
       fix: async () => {
         if (fg.canAskAgain) {
@@ -70,9 +74,13 @@ export async function getPermissionChecks(): Promise<PermissionCheck[]> {
     },
     {
       key: "backgroundLocation",
-      label:
-        Platform.OS === "ios" ? "Location: Always" : "Location all the time",
-      help: "Keeps reminders and widgets on the right zone when you travel.",
+      label: t(
+        lang,
+        Platform.OS === "ios"
+          ? "permission.locationAlways.ios"
+          : "permission.locationAlways.android",
+      ),
+      help: t(lang, "permission.locationAlways.help"),
       ok: bg.granted,
       fix: async () => {
         if (fg.granted && bg.canAskAgain) {

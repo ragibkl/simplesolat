@@ -16,6 +16,7 @@ import {
 } from "@/lib/hooks/waktuSolat";
 import { useWaktuSolatWidgetUpdate } from "@/lib/hooks/waktuSolatWidget";
 import { useUpdatedZone } from "@/lib/hooks/zone";
+import { dateText as formatDate, useI18n } from "@/lib/i18n";
 
 function LabelText(props: { children: string; bold: boolean }) {
   return (
@@ -64,25 +65,20 @@ function PrayerTimeRow(props: {
   );
 }
 
-const FAILURE_TEXT: Record<LoadFailure, string> = {
-  offline: "Couldn't load the prayer times: no internet connection.",
-  notFound: "This zone's timetable for this day isn't published yet.",
-  server: "Couldn't load the prayer times: the server didn't answer.",
-};
-
 // Instead of empty times: loading, or why the times couldn't be loaded and a
 // way to try again.
 function NoTimes(props: { failure: LoadFailure | null; onRetry: () => void }) {
   const { failure, onRetry } = props;
+  const { t } = useI18n();
   return (
     <View style={{ padding: 25, alignItems: "center", gap: 16 }}>
       <MonoText style={{ fontSize: 16, textAlign: "center" }}>
-        {failure ? FAILURE_TEXT[failure] : "Loading prayer times…"}
+        {failure ? t(`home.failure.${failure}`) : t("home.loading")}
       </MonoText>
       {failure && (
         <Pressable onPress={onRetry} accessibilityRole="button">
           <MonoView style={{ borderWidth: 1, borderRadius: 8, padding: 10 }}>
-            <MonoText style={{ fontSize: 16 }}>Retry</MonoText>
+            <MonoText style={{ fontSize: 16 }}>{t("home.retry")}</MonoText>
           </MonoView>
         </Pressable>
       )}
@@ -112,7 +108,8 @@ function PrayerTimePage(props: {
     isha = 0,
   } = waktuSolat?.prayerTime || {};
 
-  const dateText = displayDate.toDateString();
+  const { lang, prayerName } = useI18n();
+  const dateText = formatDate(lang, displayDate);
 
   return (
     <View>
@@ -129,49 +126,53 @@ function PrayerTimePage(props: {
         <View>
           <PrayerTimeRow
             date={currentDate}
-            label="Imsak"
+            label={prayerName("imsak")}
             start={imsak}
             end={fajr}
           />
           <PrayerTimeRow
             date={currentDate}
-            label="Fajr"
+            label={prayerName("fajr")}
             start={fajr}
             end={syuruk}
           />
           <PrayerTimeRow
             date={currentDate}
-            label="Syuruk"
+            label={prayerName("syuruk")}
             start={syuruk}
             end={waktuSolat ? getSyurukEnd(waktuSolat.prayerTime) : dhuhr}
           />
           {dhuha !== undefined && (
             <PrayerTimeRow
               date={currentDate}
-              label="Dhuha"
+              label={prayerName("dhuha")}
               start={dhuha}
               end={dhuhr}
             />
           )}
           <PrayerTimeRow
             date={currentDate}
-            label="Dhuhr"
+            label={prayerName("dhuhr")}
             start={dhuhr}
             end={asr}
           />
           <PrayerTimeRow
             date={currentDate}
-            label="Asr"
+            label={prayerName("asr")}
             start={asr}
             end={maghrib}
           />
           <PrayerTimeRow
             date={currentDate}
-            label="Maghrib"
+            label={prayerName("maghrib")}
             start={maghrib}
             end={isha}
           />
-          <PrayerTimeRow date={currentDate} label="Isha" start={isha} />
+          <PrayerTimeRow
+            date={currentDate}
+            label={prayerName("isha")}
+            start={isha}
+          />
         </View>
       )}
     </View>
@@ -186,8 +187,9 @@ export default function Index() {
     useWaktuSolatTomorrow();
   useWaktuSolatWidgetUpdate();
 
-  const locationText = zone ? getZoneLocationText(zone) : "Location not set";
-  const zoneText = zone ? getZoneInfoText(zone) : "Location not set";
+  const { lang, t } = useI18n();
+  const locationText = zone ? getZoneLocationText(zone) : t("home.noLocation");
+  const zoneText = zone ? getZoneInfoText(zone, lang) : t("home.noLocation");
 
   return (
     <MonoScrollPage>
@@ -200,7 +202,7 @@ export default function Index() {
         <PrayerTimePage
           currentDate={date}
           displayDate={date}
-          subtitle="Today"
+          subtitle={t("home.today")}
           waktuSolat={waktuSolat}
           failure={failure}
           onRetry={retry}
@@ -208,7 +210,7 @@ export default function Index() {
         <PrayerTimePage
           currentDate={date}
           displayDate={tomorrow}
-          subtitle="Tomorrow"
+          subtitle={t("home.tomorrow")}
           waktuSolat={waktuSolatTomorrow}
           failure={tomorrowFailure}
           onRetry={retryTomorrow}

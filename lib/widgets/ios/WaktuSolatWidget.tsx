@@ -44,7 +44,7 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
       <VStack spacing={0}>
         <HStack>
           <Text modifiers={[mono(11, false), lineLimit(1), secondary]}>
-            {now ? "Now" : "Next"}
+            {now ? props.nowText : props.nextText}
           </Text>
           <Spacer />
           <Text modifiers={[mono(11, false), lineLimit(1), secondary]}>

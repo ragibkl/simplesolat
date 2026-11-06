@@ -10,6 +10,7 @@ import {
   removeOfflineCountry,
 } from "@/lib/service/offlineCountries";
 import { countryMapFiles, getCountries } from "@/lib/service/zone";
+import { shortDateText, useI18n } from "@/lib/i18n";
 
 import { MonoText } from "./MonoText";
 import { useMonoStyle } from "./monoui";
@@ -23,19 +24,13 @@ function sizeText(bytes: number): string {
     : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-function dateText(ms: number): string {
-  return new Date(ms).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-  });
-}
-
 export function OfflineData() {
   const { color, backgroundColor, colorScheme } = useMonoStyle();
   const offTrackColor = colorScheme === "dark" ? "#555555" : "#BDBDBD";
   const onTrackColor =
     Platform.OS === "ios" && colorScheme === "dark" ? "#A0A0A0" : color;
   const { settings } = useSettings();
+  const { lang, t } = useI18n();
   const kept = new Set(settings.offlineCountries ?? []);
 
   const [countries, setCountries] = useState<CountryConfig[]>([]);
@@ -67,13 +62,16 @@ export function OfflineData() {
   }, [refresh]);
 
   const toggle = async (cc: string, keep: boolean) => {
-    setBusy((b) => ({ ...b, [cc]: keep ? "Downloading…" : "Removing…" }));
+    setBusy((b) => ({
+      ...b,
+      [cc]: keep ? t("offline.downloading") : t("offline.removing"),
+    }));
     let message = "";
     try {
       if (keep) await downloadCountryNow(cc);
       else await removeOfflineCountry(cc);
     } catch {
-      message = "Couldn't download. Check the internet connection.";
+      message = t("offline.failed");
     }
     refresh(countries);
     setBusy((b) => ({ ...b, [cc]: message }));
@@ -82,9 +80,7 @@ export function OfflineData() {
   return (
     <>
       <MonoText style={{ fontSize: 13, paddingBottom: 8 }}>
-        Countries kept on your phone, so prayer times work without internet
-        anywhere in them, for this month and next. Kept up to date
-        automatically. The country you are in is added when you arrive.
+        {t("offline.help")}
       </MonoText>
       {countries.map((c) => {
         const on = kept.has(c.code);
@@ -92,10 +88,15 @@ export function OfflineData() {
         const status =
           busy[c.code] ||
           (i?.months.length
-            ? `${sizeText(i.bytes)}${i.checkedAt ? ` · updated ${dateText(i.checkedAt)}` : ""}`
+            ? i.checkedAt
+              ? t("offline.updated", {
+                  size: sizeText(i.bytes),
+                  date: shortDateText(lang, new Date(i.checkedAt)),
+                })
+              : sizeText(i.bytes)
             : on
-              ? "Waiting for internet"
-              : "Not on this phone");
+              ? t("offline.waiting")
+              : t("offline.notHere"));
         return (
           <View
             key={c.code}
@@ -111,7 +112,7 @@ export function OfflineData() {
               <MonoText style={{ fontSize: 12 }}>{status}</MonoText>
             </View>
             <Switch
-              accessibilityLabel={`Keep ${c.name} offline`}
+              accessibilityLabel={t("offline.keep", { country: c.name })}
               value={on}
               disabled={!!busy[c.code]?.endsWith("…")}
               onValueChange={(value) => toggle(c.code, value)}

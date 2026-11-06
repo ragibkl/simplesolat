@@ -1,6 +1,12 @@
 import { WidgetExtraTime } from "@/lib/data/settingsStore";
 import { WaktuSolat } from "@/lib/domain/prayerTime";
 
+import {
+  dateText as formatDate,
+  Language,
+  t as translate,
+} from "@/lib/i18n/translate";
+
 import { getWidgetColumns } from "../widgetColumns";
 
 // What the iOS widget shows at one moment. The widget itself can't compute
@@ -19,6 +25,9 @@ export type IosWidgetProps = {
   nowLabel: string;
   nextLabel: string;
   nextAt: number;
+  // "Now" / "Next" in the app language (the widget can't translate).
+  nowText: string;
+  nextText: string;
 };
 
 export type IosWidgetEntry = { date: Date; props: IosWidgetProps };
@@ -43,12 +52,13 @@ export function buildTimeline(
   days: WaktuSolat[],
   place: string,
   extraTime: WidgetExtraTime,
+  lang: Language = "en",
   now: number = Date.now(),
 ): IosWidgetEntry[] {
   const entries: IosWidgetEntry[] = [];
 
   days.forEach((ws, dayIndex) => {
-    const cols = getWidgetColumns(ws.prayerTime, extraTime);
+    const cols = getWidgetColumns(ws.prayerTime, extraTime, lang);
     const dayStart = startOfDay(ws);
     const dayEnd = dayStart + 24 * 60 * 60 * 1000;
     const columns = cols.map((c) => ({
@@ -56,10 +66,10 @@ export function buildTimeline(
       time: timeText(c.start),
       short: timeText(c.start).replace(/\s*[ap]m$/, ""),
     }));
-    const dateText = new Date(dayStart).toDateString();
+    const dateText = formatDate(lang, new Date(dayStart));
     const tomorrow = days[dayIndex + 1];
     const firstTomorrow = tomorrow
-      ? getWidgetColumns(tomorrow.prayerTime, extraTime)[0]
+      ? getWidgetColumns(tomorrow.prayerTime, extraTime, lang)[0]
       : undefined;
 
     const moments = new Set<number>([dayStart]);
@@ -92,6 +102,8 @@ export function buildTimeline(
           nowLabel: active >= 0 ? cols[active].label : "",
           nextLabel: upcoming?.label ?? "",
           nextAt: upcoming ? upcoming.start * 1000 : 0,
+          nowText: translate(lang, "widget.now"),
+          nextText: translate(lang, "widget.next"),
         },
       });
     });
