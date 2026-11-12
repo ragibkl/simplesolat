@@ -14,6 +14,9 @@ export type ZoneConfig = {
   location: string;
   timezone: string;
   shapes: string[];
+  // The zone's own authority when it differs from the country's (Selangor's
+  // 2027 district zones MFSGR01-09: "Mufti Selangor").
+  source?: string;
 };
 
 export type PrayerTimeEntry = {
