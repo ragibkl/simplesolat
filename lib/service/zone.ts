@@ -1,3 +1,4 @@
+import type { LocationObject } from "expo-location";
 import PolygonLookup from "polygon-lookup";
 
 import {
@@ -8,6 +9,8 @@ import {
   NEVER,
   removeOthers,
 } from "@/lib/data/mirror";
+import { coalesce } from "@/lib/data/coalesce";
+import { zoneCheckStore } from "@/lib/data/zoneCheckStore";
 import { zoneStore } from "@/lib/data/zoneStore";
 import { CalculatedZone, OfficialZone, Zone } from "@/lib/domain/zone";
 import { CountryConfig, ZoneConfig } from "@/lib/remote/simplesolat";
@@ -349,12 +352,25 @@ async function nearAnotherZone(
   return false;
 }
 
-export async function getUpdatedZone(
+// The zone for a location fix: the fix's own zone, or, near a border or a
+// small special zone, the zone of one better fix. Used by the screens and by
+// background updates alike.
+export function resolveZone(
+  location: LocationObject,
   options: GetLocationOptions = {},
-): Promise<Zone | null> {
-  const location = await getLocation(options);
-  if (!location) return await zoneStore.load();
+): Promise<Zone> {
+  // The home screen and the widget updater resolve the same fix at once:
+  // share one lookup (and at most one better fix).
+  const { latitude, longitude, accuracy } = location.coords;
+  return coalesce(`resolveZone:${latitude},${longitude},${accuracy}`, () =>
+    resolveZoneOnce(location, options),
+  );
+}
 
+async function resolveZoneOnce(
+  location: LocationObject,
+  options: GetLocationOptions,
+): Promise<Zone> {
   const { latitude, longitude, accuracy } = location.coords;
   const zone = await lookupZoneByGps(latitude, longitude);
   const rough = accuracy === null || accuracy > TRUSTED_ACCURACY_M;
@@ -363,12 +379,22 @@ export async function getUpdatedZone(
     if (await nearAnotherZone(zone, latitude, longitude, radiusKm)) {
       const precise = await getPreciseLocation(options);
       if (precise) {
-        return await updateZoneViaGps(
+        return await lookupZoneByGps(
           precise.coords.latitude,
           precise.coords.longitude,
         );
       }
     }
   }
-  return await saveZone(zone);
+  return zone;
+}
+
+export async function getUpdatedZone(
+  options: GetLocationOptions = {},
+): Promise<Zone | null> {
+  const location = await getLocation(options);
+  if (!location) return await zoneStore.load();
+  const zone = await saveZone(await resolveZone(location, options));
+  await zoneCheckStore.save(Date.now());
+  return zone;
 }

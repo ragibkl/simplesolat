@@ -14,6 +14,7 @@ import * as SystemUI from "expo-system-ui";
 import { useMonoStyle } from "@/lib/components/monoui";
 import { useI18n } from "@/lib/i18n";
 import { settingsStore } from "@/lib/data/settingsStore";
+import { zoneCheckStore } from "@/lib/data/zoneCheckStore";
 import { zoneStore } from "@/lib/data/zoneStore";
 import { requestPermissionsOnFirstLaunch } from "@/lib/service/permissions";
 
@@ -41,11 +42,13 @@ export default function RootLayout() {
       }}
     >
       <zoneStore.Provider>
-        <settingsStore.Provider>
-          {/* Dark icons on the light header, light icons in dark mode. */}
-          <StatusBar style="auto" />
-          <AppStack color={color} backgroundColor={backgroundColor} />
-        </settingsStore.Provider>
+        <zoneCheckStore.Provider>
+          <settingsStore.Provider>
+            {/* Dark icons on the light header, light icons in dark mode. */}
+            <StatusBar style="auto" />
+            <AppStack color={color} backgroundColor={backgroundColor} />
+          </settingsStore.Provider>
+        </zoneCheckStore.Provider>
       </zoneStore.Provider>
     </ThemeProvider>
   );

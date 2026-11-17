@@ -17,6 +17,21 @@ async function hasLocationPermissions(): Promise<boolean> {
   return true;
 }
 
+// Why the zone can't be checked right now, if it can't: location access
+// not allowed, or the phone's location switched off.
+export type LocationProblem = "denied" | "off";
+
+export async function getLocationProblem(): Promise<LocationProblem | null> {
+  try {
+    const fg = await Location.getForegroundPermissionsAsync();
+    if (fg.status !== "granted") return "denied";
+    if (!(await Location.hasServicesEnabledAsync())) return "off";
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export type GetLocationOptions = {
   // iOS woke the app because the user left the travel geofence. With
   // "Always" permission, iOS allows one location reading in that wake-up,

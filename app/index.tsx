@@ -1,8 +1,22 @@
+import * as Location from "expo-location";
 import { Link } from "expo-router";
-import { Pressable, View } from "react-native";
+import { useState } from "react";
+import { Linking, Platform, Pressable, View } from "react-native";
 
 import { getSyurukEnd, getTimeText, WaktuSolat } from "@/lib/domain/prayerTime";
-import { getZoneInfoText, getZoneLocationText } from "@/lib/domain/zone";
+import {
+  gmtLabel,
+  phoneOffsetMinutes,
+  zoneOffsetMinutes,
+} from "@/lib/domain/timezone";
+import {
+  getZoneDisplayName,
+  getZoneInfoText,
+  getZoneLocationText,
+  Zone,
+} from "@/lib/domain/zone";
+import { getCalculationMethod } from "@/lib/domain/adhanCalculator";
+import type { LocationProblem } from "@/lib/service/location";
 import { LoadFailure } from "@/lib/data/mirror";
 
 import { MonoPager } from "@/lib/components/MonoPager";
@@ -16,7 +30,7 @@ import {
 } from "@/lib/hooks/waktuSolat";
 import { useWaktuSolatWidgetUpdate } from "@/lib/hooks/waktuSolatWidget";
 import { useUpdatedZone } from "@/lib/hooks/zone";
-import { dateText as formatDate, useI18n } from "@/lib/i18n";
+import { dateText as formatDate, shortDateText, useI18n } from "@/lib/i18n";
 
 function LabelText(props: { children: string; bold: boolean }) {
   return (
@@ -179,9 +193,134 @@ function PrayerTimePage(props: {
   );
 }
 
+// "3:42 pm" today, "12 Nov" before.
+function whenText(lang: "en" | "ms", epochMs: number, now: Date): string {
+  const at = new Date(epochMs);
+  if (at.toDateString() === now.toDateString()) {
+    return at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  return shortDateText(lang, at);
+}
+
+// A zone not checked for this long gets a quiet "last checked" line.
+const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
+
+async function fixLocation(problem: LocationProblem) {
+  if (problem === "off" && Platform.OS === "android") {
+    try {
+      // Android's own "turn on location" dialog.
+      await Location.enableNetworkProviderAsync();
+      return;
+    } catch {}
+  }
+  await Linking.openSettings();
+}
+
+// Under the place name: why the zone may be out of date, the time-zone hint
+// and what "calculated" means. Says nothing when all is well.
+function ZoneNotes(props: {
+  zone: Zone;
+  checkedAt: number | null;
+  problem: LocationProblem | null;
+  now: Date;
+}) {
+  const { zone, checkedAt, problem, now } = props;
+  const { lang, t } = useI18n();
+  const place = getZoneDisplayName(zone);
+  const notes: {
+    text: string;
+    action?: { label: string; onPress: () => void };
+  }[] = [];
+
+  if (problem) {
+    const checked = checkedAt
+      ? t("zone.stale.checked", { when: whenText(lang, checkedAt, now) })
+      : "";
+    notes.push({
+      text: t(problem === "off" ? "zone.stale.off" : "zone.stale.denied", {
+        place,
+        checked,
+      }),
+      action: {
+        label: t(problem === "off" ? "zone.stale.turnOn" : "zone.stale.allow"),
+        onPress: () => fixLocation(problem),
+      },
+    });
+  } else if (checkedAt && now.getTime() - checkedAt > STALE_AFTER_MS) {
+    notes.push({
+      text: t("zone.stale.old", { when: whenText(lang, checkedAt, now) }),
+    });
+  }
+
+  if (zone.type === "official") {
+    const zoneOffset = zoneOffsetMinutes(zone.timezone, now);
+    const phoneOffset = phoneOffsetMinutes(now);
+    if (zoneOffset !== null && zoneOffset !== phoneOffset) {
+      const diff = Math.abs(zoneOffset - phoneOffset);
+      const h = Math.floor(diff / 60);
+      const m = diff % 60;
+      notes.push({
+        text: t("zone.tzHint", {
+          phone: gmtLabel(phoneOffset),
+          place,
+          diff: m
+            ? t("zone.tzHint.hoursMinutes", { n: h, m })
+            : t("zone.tzHint.hours", { n: h }),
+          direction: t(
+            zoneOffset > phoneOffset
+              ? "zone.tzHint.ahead"
+              : "zone.tzHint.behind",
+          ),
+        }),
+      });
+    }
+  }
+
+  // A calculated place has no time zone in the data, but its longitude
+  // says when the phone's clock is clearly not local time there (London on
+  // a Malaysian phone: Subuh shown as "1:17 pm").
+  if (zone.type === "calculated") {
+    const solarOffset = (zone.lng / 15) * 60;
+    const phoneOffset = phoneOffsetMinutes(now);
+    if (Math.abs(solarOffset - phoneOffset) > 120) {
+      notes.push({
+        text: t("zone.tzHint.calculated", {
+          phone: gmtLabel(phoneOffset),
+          place,
+        }),
+      });
+    }
+  }
+
+  if (notes.length === 0) return null;
+  return (
+    <View style={{ paddingHorizontal: 5, paddingTop: 6, gap: 8 }}>
+      {notes.map((note) => (
+        <View key={note.text} style={{ gap: 6 }}>
+          <MonoText style={{ fontSize: 13 }}>{note.text}</MonoText>
+          {note.action && (
+            <Pressable
+              onPress={note.action.onPress}
+              accessibilityRole="button"
+              style={{ alignSelf: "flex-start" }}
+            >
+              <MonoView style={{ borderWidth: 1, borderRadius: 8, padding: 6 }}>
+                <MonoText style={{ fontSize: 13 }}>
+                  {note.action.label}
+                </MonoText>
+              </MonoView>
+            </Pressable>
+          )}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export default function Index() {
   const { date } = useCurrentDate();
-  const { zone } = useUpdatedZone();
+  const { zone, checkedAt, problem } = useUpdatedZone();
+  const [explainOpen, setExplainOpen] = useState(false);
   const { waktuSolat, failure, retry } = useWaktuSolatCurrent();
   const { waktuSolatTomorrow, tomorrowFailure, retryTomorrow, tomorrow } =
     useWaktuSolatTomorrow();
@@ -195,7 +334,33 @@ export default function Index() {
     <MonoScrollPage>
       <View style={{ padding: 20, paddingBottom: 0 }}>
         <MonoText style={{ padding: 5, fontSize: 20 }}>{locationText}</MonoText>
-        <MonoText style={{ padding: 5, fontSize: 14 }}>{zoneText}</MonoText>
+        {zone?.type === "calculated" ? (
+          <Pressable
+            onPress={() => setExplainOpen(!explainOpen)}
+            accessibilityRole="button"
+          >
+            <MonoText style={{ padding: 5, fontSize: 14 }}>
+              {`${zoneText} ⓘ`}
+            </MonoText>
+            {explainOpen && (
+              <MonoText style={{ paddingHorizontal: 5, fontSize: 13 }}>
+                {t("zone.calculated.explain", {
+                  method: getCalculationMethod(zone.country).label,
+                })}
+              </MonoText>
+            )}
+          </Pressable>
+        ) : (
+          <MonoText style={{ padding: 5, fontSize: 14 }}>{zoneText}</MonoText>
+        )}
+        {zone && (
+          <ZoneNotes
+            zone={zone}
+            checkedAt={checkedAt}
+            problem={problem}
+            now={date}
+          />
+        )}
       </View>
 
       <MonoPager>

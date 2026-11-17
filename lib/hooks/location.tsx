@@ -3,17 +3,23 @@ import { useState, useEffect, useCallback } from "react";
 import { AppState } from "react-native";
 
 import { useCurrentDate } from "@/lib/hooks/date";
-import { getLocation } from "@/lib/service/location";
+import {
+  getLocation,
+  getLocationProblem,
+  LocationProblem,
+} from "@/lib/service/location";
 
 export function useLocation() {
   const { date } = useCurrentDate();
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null,
   );
+  const [problem, setProblem] = useState<LocationProblem | null>(null);
 
   const updateLocation = useCallback(async () => {
     const location = await getLocation();
     setLocation(location);
+    setProblem(location ? null : await getLocationProblem());
 
     return location;
   }, []);
@@ -32,5 +38,5 @@ export function useLocation() {
     return () => sub.remove();
   }, [updateLocation]);
 
-  return { location, updateLocation };
+  return { location, problem, updateLocation };
 }

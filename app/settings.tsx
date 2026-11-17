@@ -296,6 +296,11 @@ export default function SettingsScreen() {
         <SectionTitle>{t("settings.offlineData")}</SectionTitle>
         <OfflineData />
 
+        <SectionTitle>{t("settings.dataSources")}</SectionTitle>
+        <MonoText style={{ fontSize: 13 }}>
+          {t("settings.dataSources.text")}
+        </MonoText>
+
         {!needsFix && permissions}
       </View>
     </MonoScrollPage>
