@@ -276,6 +276,22 @@ function ZoneNotes(props: {
     }
   }
 
+  // A calculated place has no time zone in the data, but its longitude
+  // says when the phone's clock is clearly not local time there (London on
+  // a Malaysian phone: Subuh shown as "1:17 pm").
+  if (zone.type === "calculated") {
+    const solarOffset = (zone.lng / 15) * 60;
+    const phoneOffset = phoneOffsetMinutes(now);
+    if (Math.abs(solarOffset - phoneOffset) > 120) {
+      notes.push({
+        text: t("zone.tzHint.calculated", {
+          phone: gmtLabel(phoneOffset),
+          place,
+        }),
+      });
+    }
+  }
+
   if (notes.length === 0) return null;
   return (
     <View style={{ paddingHorizontal: 5, paddingTop: 6, gap: 8 }}>

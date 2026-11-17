@@ -42,6 +42,8 @@ export const en = {
   "zone.stale.allow": "Allow location",
   "zone.tzHint":
     "Times are in your phone's time ({phone}). The clock in {place} is {diff} {direction} your phone's.",
+  "zone.tzHint.calculated":
+    "Times are in your phone's time ({phone}), not the local time in {place}.",
   "zone.tzHint.ahead": "ahead of",
   "zone.tzHint.behind": "behind",
   "zone.tzHint.hours": "{n} h",
@@ -208,6 +210,8 @@ export const ms: Record<StringKey, string> = {
   "zone.stale.allow": "Benarkan lokasi",
   "zone.tzHint":
     "Waktu ikut jam telefon anda ({phone}). Jam di {place} {diff} {direction} jam telefon anda.",
+  "zone.tzHint.calculated":
+    "Waktu ikut jam telefon anda ({phone}), bukan waktu tempatan di {place}.",
   "zone.tzHint.ahead": "lebih awal daripada",
   "zone.tzHint.behind": "lebih lambat daripada",
   "zone.tzHint.hours": "{n} jam",
