@@ -222,7 +222,7 @@ async function lookupOfficialZone(
     state: zoneEntry.state,
     district,
     timezone: zoneConfig.timezone,
-    source: countryConfig.source,
+    source: zoneConfig.source ?? countryConfig.source,
   };
 }
 
