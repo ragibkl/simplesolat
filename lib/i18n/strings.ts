@@ -32,6 +32,22 @@ export const en = {
   "zone.source": "{zone} - Source: {source}",
   "zone.calculated": "Calculated ({method})",
   "zone.unknownCountry": "Unknown",
+  "zone.stale.off":
+    "Location is off, so the zone can't be checked. Showing times for {place}{checked}.",
+  "zone.stale.denied":
+    "Location access is off for simplesolat. Showing times for {place}{checked}.",
+  "zone.stale.old": "Zone last checked {when}.",
+  "zone.stale.checked": ", last checked {when}",
+  "zone.stale.turnOn": "Turn on location",
+  "zone.stale.allow": "Allow location",
+  "zone.tzHint":
+    "Times are in your phone's time ({phone}). The clock in {place} is {diff} {direction} your phone's.",
+  "zone.tzHint.ahead": "ahead of",
+  "zone.tzHint.behind": "behind",
+  "zone.tzHint.hours": "{n} h",
+  "zone.tzHint.hoursMinutes": "{n} h {m} min",
+  "zone.calculated.explain":
+    "There's no official timetable here, so simplesolat calculates the times with the {method} method. They can differ from your local mosque by a few minutes.",
 
   // Qibla
   "qibla.allowLocation":
@@ -68,6 +84,9 @@ export const en = {
     "Extra time shown on the Waktu Solat widgets, next to the five prayers. None shows only the five prayers. Dhuha is for Malaysia, Brunei and Indonesia only; elsewhere the widget shows the five prayers.",
   "settings.widget.none": "None",
   "settings.offlineData": "Offline data",
+  "settings.dataSources": "Data sources",
+  "settings.dataSources.text":
+    "Prayer times: the official timetables of each country's religious authority (JAKIM, the state muftis, MUIS, KHEU, Kemenag and others); calculated elsewhere. Zone maps: © OpenStreetMap contributors (ODbL) and geoBoundaries.",
   "settings.pinned": "Pinned notification",
   "settings.pinned.label": "Prayer times in notifications",
   "settings.pinned.help":
@@ -179,6 +198,22 @@ export const ms: Record<StringKey, string> = {
   "zone.source": "{zone} - Sumber: {source}",
   "zone.calculated": "Kiraan ({method})",
   "zone.unknownCountry": "Tidak diketahui",
+  "zone.stale.off":
+    "Lokasi telefon dimatikan, jadi zon tak dapat disemak. Menunjukkan waktu untuk {place}{checked}.",
+  "zone.stale.denied":
+    "Akses lokasi untuk simplesolat dimatikan. Menunjukkan waktu untuk {place}{checked}.",
+  "zone.stale.old": "Zon kali terakhir disemak {when}.",
+  "zone.stale.checked": ", kali terakhir disemak {when}",
+  "zone.stale.turnOn": "Hidupkan lokasi",
+  "zone.stale.allow": "Benarkan lokasi",
+  "zone.tzHint":
+    "Waktu ikut jam telefon anda ({phone}). Jam di {place} {diff} {direction} jam telefon anda.",
+  "zone.tzHint.ahead": "lebih awal daripada",
+  "zone.tzHint.behind": "lebih lambat daripada",
+  "zone.tzHint.hours": "{n} jam",
+  "zone.tzHint.hoursMinutes": "{n} jam {m} minit",
+  "zone.calculated.explain":
+    "Tiada jadual waktu solat rasmi di sini, jadi simplesolat mengira waktu dengan kaedah {method}. Waktu mungkin berbeza beberapa minit daripada masjid berhampiran.",
 
   "qibla.allowLocation":
     "Benarkan akses lokasi (Tetapan) untuk menggunakan kompas kiblat.",
@@ -211,9 +246,12 @@ export const ms: Record<StringKey, string> = {
   "settings.dhuhaNote": "Malaysia, Brunei dan Indonesia sahaja",
   "settings.widget": "Widget",
   "settings.widget.help":
-    "Waktu tambahan pada widget Waktu Solat, di sebelah lima waktu solat. \"Tiada\" bermaksud lima waktu solat sahaja. Dhuha untuk Malaysia, Brunei dan Indonesia sahaja; di tempat lain widget menunjukkan lima waktu solat.",
+    'Waktu tambahan pada widget Waktu Solat, di sebelah lima waktu solat. "Tiada" bermaksud lima waktu solat sahaja. Dhuha untuk Malaysia, Brunei dan Indonesia sahaja; di tempat lain widget menunjukkan lima waktu solat.',
   "settings.widget.none": "Tiada",
   "settings.offlineData": "Data luar talian",
+  "settings.dataSources": "Sumber data",
+  "settings.dataSources.text":
+    "Waktu solat: jadual rasmi pihak berkuasa agama setiap negara (JAKIM, jabatan mufti negeri, MUIS, KHEU, Kemenag dan lain-lain); dikira di tempat lain. Peta zon: © penyumbang OpenStreetMap (ODbL) dan geoBoundaries.",
   "settings.pinned": "Notifikasi disemat",
   "settings.pinned.label": "Waktu solat dalam notifikasi",
   "settings.pinned.help":
