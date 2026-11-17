@@ -61,3 +61,34 @@ export async function getLocation(
     return null;
   }
 }
+
+// A fix good enough to tell neighbouring zones apart (about 100 m), for
+// when the cheap fix lands near a zone border or one of JAKIM's small special
+// zones. Null if the user only allowed approximate location, or no fix comes
+// in time.
+const PRECISE_FIX_TIMEOUT_MS = 15_000;
+
+export async function getPreciseLocation(
+  options: GetLocationOptions = {},
+): Promise<Location.LocationObject | null> {
+  try {
+    if (!(await hasLocationPermissions())) return null;
+    const fg = await Location.getForegroundPermissionsAsync();
+    if (fg.android?.accuracy === "coarse" || fg.ios?.accuracy === "reduced") {
+      return null;
+    }
+    if (AppState.currentState !== "active" && !options.woken) {
+      if (!(await Location.isBackgroundLocationAvailableAsync())) return null;
+    }
+    return await Promise.race([
+      Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      }),
+      new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), PRECISE_FIX_TIMEOUT_MS),
+      ),
+    ]);
+  } catch {
+    return null;
+  }
+}
