@@ -9,12 +9,16 @@ import {
   removeOthers,
 } from "@/lib/data/mirror";
 import { zoneStore } from "@/lib/data/zoneStore";
-import { CalculatedZone, Zone } from "@/lib/domain/zone";
+import { CalculatedZone, OfficialZone, Zone } from "@/lib/domain/zone";
 import { CountryConfig, ZoneConfig } from "@/lib/remote/simplesolat";
 
 import countriesGeoData from "@/assets/geodata/countries-adm0.json";
 
-import { getLocation, GetLocationOptions } from "./location";
+import {
+  getLocation,
+  GetLocationOptions,
+  getPreciseLocation,
+} from "./location";
 
 // Bundled ADM0 for fast country detection: Natural Earth 1:10m countries,
 // simplified to 20% with coordinates rounded to ~10 m (2.2 MB)
@@ -292,8 +296,11 @@ export async function updateZoneViaGps(
   lat: number,
   lng: number,
 ): Promise<Zone> {
+  return await saveZone(await lookupZoneByGps(lat, lng));
+}
+
+async function saveZone(newZone: Zone): Promise<Zone> {
   const existingZone = await zoneStore.load();
-  const newZone = await lookupZoneByGps(lat, lng);
 
   if (
     existingZone &&
@@ -306,16 +313,62 @@ export async function updateZoneViaGps(
   return newZone;
 }
 
+// The cheap location fix can be a few km off. Within that distance of a zone
+// border, or of one of JAKIM's small special zones (Genting Highlands, Bukit
+// Fraser and the other hilltop circles are only 2-4 km across), it can land
+// in the wrong zone: up to 7 minutes off at Maghrib. Then one better fix
+// (Wi-Fi/cell, about 100 m) settles it. Fixes better than this are trusted.
+const TRUSTED_ACCURACY_M = 300;
+// About 1, 2, 3 and 5 km, in eight directions.
+const AROUND_STEPS_DEG = [0.01, 0.02, 0.03, 0.045];
+const KM_PER_DEG = 111;
+
+// Whether a point within `radiusKm` of the fix belongs to another official
+// zone of the same country (the sea and other countries don't count).
+async function nearAnotherZone(
+  zone: OfficialZone,
+  lat: number,
+  lng: number,
+  radiusKm: number,
+): Promise<boolean> {
+  const countryConfig = (await getCountries()).find(
+    (c) => c.code === zone.country,
+  );
+  if (!countryConfig) return false;
+  for (const step of AROUND_STEPS_DEG) {
+    if (step * KM_PER_DEG > radiusKm + 0.5) break;
+    for (const [dLat, dLng] of DIRECTIONS) {
+      const other = await lookupOfficialZone(
+        countryConfig,
+        lat + dLat * step,
+        lng + dLng * step,
+      );
+      if (other?.type === "official" && other.zone !== zone.zone) return true;
+    }
+  }
+  return false;
+}
+
 export async function getUpdatedZone(
   options: GetLocationOptions = {},
 ): Promise<Zone | null> {
   const location = await getLocation(options);
-  if (location) {
-    return await updateZoneViaGps(
-      location.coords.latitude,
-      location.coords.longitude,
-    );
-  }
+  if (!location) return await zoneStore.load();
 
-  return await zoneStore.load();
+  const { latitude, longitude, accuracy } = location.coords;
+  const zone = await lookupZoneByGps(latitude, longitude);
+  const rough = accuracy === null || accuracy > TRUSTED_ACCURACY_M;
+  if (zone.type === "official" && rough) {
+    const radiusKm = Math.min(Math.max((accuracy ?? 3000) / 1000, 1), 5);
+    if (await nearAnotherZone(zone, latitude, longitude, radiusKm)) {
+      const precise = await getPreciseLocation(options);
+      if (precise) {
+        return await updateZoneViaGps(
+          precise.coords.latitude,
+          precise.coords.longitude,
+        );
+      }
+    }
+  }
+  return await saveZone(zone);
 }
