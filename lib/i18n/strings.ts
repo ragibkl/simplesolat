@@ -158,6 +158,7 @@ export const en = {
   // Widgets
   "widget.now": "Now",
   "widget.next": "Next",
+  "widget.stale": "Open simplesolat to update the prayer times",
 
   // Offline data
   "offline.help":
@@ -320,6 +321,7 @@ export const ms: Record<StringKey, string> = {
 
   "widget.now": "Kini",
   "widget.next": "Seterusnya",
+  "widget.stale": "Buka simplesolat untuk kemas kini waktu solat",
 
   "offline.help":
     "Negara yang disimpan dalam telefon anda, supaya waktu solat berfungsi tanpa internet di mana-mana tempat dalam negara itu, untuk bulan ini dan bulan depan. Dikemas kini secara automatik. Negara tempat anda berada ditambah apabila anda tiba.",

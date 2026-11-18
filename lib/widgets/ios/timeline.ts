@@ -28,6 +28,9 @@ export type IosWidgetProps = {
   // "Now" / "Next" in the app language (the widget can't translate).
   nowText: string;
   nextText: string;
+  // Set on the entry after the last day the app worked out: the widget then
+  // asks to open the app instead of showing old times.
+  staleText?: string;
 };
 
 export type IosWidgetEntry = { date: Date; props: IosWidgetProps };
@@ -108,6 +111,29 @@ export function buildTimeline(
       });
     });
   });
+
+  // After the last day: iOS keeps showing the last entry once the timeline
+  // runs out (yesterday's Isha in the morning), so end with a note instead.
+  const last = days[days.length - 1];
+  if (last) {
+    const end = startOfDay(last) + 24 * 60 * 60 * 1000;
+    entries.push({
+      date: new Date(Math.max(end, now)),
+      props: {
+        dateText: "",
+        place,
+        columns: [],
+        active: -1,
+        next: translate(lang, "widget.stale"),
+        nowLabel: "",
+        nextLabel: "",
+        nextAt: 0,
+        nowText: "",
+        nextText: "",
+        staleText: translate(lang, "widget.stale"),
+      },
+    });
+  }
 
   return entries;
 }
