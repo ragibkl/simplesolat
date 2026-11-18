@@ -35,6 +35,26 @@ const WaktuSolatWidget = (props: IosWidgetProps, env: WidgetEnvironment) => {
     );
   }
 
+  // The timeline ran out (the app hasn't run for days): no old times.
+  if (props.staleText) {
+    return (
+      <VStack spacing={6}>
+        <Text modifiers={[mono(11, false), lineLimit(1), secondary]}>
+          {props.place}
+        </Text>
+        <Text
+          modifiers={[
+            mono(15, true),
+            lineLimit(3),
+            multilineTextAlignment("center"),
+          ]}
+        >
+          {props.staleText}
+        </Text>
+      </VStack>
+    );
+  }
+
   // systemMedium: the current prayer in large type with a countdown to the
   // next one, above the Android widget's row of times in a rounded box.
   // Between prayers (after Syuruk, or after midnight) it leads with the next.
